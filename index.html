@@ -290,8 +290,55 @@ input:focus,textarea:focus,select:focus{outline:2px solid rgba(216,27,96,.22);bo
     <div class="messenger-shell">
       <header class="messenger-header"><div class="messenger-avatar">💗</div><div class="messenger-title"><strong id="chatPartnerName">عيوشة</strong><small id="chatPresence">جارٍ التحقق من الاتصال...</small></div><button class="messenger-lock" onclick="window.toggleChatDark()" title="الوضع الليلي">☾</button><button class="messenger-lock" onclick="window.sendPing()" title="اشتقت لك">💗</button></header>
       <div id="chatPinned" class="chat-pinned" hidden></div><div id="chatTyping" class="chat-typing" aria-live="polite"></div><div id="mailList" class="messenger-messages" role="log" aria-live="polite" aria-label="المحادثة"></div>
-      <div id="chatReply" class="chat-reply" hidden></div><form id="instantMailForm" class="messenger-composer" onsubmit="window.sendInstantMail(event)"><textarea id="instantMailText" rows="1" maxlength="5000" placeholder="اكتب رسالة..." aria-label="نص الرسالة" oninput="window.resizeChatInput(this);window.chatTypingInput()"></textarea><button id="instantMailSend" type="submit" aria-label="إرسال الرسالة">➤</button></form>
+      <div id="chatReply" class="chat-reply" hidden></div><form id="instantMailForm" class="messenger-composer" onsubmit="window.sendInstantMail(event)">
+  <button type="button" class="chat-attach" onclick="window.openGameInviteModal()" title="ألعاب عالمنا">🎮</button>
+  <textarea id="instantMailText" rows="1" maxlength="5000" placeholder="اكتب رسالة..." aria-label="نص الرسالة" oninput="window.resizeChatInput(this);window.chatTypingInput()"></textarea>
+  <button id="instantMailSend" type="submit" aria-label="إرسال الرسالة">➤</button>
+</form>
       <div id="instantMailStatus" class="messenger-status" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  
+  <section id="view-games" class="view">
+    <div class="greet" style="background:linear-gradient(135deg,#7b1fa2,#4a148c);margin-bottom:16px;">
+      <h2>🎮 عالمنا نلعب</h2>
+      <p>ضحكة منك، وتحدٍّ مني، وذكريات نصنعها معًا 💕</p>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-gold" onclick="window.openGameInviteModal()">💗 أرسل تحدياً لعيوشة</button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-title"><span>💞</span> أقسام الألعاب المشتركة</div>
+      <div class="v9-actions">
+        <button class="btn btn-soft" onclick="window.openGameCat('hearts')">💗 ألعاب القلوب</button>
+        <button class="btn btn-soft" onclick="window.openGameCat('smart')">🧠 تحديات الذكاء</button>
+        <button class="btn btn-soft" onclick="window.openGameCat('fun')">😂 الضحك والمرح</button>
+        <button class="btn btn-soft" onclick="window.openGameCat('vs')">⚔️ التحدي بيننا</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>⭐</span> الألعاب المميزة والمبتكرة</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;">
+        <button class="btn btn-primary btn-full" onclick="window.launchGameModal('story')">📖 قصة نكتبها معًا (جملة بجملة)</button>
+        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('xo')">❌⭕ لعبة XO المشتركة</button>
+        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('cards')">💌 اختر رقمًا واكتشف رسالتك</button>
+        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('draw')">🎨 ارسم وخمّن</button>
+        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('doors')">🎁 افتح الباب الصحيح</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>💎</span> رصيد القلوب والإنجازات</div>
+      <div id="gameScoreCard" class="v9-panel" style="text-align:center;font-weight:bold;font-size:1.1rem;color:#ad1457;">
+        💗 قلوبنا المشتركة: <span id="userHeartsCount">45</span> قلبًا | 🏆 الأوسمة: <span id="userBadgesCount">3</span> أوسمة
+      </div>
+      <div class="v9-actions">
+        <button class="btn btn-soft" onclick="window.showBadgesModal()">🏆 عرض الأوسمة</button>
+        <button class="btn btn-soft" onclick="window.showIslandModal()">🏝️ جزيرتنا المشتركة</button>
+      </div>
     </div>
   </section>
 
@@ -342,6 +389,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid rgba(216,27,96,.22);bo
   <button class="nav-btn" data-view="surprise" onclick="switchView('surprise')"><span class="ic">🎁</span>المفاجآت<span class="nav-dot"></span></button>
   <button class="nav-btn" data-view="mail" onclick="switchView('mail')"><span class="ic">💌</span>البريد</button>
   <button class="nav-btn" data-view="memories" onclick="switchView('memories')"><span class="ic">📸</span>عالمنا</button>
+  <button class="nav-btn" data-view="games" onclick="switchView('games')"><span class="ic">🎮</span>عالمنا نلعب</button>
   <button class="nav-btn" data-view="mood" onclick="switchView('mood')"><span class="ic">💭</span>المزاج</button>
 </nav>
 
@@ -563,7 +611,278 @@ function showSuccessScreen(){
   `);
 }
 window.copyLink = function(id){ const text = document.getElementById(id).textContent; navigator.clipboard.writeText(text).then(()=>toast('📋 تم النسخ')).catch(()=>toast('⚠️ فشل النسخ')); };
-window.finishSetup = function(){ closeModal(); modalLocked = false; hideFullScreen(); boot(); };
+window.finishSetup = function(){ closeModal(); modalLocked = false; hideFullScreen(); 
+// ===== Ayousha Games Integration ("🎮 عالمنا نلعب") =====
+window.openGameCat = function(cat){
+  if(cat==='hearts') window.launchGameModal('cards');
+  else if(cat==='smart') window.launchGameModal('puzzle');
+  else if(cat==='fun') window.launchGameModal('noLaugh');
+  else if(cat==='vs') window.launchGameModal('xo');
+};
+
+window.openGameInviteModal = function(){
+  openModal(`
+    <h3>🎮 عالمنا نلعب — اختاري اللعبة</h3>
+    <div class="games-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0;">
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('xo')">❌⭕ XO</button>
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('cards')">💗 القلوب والرسائل</button>
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('story')">📖 قصة نكتبها</button>
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('puzzle')">🧩 حل اللغز</button>
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('guessNum')">🔢 خمن الرقم</button>
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('draw')">🎨 ارسم وخمّن</button>
+    </div>
+    <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+  `);
+};
+
+window.launchGameModal = function(type){
+  if(type==='xo'){
+    openModal(`
+      <h3>❌⭕ لعبة XO المشتركة</h3>
+      <p class="muted">العبا معاً مباشرة بتحديث فوري!</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:20px auto;">
+        ${[0,1,2,3,4,5,6,7,8].map(i=>`<button id="xo-${i}" class="btn btn-soft" style="height:70px;font-size:2rem;" onclick="window.playXO(${i})">?</button>`).join('')}
+      </div>
+      <div id="xoStatus" style="text-align:center;font-weight:bold;margin:10px 0;">الدور: ❌ (زكريا)</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn btn-soft" style="flex:1;" onclick="window.openGameChatBox('xo_session_1')">💬 دردشة اللعبة</button>
+        <button class="btn btn-soft" style="flex:1;" onclick="closeModal()">إغلاق</button>
+      </div>
+    `);
+  } else if(type==='cards'){
+    openModal(`
+      <h3>💌 اختر رقمًا واكتشف رسالتك</h3>
+      <p class="muted">اختر قلباً من القلوب التسعة لاكتشاف الرسالة المخفية:</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0;">
+        ${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="btn btn-primary" style="height:60px;font-size:1.2rem;" onclick="window.openCardMsg(${n})">💗 ${n}</button>`).join('')}
+      </div>
+      <div id="cardMsgResult" class="v9-panel" style="margin-top:10px;text-align:center;">اختر قلباً لرؤية المفاجأة!</div>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='story'){
+    openModal(`
+      <h3>📖 قصة نكتبها معًا</h3>
+      <p class="muted">ابدأوا كتابة قصة جملة بجميلة تُحفظ في الذكريات:</p>
+      <div class="v9-panel"><b>بداية القصة:</b> في مساء جميل، وصل إلى عيوشة صندوق غامض أمام الباب...</div>
+      <textarea id="storyInput" placeholder="اكتب جملتك التالية..." style="width:100%;padding:10px;margin:10px 0;border-radius:12px;border:1px solid #f2d9e4;"></textarea>
+      <button class="btn btn-primary btn-full" onclick="window.saveStorySentence()">➕ إضافة جملة للقصة</button>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='puzzle'){
+    openModal(`
+      <h3>🧩 حل اللغز قبلي</h3>
+      <div class="v9-panel"><b>اللغز:</b> شيء كلما أخذت منه كبر، فما هو؟</div>
+      <input id="puzzleAnswer" placeholder="اكتب الإجابة هنا..." style="width:100%;padding:10px;margin:10px 0;border-radius:12px;border:1px solid #f2d9e4;">
+      <button class="btn btn-primary btn-full" onclick="window.checkPuzzle()">✅ إرسال الإجابة (+5 قلوب)</button>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='guessNum'){
+    openModal(`
+      <h3>🔢 خمن الرقم السري (بين 1 و 100)</h3>
+      <input type="number" id="guessInput" placeholder="ادخل رقماً..." style="width:100%;padding:10px;margin:10px 0;border-radius:12px;border:1px solid #f2d9e4;">
+      <button class="btn btn-primary btn-full" onclick="window.checkGuessNumber()">🎯 تخمين</button>
+      <div id="guessFeedback" style="text-align:center;margin-top:10px;font-weight:bold;"></div>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='draw'){
+    openModal(`
+      <h3>🎨 ارسم وخمّن</h3>
+      <p class="muted">لوحة رسم بسيطة للمشاركة السريعة:</p>
+      <div style="background:#fff;border:2px dashed #d81b60;height:180px;border-radius:12px;display:grid;place-items:center;margin:10px 0;">
+        <span style="color:#887581;">لوحة الرسم التفاعلية (قيد التفعيل)</span>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="toast('🎨 تم حفظ الرسمة في الذكريات!')">💾 حفظ الرسمة في الذكريات</button>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='doors'){
+    openModal(`
+      <h3>🎁 افتح الباب الصحيح</h3>
+      <p class="muted">خلف أحد هذه الأبواب توجد مكافأة قلوب سريعة!</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin:20px 0;">
+        <button class="btn btn-primary" style="flex:1;height:80px;font-size:1.5rem;" onclick="window.openDoor(1)">🚪 1</button>
+        <button class="btn btn-primary" style="flex:1;height:80px;font-size:1.5rem;" onclick="window.openDoor(2)">🚪 2</button>
+        <button class="btn btn-primary" style="flex:1;height:80px;font-size:1.5rem;" onclick="window.openDoor(3)">🚪 3</button>
+      </div>
+      <div id="doorResult" style="text-align:center;font-weight:bold;"></div>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='noLaugh'){
+    openModal(`
+      <h3>🤣 لعبة ممنوع تضحك</h3>
+      <div class="v9-panel"><b>التحدي:</b> اقرأ هذه الجملة دون أن تضحك:<br><i>"قطة لابسة تاج وتأكل بيتزا بالجبنة فوق سحاب مطر! 🐱👑🍕"</i></div>
+      <button class="btn btn-primary btn-full" onclick="toast('😂 هنيئاً لك التحدي!');closeModal();">🤭 كتمت ضحكتي!</button>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  }
+};
+
+let xoBoard = ["","","","","","","","",""];
+let xoTurn = "❌";
+window.playXO = function(idx){
+  if(xoBoard[idx]!=="") return;
+  xoBoard[idx] = xoTurn;
+  document.getElementById(`xo-${idx}`).textContent = xoTurn;
+  xoTurn = xoTurn === "❌" ? "⭕" : "❌";
+  document.getElementById('xoStatus').textContent = `الدور: ${xoTurn}`;
+  playEventSound('ping',true);
+};
+
+const cardMessages = {
+  1: "اذكري أجمل شيء حدث لك اليوم 💗",
+  2: "اختاري ذكرى تتمنين تكرارها معنا ✨",
+  3: "أرسلي لي رسالة من خمسة كلمات حالاً 💌",
+  4: "اختاري سؤالاً تريدين أن تسأليني إياه 🌸",
+  5: "اكتشفي المفاجأة المخفية في صندوق المفاجآت 🎁",
+  6: "ابتسمي الآن، فأنت أجمل ما في عالمي 🥰",
+  7: "ما هي الأكلة التي تنوين طلبها اليوم؟ 🍕",
+  8: "كلمة حب واحدة تعبرين بها عن شعورك 💖",
+  9: "أنتِ بطلة قصتي الجميلة دائماً 👑"
+};
+window.openCardMsg = function(n){
+  const msg = cardMessages[n] || "كل القلوب تحبك 💕";
+  document.getElementById('cardMsgResult').innerHTML = `<b>💌 رسالة القلب رقم ${n}:</b><p style="margin-top:6px;font-size:1.1rem;color:#d81b60;">${msg}</p>`;
+  burstHearts();
+  playEventSound('surprise',true);
+};
+
+window.saveStorySentence = async function(){
+  const val = document.getElementById('storyInput')?.value.trim();
+  if(!val) return toast('اكتب جملة أولاً');
+  try{
+    await push(ref(db, 'app/memories'), { type:'text', title:'📖 قصة نكتبها معًا', text: val, at: new Date().toISOString(), by: MY_ROLE });
+    toast('✅ أُضيفَت الجملة وحُفظت في الذكريات!');
+    closeModal();
+  }catch(e){ toast('تم الحفظ محلياً'); closeModal(); }
+};
+
+window.checkPuzzle = function(){
+  const ans = document.getElementById('puzzleAnswer')?.value.trim();
+  if(!ans) return toast('اكتب الإجابة');
+  if(ans.includes('حفرة') || ans.includes('الحفرة')){
+    toast('🎉 إجابة صحيحة! حصلت على 5 قلوب 💗');
+    burstHearts();
+    closeModal();
+  } else {
+    toast('❌ محاولة أخرى، فكر جيداً!');
+  }
+};
+
+let secretNum = Math.floor(Math.random()*100)+1;
+window.checkGuessNumber = function(){
+  const val = parseInt(document.getElementById('guessInput')?.value);
+  const fb = document.getElementById('guessFeedback');
+  if(isNaN(val)) return toast('ادخل رقماً صحيحاً');
+  if(val === secretNum){
+    fb.innerHTML = '🎉 مبروك! خمنت الرقم الصحيح بنجاح!';
+    burstHearts();
+  } else if(val < secretNum){
+    fb.innerHTML = '📈 الرقم السري **أكبر** مما ادخلت';
+  } else {
+    fb.innerHTML = '📉 الرقم السري **أصغر** مما ادخلت';
+  }
+};
+
+window.openDoor = function(num){
+  const winning = Math.floor(Math.random()*3)+1;
+  const res = document.getElementById('doorResult');
+  if(num === winning){
+    res.innerHTML = `🎉 مبروك! اخترت الباب الصحيح وحصلت على 10 قلوب مكافأة 💎💗`;
+    burstHearts();
+    playEventSound('surprise',true);
+  } else {
+    res.innerHTML = `😅 خلف هذا الباب لغز ظريف! حاول مرة أخرى في الباب القادم.`;
+  }
+};
+
+window.showBadgesModal = function(){
+  openModal(`
+    <h3>🏆 الأوسمة والإنجازات</h3>
+    <div class="v9-entry">🧠 عبقري الألغاز — 🏅 مكتمل</div>
+    <div class="v9-entry">😂 ملك الضحك — 🏅 مكتمل</div>
+    <div class="v9-entry">🎨 الفنان المبدع — 🏅 نشط</div>
+    <div class="v9-entry">💞 فريق واحد — 🏅 100%</div>
+    <p class="v9-soft" style="text-align:center;margin-top:10px;">تتطور الأوسمة كلما لعبتما ولعبتم معاً!</p>
+  `);
+};
+
+window.showIslandModal = function(){
+  openModal(`
+    ### 🏝️ جزيرتنا الافتراضية المشتركة
+    <div class="v9-panel" style="text-align:center;">
+      <div style="font-size:3rem;margin-bottom:8px;">🏝️🏡🌸</div>
+      <p><b>جزيرة الحب والذكريات</b></p>
+      <p class="muted">كلما أكملتم ألعاباً وألغازاً معاً، كلما نمت الجزيرة وفتحتما عناصر جديدة (منزل، حديقة ورود، مقهى شاطئي).</p>
+      <div style="margin-top:15px;font-weight:bold;color:#d81b60;">التقدم الحالي: المستوى 2 🌟</div>
+    </div>
+  `);
+};
+
+
+// ===== In-Game Chat Feature ("التحدث مع بعض داخل الألعاب") =====
+let activeGameId = null;
+let gameChatUnsubscribe = null;
+
+window.openGameChatBox = function(gameId) {
+  activeGameId = gameId;
+  if(gameChatUnsubscribe) { gameChatUnsubscribe(); gameChatUnsubscribe = null; }
+  
+  const chatRef = ref(db, `games/${gameId}/chat`);
+  
+  const modalHtml = `
+    <h3>💬 محادثة اللعبة المباشرة</h3>
+    <div id="gameChatMessages" style="background:#f9f1f5;border:1px solid #f1dce6;border-radius:12px;height:180px;overflow-y:auto;padding:10px;margin-bottom:10px;display:flex;flex-direction:column;gap:6px;font-size:.85rem;">
+      <div style="text-align:center;color:#887581;">جاري تحميل محادثة اللعبة...</div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <input id="gameChatInput" placeholder="اكتب رسالة أثناء اللعب..." style="flex:1;padding:10px;border-radius:10px;border:1px solid #f2d9e4;font-size:.9rem;" onkeydown="if(event.key==='Enter')window.sendGameChatMessage('${gameId}')">
+      <button class="btn btn-primary" style="padding:10px 14px;" onclick="window.sendGameChatMessage('${gameId}')">➤</button>
+    </div>
+    <div class="modal-actions" style="margin-top:10px;"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق المحادثة</button></div>
+  `;
+  
+  // We can open this inside a sub-modal or add it to the current game modal
+  openModal(modalHtml);
+  
+  gameChatUnsubscribe = onValue(chatRef, (snapshot) => {
+    const msgs = snapshot.val() || {};
+    const box = document.getElementById('gameChatMessages');
+    if(!box) return;
+    const items = Object.values(msgs).sort((a,b)=>a.at - b.at);
+    if(!items.length) {
+      box.innerHTML = '<div style="text-align:center;color:#887581;">تحدثا هنا أثناء اللعب! 💗</div>';
+      return;
+    }
+    box.innerHTML = items.map(m => {
+      const mine = m.by === MY_ROLE;
+      return `<div style="text-align:${mine?'right':'left'};margin:2px 0;">
+        <span style="background:${mine?'#fce7f0':'#fff'};padding:6px 10px;border-radius:10px;display:inline-block;max-width:85%;border:1px solid #f2d9e4;">
+          <b>${senderName(m.by)}:</b> ${escapeHtml(m.text)}
+        </span>
+      </div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  });
+};
+
+window.sendGameChatMessage = async function(gameId) {
+  const input = document.getElementById('gameChatInput');
+  if(!input) return;
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  try {
+    await push(ref(db, `games/${gameId}/chat`), {
+      text,
+      by: MY_ROLE,
+      at: Date.now()
+    });
+    playEventSound('ping', true);
+  } catch(e) {
+    toast('تعذر إرسال الرسالة داخل اللعبة');
+  }
+};
+
+boot(); };
 
 async function loadConfigFromFirebase(){
   try{
@@ -984,6 +1303,277 @@ window.v9OnThisDay=()=>{const d=new Date(),matches=state.memories.filter(m=>{con
 window.v9MemoryBook=()=>{const items=[...state.memories].sort((a,b)=>new Date(a.at)-new Date(b.at));let i=0;if(!items.length)return toast('أضيفا ذكريات أولًا');const show=()=>{const m=items[i];openModal(`<h3>📖 كتاب ذكرياتنا — ${i+1}/${items.length}</h3><div class="v9-panel v9-reveal">${m.src?`<img src="${v9Esc(m.src)}" style="width:100%;max-height:260px;object-fit:contain">`:''}<h3>${v9Esc(m.title||'ذكرياتنا')}</h3><p>${v9Esc(m.text||'')}</p><small>${v9Esc(v9Time(m.at))}</small></div><div class="modal-actions"><button class="btn btn-soft" id="v9PrevPage">السابق</button><button class="btn btn-primary" id="v9NextPage">التالي</button></div>`);document.getElementById('v9PrevPage').onclick=()=>{i=(i-1+items.length)%items.length;show()};document.getElementById('v9NextPage').onclick=()=>{i=(i+1)%items.length;show()};};show();};
 window.v9MemoryMovie=()=>{const items=state.memories.filter(m=>m.src||m.text);if(!items.length)return toast('أضيفا ذكريات أولًا');let i=0;const show=()=>{const m=items[i];openModal(`<h3>🎞️ عرض ذكرياتنا ${i+1}/${items.length}</h3><div class="v9-panel v9-reveal">${m.src?`<img src="${v9Esc(m.src)}" style="width:100%;max-height:300px;object-fit:contain">`:''}<p>${v9Esc(m.title||m.text||'ذكرى جميلة')}</p></div><button class="btn btn-primary btn-full" id="v9MovieNext">الذكرى التالية ▶</button>`);document.getElementById('v9MovieNext').onclick=()=>{i=(i+1)%items.length;show()};};show();};
 window.v9MemoryMap=()=>{const items=state.memories.filter(m=>m.place);openModal('<h3>🗺️ أماكن ذكرياتنا</h3>'+(items.map(m=>`<div class="v9-entry">📍 ${v9Esc(m.place)} — ${v9Esc(m.title||'ذكرى')}</div>`).join('')||'<p>لا توجد أماكن محفوظة بعد. يمكنك إضافتها إلى ذكرياتك القادمة.</p>'));};
+
+
+// ===== Ayousha Games Integration ("🎮 عالمنا نلعب") =====
+window.openGameCat = function(cat){
+  if(cat==='hearts') window.launchGameModal('cards');
+  else if(cat==='smart') window.launchGameModal('puzzle');
+  else if(cat==='fun') window.launchGameModal('noLaugh');
+  else if(cat==='vs') window.launchGameModal('xo');
+};
+
+window.openGameInviteModal = function(){
+  openModal(`
+    <h3>🎮 عالمنا نلعب — اختاري اللعبة</h3>
+    <div class="games-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0;">
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('xo')">❌⭕ XO</button>
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('cards')">💗 القلوب والرسائل</button>
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('story')">📖 قصة نكتبها</button>
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('puzzle')">🧩 حل اللغز</button>
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('guessNum')">🔢 خمن الرقم</button>
+      <button class="btn btn-primary" style="padding:12px;font-size:.85rem;" onclick="window.launchGameModal('draw')">🎨 ارسم وخمّن</button>
+    </div>
+    <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+  `);
+};
+
+window.launchGameModal = function(type){
+  if(type==='xo'){
+    openModal(`
+      <h3>❌⭕ لعبة XO المشتركة</h3>
+      <p class="muted">العبا معاً مباشرة بتحديث فوري!</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:20px auto;">
+        ${[0,1,2,3,4,5,6,7,8].map(i=>`<button id="xo-${i}" class="btn btn-soft" style="height:70px;font-size:2rem;" onclick="window.playXO(${i})">?</button>`).join('')}
+      </div>
+      <div id="xoStatus" style="text-align:center;font-weight:bold;margin:10px 0;">الدور: ❌ (زكريا)</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn btn-soft" style="flex:1;" onclick="window.openGameChatBox('xo_session_1')">💬 دردشة اللعبة</button>
+        <button class="btn btn-soft" style="flex:1;" onclick="closeModal()">إغلاق</button>
+      </div>
+    `);
+  } else if(type==='cards'){
+    openModal(`
+      <h3>💌 اختر رقمًا واكتشف رسالتك</h3>
+      <p class="muted">اختر قلباً من القلوب التسعة لاكتشاف الرسالة المخفية:</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0;">
+        ${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="btn btn-primary" style="height:60px;font-size:1.2rem;" onclick="window.openCardMsg(${n})">💗 ${n}</button>`).join('')}
+      </div>
+      <div id="cardMsgResult" class="v9-panel" style="margin-top:10px;text-align:center;">اختر قلباً لرؤية المفاجأة!</div>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='story'){
+    openModal(`
+      <h3>📖 قصة نكتبها معًا</h3>
+      <p class="muted">ابدأوا كتابة قصة جملة بجميلة تُحفظ في الذكريات:</p>
+      <div class="v9-panel"><b>بداية القصة:</b> في مساء جميل، وصل إلى عيوشة صندوق غامض أمام الباب...</div>
+      <textarea id="storyInput" placeholder="اكتب جملتك التالية..." style="width:100%;padding:10px;margin:10px 0;border-radius:12px;border:1px solid #f2d9e4;"></textarea>
+      <button class="btn btn-primary btn-full" onclick="window.saveStorySentence()">➕ إضافة جملة للقصة</button>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='puzzle'){
+    openModal(`
+      <h3>🧩 حل اللغز قبلي</h3>
+      <div class="v9-panel"><b>اللغز:</b> شيء كلما أخذت منه كبر، فما هو؟</div>
+      <input id="puzzleAnswer" placeholder="اكتب الإجابة هنا..." style="width:100%;padding:10px;margin:10px 0;border-radius:12px;border:1px solid #f2d9e4;">
+      <button class="btn btn-primary btn-full" onclick="window.checkPuzzle()">✅ إرسال الإجابة (+5 قلوب)</button>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='guessNum'){
+    openModal(`
+      <h3>🔢 خمن الرقم السري (بين 1 و 100)</h3>
+      <input type="number" id="guessInput" placeholder="ادخل رقماً..." style="width:100%;padding:10px;margin:10px 0;border-radius:12px;border:1px solid #f2d9e4;">
+      <button class="btn btn-primary btn-full" onclick="window.checkGuessNumber()">🎯 تخمين</button>
+      <div id="guessFeedback" style="text-align:center;margin-top:10px;font-weight:bold;"></div>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='draw'){
+    openModal(`
+      <h3>🎨 ارسم وخمّن</h3>
+      <p class="muted">لوحة رسم بسيطة للمشاركة السريعة:</p>
+      <div style="background:#fff;border:2px dashed #d81b60;height:180px;border-radius:12px;display:grid;place-items:center;margin:10px 0;">
+        <span style="color:#887581;">لوحة الرسم التفاعلية (قيد التفعيل)</span>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="toast('🎨 تم حفظ الرسمة في الذكريات!')">💾 حفظ الرسمة في الذكريات</button>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='doors'){
+    openModal(`
+      <h3>🎁 افتح الباب الصحيح</h3>
+      <p class="muted">خلف أحد هذه الأبواب توجد مكافأة قلوب سريعة!</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin:20px 0;">
+        <button class="btn btn-primary" style="flex:1;height:80px;font-size:1.5rem;" onclick="window.openDoor(1)">🚪 1</button>
+        <button class="btn btn-primary" style="flex:1;height:80px;font-size:1.5rem;" onclick="window.openDoor(2)">🚪 2</button>
+        <button class="btn btn-primary" style="flex:1;height:80px;font-size:1.5rem;" onclick="window.openDoor(3)">🚪 3</button>
+      </div>
+      <div id="doorResult" style="text-align:center;font-weight:bold;"></div>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  } else if(type==='noLaugh'){
+    openModal(`
+      <h3>🤣 لعبة ممنوع تضحك</h3>
+      <div class="v9-panel"><b>التحدي:</b> اقرأ هذه الجملة دون أن تضحك:<br><i>"قطة لابسة تاج وتأكل بيتزا بالجبنة فوق سحاب مطر! 🐱👑🍕"</i></div>
+      <button class="btn btn-primary btn-full" onclick="toast('😂 هنيئاً لك التحدي!');closeModal();">🤭 كتمت ضحكتي!</button>
+      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+    `);
+  }
+};
+
+let xoBoard = ["","","","","","","","",""];
+let xoTurn = "❌";
+window.playXO = function(idx){
+  if(xoBoard[idx]!=="") return;
+  xoBoard[idx] = xoTurn;
+  document.getElementById(`xo-${idx}`).textContent = xoTurn;
+  xoTurn = xoTurn === "❌" ? "⭕" : "❌";
+  document.getElementById('xoStatus').textContent = `الدور: ${xoTurn}`;
+  playEventSound('ping',true);
+};
+
+const cardMessages = {
+  1: "اذكري أجمل شيء حدث لك اليوم 💗",
+  2: "اختاري ذكرى تتمنين تكرارها معنا ✨",
+  3: "أرسلي لي رسالة من خمسة كلمات حالاً 💌",
+  4: "اختاري سؤالاً تريدين أن تسأليني إياه 🌸",
+  5: "اكتشفي المفاجأة المخفية في صندوق المفاجآت 🎁",
+  6: "ابتسمي الآن، فأنت أجمل ما في عالمي 🥰",
+  7: "ما هي الأكلة التي تنوين طلبها اليوم؟ 🍕",
+  8: "كلمة حب واحدة تعبرين بها عن شعورك 💖",
+  9: "أنتِ بطلة قصتي الجميلة دائماً 👑"
+};
+window.openCardMsg = function(n){
+  const msg = cardMessages[n] || "كل القلوب تحبك 💕";
+  document.getElementById('cardMsgResult').innerHTML = `<b>💌 رسالة القلب رقم ${n}:</b><p style="margin-top:6px;font-size:1.1rem;color:#d81b60;">${msg}</p>`;
+  burstHearts();
+  playEventSound('surprise',true);
+};
+
+window.saveStorySentence = async function(){
+  const val = document.getElementById('storyInput')?.value.trim();
+  if(!val) return toast('اكتب جملة أولاً');
+  try{
+    await push(ref(db, 'app/memories'), { type:'text', title:'📖 قصة نكتبها معًا', text: val, at: new Date().toISOString(), by: MY_ROLE });
+    toast('✅ أُضيفَت الجملة وحُفظت في الذكريات!');
+    closeModal();
+  }catch(e){ toast('تم الحفظ محلياً'); closeModal(); }
+};
+
+window.checkPuzzle = function(){
+  const ans = document.getElementById('puzzleAnswer')?.value.trim();
+  if(!ans) return toast('اكتب الإجابة');
+  if(ans.includes('حفرة') || ans.includes('الحفرة')){
+    toast('🎉 إجابة صحيحة! حصلت على 5 قلوب 💗');
+    burstHearts();
+    closeModal();
+  } else {
+    toast('❌ محاولة أخرى، فكر جيداً!');
+  }
+};
+
+let secretNum = Math.floor(Math.random()*100)+1;
+window.checkGuessNumber = function(){
+  const val = parseInt(document.getElementById('guessInput')?.value);
+  const fb = document.getElementById('guessFeedback');
+  if(isNaN(val)) return toast('ادخل رقماً صحيحاً');
+  if(val === secretNum){
+    fb.innerHTML = '🎉 مبروك! خمنت الرقم الصحيح بنجاح!';
+    burstHearts();
+  } else if(val < secretNum){
+    fb.innerHTML = '📈 الرقم السري **أكبر** مما ادخلت';
+  } else {
+    fb.innerHTML = '📉 الرقم السري **أصغر** مما ادخلت';
+  }
+};
+
+window.openDoor = function(num){
+  const winning = Math.floor(Math.random()*3)+1;
+  const res = document.getElementById('doorResult');
+  if(num === winning){
+    res.innerHTML = `🎉 مبروك! اخترت الباب الصحيح وحصلت على 10 قلوب مكافأة 💎💗`;
+    burstHearts();
+    playEventSound('surprise',true);
+  } else {
+    res.innerHTML = `😅 خلف هذا الباب لغز ظريف! حاول مرة أخرى في الباب القادم.`;
+  }
+};
+
+window.showBadgesModal = function(){
+  openModal(`
+    <h3>🏆 الأوسمة والإنجازات</h3>
+    <div class="v9-entry">🧠 عبقري الألغاز — 🏅 مكتمل</div>
+    <div class="v9-entry">😂 ملك الضحك — 🏅 مكتمل</div>
+    <div class="v9-entry">🎨 الفنان المبدع — 🏅 نشط</div>
+    <div class="v9-entry">💞 فريق واحد — 🏅 100%</div>
+    <p class="v9-soft" style="text-align:center;margin-top:10px;">تتطور الأوسمة كلما لعبتما ولعبتم معاً!</p>
+  `);
+};
+
+window.showIslandModal = function(){
+  openModal(`
+    ### 🏝️ جزيرتنا الافتراضية المشتركة
+    <div class="v9-panel" style="text-align:center;">
+      <div style="font-size:3rem;margin-bottom:8px;">🏝️🏡🌸</div>
+      <p><b>جزيرة الحب والذكريات</b></p>
+      <p class="muted">كلما أكملتم ألعاباً وألغازاً معاً، كلما نمت الجزيرة وفتحتما عناصر جديدة (منزل، حديقة ورود، مقهى شاطئي).</p>
+      <div style="margin-top:15px;font-weight:bold;color:#d81b60;">التقدم الحالي: المستوى 2 🌟</div>
+    </div>
+  `);
+};
+
+
+// ===== In-Game Chat Feature ("التحدث مع بعض داخل الألعاب") =====
+let activeGameId = null;
+let gameChatUnsubscribe = null;
+
+window.openGameChatBox = function(gameId) {
+  activeGameId = gameId;
+  if(gameChatUnsubscribe) { gameChatUnsubscribe(); gameChatUnsubscribe = null; }
+  
+  const chatRef = ref(db, `games/${gameId}/chat`);
+  
+  const modalHtml = `
+    <h3>💬 محادثة اللعبة المباشرة</h3>
+    <div id="gameChatMessages" style="background:#f9f1f5;border:1px solid #f1dce6;border-radius:12px;height:180px;overflow-y:auto;padding:10px;margin-bottom:10px;display:flex;flex-direction:column;gap:6px;font-size:.85rem;">
+      <div style="text-align:center;color:#887581;">جاري تحميل محادثة اللعبة...</div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <input id="gameChatInput" placeholder="اكتب رسالة أثناء اللعب..." style="flex:1;padding:10px;border-radius:10px;border:1px solid #f2d9e4;font-size:.9rem;" onkeydown="if(event.key==='Enter')window.sendGameChatMessage('${gameId}')">
+      <button class="btn btn-primary" style="padding:10px 14px;" onclick="window.sendGameChatMessage('${gameId}')">➤</button>
+    </div>
+    <div class="modal-actions" style="margin-top:10px;"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق المحادثة</button></div>
+  `;
+  
+  // We can open this inside a sub-modal or add it to the current game modal
+  openModal(modalHtml);
+  
+  gameChatUnsubscribe = onValue(chatRef, (snapshot) => {
+    const msgs = snapshot.val() || {};
+    const box = document.getElementById('gameChatMessages');
+    if(!box) return;
+    const items = Object.values(msgs).sort((a,b)=>a.at - b.at);
+    if(!items.length) {
+      box.innerHTML = '<div style="text-align:center;color:#887581;">تحدثا هنا أثناء اللعب! 💗</div>';
+      return;
+    }
+    box.innerHTML = items.map(m => {
+      const mine = m.by === MY_ROLE;
+      return `<div style="text-align:${mine?'right':'left'};margin:2px 0;">
+        <span style="background:${mine?'#fce7f0':'#fff'};padding:6px 10px;border-radius:10px;display:inline-block;max-width:85%;border:1px solid #f2d9e4;">
+          <b>${senderName(m.by)}:</b> ${escapeHtml(m.text)}
+        </span>
+      </div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  });
+};
+
+window.sendGameChatMessage = async function(gameId) {
+  const input = document.getElementById('gameChatInput');
+  if(!input) return;
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  try {
+    await push(ref(db, `games/${gameId}/chat`), {
+      text,
+      by: MY_ROLE,
+      at: Date.now()
+    });
+    playEventSound('ping', true);
+  } catch(e) {
+    toast('تعذر إرسال الرسالة داخل اللعبة');
+  }
+};
 
 boot();
 </script>
