@@ -131,6 +131,13 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
   border-radius: 0;
   padding: 20px;
 }
+
+/* محادثة فورية بتصميم فقاعات واضح */
+#view-mail{padding:0 8px 12px}#view-mail .messenger-shell{display:flex;flex-direction:column;height:calc(100dvh - 185px);min-height:380px;background:#f9f1f5;border:1px solid #f1dce6;border-radius:22px;overflow:hidden;box-shadow:0 9px 30px #5e31451c}
+.messenger-header{display:flex;align-items:center;gap:11px;padding:12px 14px;background:#fff;border-bottom:1px solid #f0e2e9;flex-shrink:0}.messenger-avatar{width:43px;height:43px;border-radius:50%;background:#ffe1ed;display:grid;place-items:center;font-size:22px}.messenger-title{flex:1;display:flex;flex-direction:column;gap:2px}.messenger-title strong{font-size:1rem}.messenger-title small{font-size:.73rem;color:#8b7080}.messenger-lock{font-size:25px;color:#d83275}
+#mailList.messenger-messages{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:16px 10px;display:flex;flex-direction:column;gap:9px;background:radial-gradient(circle at 15% 20%,#fff7fa 0,transparent 48%),#faf1f5;scroll-behavior:smooth}
+#mailList .chat-row{flex-shrink:0}#mailList .chat-bubble{min-width:0;max-width:83%;padding:9px 12px;border-radius:16px;box-shadow:0 2px 8px #40203010}#mailList .mine .chat-bubble{background:#dcf8e7;border-color:#bdebd0;border-radius:16px 16px 5px 16px}#mailList .theirs .chat-bubble{background:white;border-color:#f1e0eb;border-radius:16px 16px 16px 5px}#mailList .chat-head{font-size:.72rem}#mailList .chat-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;margin:5px 0}#mailList .chat-foot{font-size:.68rem}
+.messenger-composer{display:flex;gap:8px;align-items:flex-end;background:#fff;padding:10px;border-top:1px solid #f1dfe8;flex-shrink:0}.messenger-composer textarea{flex:1;min-width:0;max-height:115px;min-height:43px;border:1px solid #eedce6;border-radius:22px;padding:11px 15px;font:inherit;font-size:16px;resize:none;background:#fff9fc;outline:none}.messenger-composer textarea:focus{border-color:#e36c9e}.messenger-composer button{height:43px;width:43px;border-radius:50%;background:#d82b72;color:#fff;font-size:23px;display:grid;place-items:center;flex-shrink:0;transform:rotate(180deg)}.messenger-composer button:disabled{opacity:.55}.messenger-status{font-size:.72rem;color:#a22e56;background:#fff;text-align:center}.messenger-status:empty{display:none}
 </style>
 <style>
 /* Interactive message experience */
@@ -201,12 +208,12 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
   </section>
 
   <section id="view-mail" class="view">
-    <div class="card">
-      <div class="card-title"><span>💌</span> بريد الحنين</div>
-      <p class="muted" style="margin-bottom:14px">اكتبي رسالة اليوم، تصل في التاريخ الذي تختارينه.</p>
-      <button class="btn btn-primary btn-full" onclick="openComposeMail()">✍️ رسالة جديدة</button>
+    <div class="messenger-shell">
+      <header class="messenger-header"><div class="messenger-avatar">💗</div><div class="messenger-title"><strong id="chatPartnerName">عيوشة</strong><small>💌 محادثتنا الخاصة</small></div><span class="messenger-lock" title="محادثة خاصة">♡</span></header>
+      <div id="mailList" class="messenger-messages" role="log" aria-live="polite" aria-label="المحادثة"></div>
+      <form id="instantMailForm" class="messenger-composer" onsubmit="window.sendInstantMail(event)"><textarea id="instantMailText" rows="1" maxlength="5000" placeholder="اكتب رسالة..." aria-label="نص الرسالة" oninput="window.resizeChatInput(this)"></textarea><button id="instantMailSend" type="submit" aria-label="إرسال الرسالة">➤</button></form>
+      <div id="instantMailStatus" class="messenger-status" role="status" aria-live="polite"></div>
     </div>
-    <div id="mailList"></div>
   </section>
 
   <section id="view-memories" class="view">
@@ -520,7 +527,7 @@ function startSync(){
   setSyncStatus('online', 'متصل بقاعدة البيانات');
 }
 
-function switchView(name){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById('view-'+name).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view === name)); window.scrollTo({top:0, behavior:'smooth'}); if(name === 'notifications') { renderNotifs('inbox'); markNotifsRead(); } }
+function switchView(name){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById('view-'+name).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view === name)); window.scrollTo({top:0, behavior:'smooth'}); if(name === 'mail'){const partner=document.getElementById('chatPartnerName');if(partner)partner.textContent=MY_ROLE==='me'?state.settings.wifeName:state.settings.myName;setTimeout(()=>{const el=document.getElementById('mailList');if(el)el.scrollTop=el.scrollHeight;},80);} if(name === 'notifications') { renderNotifs('inbox'); markNotifsRead(); } }
 window.switchView = switchView;
 function openModal(html){document.getElementById('modalContent').innerHTML = html;document.getElementById('modalBg').classList.add('show');}
 function closeModal(){if(modalLocked)return;document.getElementById('modalBg').classList.remove('show');}
@@ -598,13 +605,30 @@ window.saveMail = async function(){
   } finally {if(btn){btn.disabled=false;btn.textContent='💌 إرسال الرسالة';}}
 };
 
+window.resizeChatInput=function(el){el.style.height='43px';el.style.height=Math.min(el.scrollHeight,115)+'px';};
+window.sendInstantMail=async function(event){
+ event?.preventDefault();const field=document.getElementById('instantMailText'),button=document.getElementById('instantMailSend'),status=document.getElementById('instantMailStatus');
+ const message=field?.value.trim();if(!message)return;if(button.disabled)return;
+ if(!firebaseReady||!db){status.textContent='تعذر الاتصال بقاعدة البيانات. تحقق من الإنترنت.';return;}
+ button.disabled=true;status.textContent='جارٍ الإرسال...';
+ try{
+  const item={text:message,at:new Date().toISOString(),createdAt:new Date().toISOString(),read:false,by:MY_ROLE,to:MY_ROLE==='me'?'her':'me'};
+  const record=await push(ref(db,'app/mails'),item);
+  field.value='';window.resizeChatInput(field);status.textContent='';playEventSound('mail',true);
+  requestAnimationFrame(()=>{const list=document.getElementById('mailList');if(list)list.scrollTop=list.scrollHeight;});
+  Promise.resolve().then(()=>addNotification('💌 رسالة جديدة من '+senderName(MY_ROLE),message,'mail',record.key)).catch(console.warn);
+ }catch(error){console.error('Instant message failed:',error);status.textContent='تعذر الإرسال: '+(error?.message||'تحقق من الاتصال');}
+ finally{button.disabled=false;}
+};
 function renderMails(){
  const el=document.getElementById('mailList');if(!el)return;
  const items=[...state.mails].filter(m=>m.by===MY_ROLE||m.to===MY_ROLE||!m.to).sort((a,b)=>new Date(a.createdAt||a.at)-new Date(b.createdAt||b.at));
- if(!items.length){el.innerHTML='<div class="empty"><div class="e-icon">💌</div><p>ابدآ أول رسالة حب 💗</p></div>';return;}
+ if(!items.length){el.innerHTML='<div class="empty"><div class="e-icon">💌</div><p>ابدآ المحادثة برسالة جميلة 💗</p></div>';return;}
+ const wasNearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<130;const previousCount=el.querySelectorAll('[data-mail-id]').length;
  el.innerHTML=items.map(m=>{const mine=m.by===MY_ROLE,ready=new Date(m.at)<=new Date(),visible=mine||ready;
  return `<article class="chat-row ${mine?'mine':'theirs'}" data-mail-id="${escapeHtml(m.id)}"><div class="chat-bubble"><div class="chat-head"><span>${mine?'💗 أنا':'💜 '+escapeHtml(senderName(m.by))}</span><span>${ready?(mine?'✓ أُرسلت':'📩 واردة'):'⏳ مجدولة'}</span></div><p class="chat-text">${visible?escapeHtml(m.text):'🔒 ستفتح هذه الرسالة في موعدها'}</p><div class="chat-foot"><span>🕒 ${fmtDateTime(m.at)}</span>${mine?`<button onclick="window.deleteMail('${m.id}')" aria-label="حذف الرسالة">🗑️</button>`:''}</div></div></article>`;
  }).join('');
+ if(wasNearBottom||items.length>previousCount&&previousCount===0)requestAnimationFrame(()=>{el.scrollTop=el.scrollHeight;});
 }
 window.deleteMail = async function(id){
   const mail=state.mails.find(m=>m.id===id);
