@@ -11,5 +11,19 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/mail/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/notifications/:path*",
+      "destination": "/index.html"
+    }
   ]
 }

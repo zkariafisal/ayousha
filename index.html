@@ -332,13 +332,30 @@ function playEventSound(type='mail', outgoing=false){
 }
 window.toggleSounds=function(){soundsEnabled=!soundsEnabled;localStorage.setItem(SOUND_PREF_KEY,String(soundsEnabled));toast(soundsEnabled?'🔊 تم تشغيل الأصوات':'🔇 تم كتم الأصوات');if(soundsEnabled)playEventSound('surprise');};
 function eventDestination(type){return ({mail:'mail',surprise:'surprises',memory:'memories',ping:'home',mood:'mood',answer:'home'})[type]||'notifications'}
-function openEventDestination(type,id){const view=eventDestination(type);if(document.getElementById('view-'+view))switchView(view);else switchView('notifications');if(type==='mail'&&id){setTimeout(()=>{const row=[...document.querySelectorAll('[data-mail-id]')].find(e=>e.dataset.mailId===id);if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.classList.add('highlight');setTimeout(()=>row.classList.remove('highlight'),2600)}},250)}}
+let pendingDeepLink = null;
+function focusRequestedMail(id, attempts=0){
+ const row=[...document.querySelectorAll('[data-mail-id]')].find(e=>e.dataset.mailId===id);
+ if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.classList.add('highlight');setTimeout(()=>row.classList.remove('highlight'),4500);pendingDeepLink=null;return;}
+ // Firebase may still be loading after a cold start from a notification.
+ if(attempts<25)setTimeout(()=>focusRequestedMail(id,attempts+1),400);
+}
+function openEventDestination(type,id){
+ const view=eventDestination(type);
+ if(document.getElementById('view-'+view))switchView(view);else switchView('notifications');
+ if(type==='mail'&&id){pendingDeepLink=id;setTimeout(()=>focusRequestedMail(id),300);}
+}
 window.openEventDestination=openEventDestination;
-function handleDeepLink(){const p=new URLSearchParams(location.search);const type=p.get('open'),id=p.get('item');if(type){openEventDestination(type,id);p.delete('open');p.delete('item');history.replaceState({},'',location.pathname+'?'+p.toString())}}
+function handleDeepLink(){
+ const p=new URLSearchParams(location.search),type=p.get('open'),id=p.get('item');
+ if(!type)return;
+ openEventDestination(type,id);
+ p.delete('open');p.delete('item');
+ history.replaceState({},'',location.pathname+(p.toString()?'?'+p.toString():'')+location.hash);
+}
 let receivedEventIds=new Set(),eventsPrimed=false;
 function processIncomingNotifications(items){const incoming=items.filter(n=>n.to===MY_ROLE);if(eventsPrimed){for(const n of incoming){if(!receivedEventIds.has(n.id)){playEventSound(n.type);if(navigator.vibrate)navigator.vibrate([100,70,130]);toast('🔔 '+n.title)}}}receivedEventIds=new Set(incoming.map(n=>n.id));eventsPrimed=true;}
 async function requestNotifPermission(){ if(!('Notification' in window))return false; if(Notification.permission === 'granted')return true; if(Notification.permission === 'denied')return false; try{ const p = await Notification.requestPermission(); return p === 'granted'; }catch(e){return false;} }
-function showAppNotification(title, body, type='notification', itemId=''){ playEventSound(type); if(navigator.vibrate)navigator.vibrate([200, 100, 200]); toast('🔔 ' + title); if(Notification.permission === 'granted'){ try{ navigator.serviceWorker.ready.then(reg => reg.showNotification(title, { body: body || '', icon: ICON_URL, badge: ICON_URL, tag:'ayousha-foreground-'+Date.now(), data:{url:location.origin+location.pathname+'?for='+MY_ROLE+'&open='+encodeURIComponent(type)+'&item='+encodeURIComponent(itemId)} })); }catch(e){} } }
+function showAppNotification(title, body, type='notification', itemId=''){ playEventSound(type); if(navigator.vibrate)navigator.vibrate([200, 100, 200]); toast('🔔 ' + title); if(Notification.permission === 'granted'){ try{ navigator.serviceWorker.ready.then(reg => reg.showNotification(title, { body: body || '', icon: ICON_URL, badge: ICON_URL, tag:'ayousha-foreground-'+Date.now(), data:{url:location.origin+'/index.html?for='+MY_ROLE+'&open='+encodeURIComponent(type)+'&item='+encodeURIComponent(itemId)} })); }catch(e){} } }
 
 async function addNotification(title, body, type, itemId='') {
   if(!firebaseReady || !db) return;
@@ -496,7 +513,7 @@ function startSync(){
   onValue(ref(db, 'app/answers'), s => { state.answers = s.val() || {}; renderDaily(); });
   onValue(ref(db, 'app/surprises'), s => { const v = s.val(); state.surprises = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderSurprises(); checkReadyItems(); });
   onValue(ref(db, '.info/connected'), s => { const connected=s.val()===true; window.mailConnected=connected; setSyncStatus(connected?'online':'offline', connected?'متصل بقاعدة البيانات':'غير متصل — تحقق من الإنترنت'); }, e=>console.error('Connection monitor',e));
-  onValue(ref(db, 'app/mails'), s => { const v = s.val(); state.mails = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMails(); }, e=>{ console.error('Mail sync:',e); setSyncStatus('offline','تعذر قراءة البريد'); toast('⚠️ تعذّر تحميل الرسائل: '+e.message); });
+  onValue(ref(db, 'app/mails'), s => { const v = s.val(); state.mails = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMails(); if(pendingDeepLink)focusRequestedMail(pendingDeepLink); }, e=>{ console.error('Mail sync:',e); setSyncStatus('offline','تعذر قراءة البريد'); toast('⚠️ تعذّر تحميل الرسائل: '+e.message); });
   onValue(ref(db, 'app/memories'), s => { const v = s.val(); state.memories = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMemories(); });
   onValue(ref(db, 'app/moods'), s => { state.moods = s.val() || {}; renderMood(); });
   onValue(ref(db, 'app/pings'), s => { const v = s.val(); state.pings = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderPings(); });
@@ -751,7 +768,7 @@ async function boot(){
   }
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(err => console.log('SW reg error', err));
+    navigator.serviceWorker.register('/firebase-messaging-sw.js', {updateViaCache:'none'}).catch(err => console.log('SW reg error', err));
   }
 
   const setupDone = await isSetupComplete();
@@ -776,7 +793,8 @@ async function boot(){
   setInterval(()=>{ checkReadyItems(); renderMails(); }, 20000);
   setTimeout(handleDeepLink,1200);
   window.addEventListener('pageshow', handleDeepLink);
-  navigator.serviceWorker?.addEventListener('message', event => { if(event.data?.type==='OPEN_AYOUSHA'){location.href=event.data.url;} });
+  window.addEventListener('popstate', handleDeepLink);
+  navigator.serviceWorker?.addEventListener('message', event => { if(event.data?.type==='OPEN_AYOUSHA'){location.assign(event.data.url);} });
 }
 document.addEventListener('click', () => { initAudio(); }, { once: true });
 document.addEventListener('touchstart', () => { initAudio(); }, { once: true });
