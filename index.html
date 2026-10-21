@@ -321,7 +321,7 @@ async function addNotification(title, body, type) {
 
 async function sendFCM(toRole, title, body) {
   const targetToken = config[toRole]?.fcmToken;
-  if(!targetToken) return;
+  if(!targetToken){ console.info('لا يوجد رمز إشعارات للطرف الآخر، لكن الرسالة محفوظة في قاعدة البيانات'); return; }
   try {
     const response = await fetch('/api/notify', {
       method: 'POST',
@@ -463,7 +463,8 @@ function startSync(){
   onValue(ref(db, 'app/settings'), s => { if(s.val()) state.settings = s.val(); updateGreet(); });
   onValue(ref(db, 'app/answers'), s => { state.answers = s.val() || {}; renderDaily(); });
   onValue(ref(db, 'app/surprises'), s => { const v = s.val(); state.surprises = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderSurprises(); checkReadyItems(); });
-  onValue(ref(db, 'app/mails'), s => { const v = s.val(); state.mails = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMails(); });
+  onValue(ref(db, '.info/connected'), s => { const connected=s.val()===true; window.mailConnected=connected; setSyncStatus(connected?'online':'offline', connected?'متصل بقاعدة البيانات':'غير متصل — تحقق من الإنترنت'); }, e=>console.error('Connection monitor',e));
+  onValue(ref(db, 'app/mails'), s => { const v = s.val(); state.mails = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMails(); }, e=>{ console.error('Mail sync:',e); setSyncStatus('offline','تعذر قراءة البريد'); toast('⚠️ تعذّر تحميل الرسائل: '+e.message); });
   onValue(ref(db, 'app/memories'), s => { const v = s.val(); state.memories = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMemories(); });
   onValue(ref(db, 'app/moods'), s => { state.moods = s.val() || {}; renderMood(); });
   onValue(ref(db, 'app/pings'), s => { const v = s.val(); state.pings = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderPings(); });
@@ -509,26 +510,62 @@ function renderSurprises(){ const el = document.getElementById('surpriseList'); 
 window.deleteSurprise = async function(id){ if(!confirm('حذف المفاجأة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/surprises/'+id));}catch(e){} } state.surprises = state.surprises.filter(s => s.id !== id); renderSurprises(); }
 
 function openComposeMail(){ 
-  openModal(`<h3>💌 رسالة حنين</h3><label>إلى</label><input value="${escapeHtml(MY_ROLE==='me' ? state.settings.wifeName : state.settings.myName)}" readonly><label>نص الرسالة</label><textarea id="mailText" placeholder="اكتبي من قلبك..." style="min-height:120px"></textarea><label>توصل في</label><input type="datetime-local" id="mailTime"><div class="modal-actions"><button class="btn btn-soft" onclick="window.closeModal()">إلغاء</button><button class="btn btn-primary" onclick="window.saveMail()">إرسال</button></div>`); 
-  document.getElementById('mailTime').value = toLocalISO(new Date(Date.now()+86400000)); 
+  openModal(`<h3>💌 رسالة حنين</h3><label>إلى</label><input value="${escapeHtml(MY_ROLE==='me' ? state.settings.wifeName : state.settings.myName)}" readonly><label>نص الرسالة</label><textarea id="mailText" maxlength="5000" placeholder="اكتبي من قلبك..." style="min-height:150px"></textarea><small class="help">الرسالة تصل داخل التطبيق، وليست رسالة بريد إلكتروني. يمكنك إرسالها الآن أو تحديد موعد لاحق.</small><label>توصل في</label><input type="datetime-local" id="mailTime"><div class="modal-actions"><button class="btn btn-soft" onclick="window.closeModal()">إلغاء</button><button type="button" id="mailSendBtn" class="btn btn-primary" onclick="window.saveMail()">💌 إرسال الرسالة</button></div><p id="mailFeedback" role="status" aria-live="polite" style="margin-top:10px;font-size:.85rem;line-height:1.7"></p>`); 
+  document.getElementById('mailTime').value = toLocalISO(new Date(Date.now()-60000)); 
 }
 window.openComposeMail = openComposeMail;
 
-window.saveMail = async function(){ 
+window.saveMail = async function(){
+  const btn = document.getElementById('mailSendBtn');
+  const feedback = document.getElementById('mailFeedback');
+  if(btn?.disabled) return;
+  const show = (message, error=false) => {
+    if(feedback){feedback.textContent=message;feedback.style.color=error?'#b71c1c':'#27754b';}
+    toast(message);
+  };
   try {
-    const text = document.getElementById('mailText').value.trim(); 
-    const timeVal = document.getElementById('mailTime').value; 
-    if(!text || !timeVal){ toast('⚠️ يرجى كتابة الرسالة وتحديد الوقت'); return; } 
-    const item = { text, at: new Date(timeVal).toISOString(), read: false, by: MY_ROLE }; 
-    if(firebaseReady && db){ await push(ref(db, 'app/mails'), item); } 
-    closeModal(); 
-    addNotification('رسالة حنين', text, 'mail'); 
-    toast('💌 رسالتك في الطريق'); 
-  } catch(err) { console.error(err); toast('⚠️ حدث خطأ، تأكد من صحة التاريخ'); }
-}
+    const text = document.getElementById('mailText')?.value.trim() || '';
+    const timeVal = document.getElementById('mailTime')?.value;
+    if(!text){show('⚠️ اكتب نص الرسالة أولاً',true);document.getElementById('mailText')?.focus();return;}
+    if(!timeVal || !Number.isFinite(new Date(timeVal).getTime())){show('⚠️ حدد موعداً صحيحاً',true);return;}
+    if(!firebaseReady || !db){show('❌ لم يتم إعداد اتصال Firebase. افتح الإعدادات وتحقق من قاعدة البيانات.',true);return;}
+    if(window.mailConnected===false){show('❌ لا يوجد اتصال بقاعدة البيانات. تحقق من الإنترنت.',true);return;}
+    if(btn){btn.disabled=true;btn.textContent='⏳ جارٍ الإرسال...';}
+    if(feedback){feedback.textContent='جارٍ حفظ الرسالة في قاعدة البيانات...';feedback.style.color='#555';}
+    const item = {text,at:new Date(timeVal).toISOString(),createdAt:new Date().toISOString(),read:false,by:MY_ROLE,to:MY_ROLE==='me'?'her':'me'};
+    const operation=push(ref(db,'app/mails'),item);
+    // Show a helpful message instead of an endlessly frozen send button.
+    let timer;
+    try {
+      await Promise.race([operation,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('انتهت مهلة الاتصال (15 ثانية). تحقق من الإنترنت وقواعد Firebase قبل إعادة الإرسال.')),15000);})]);
+    } finally {clearTimeout(timer);}
+    closeModal();
+    toast('✅ تم حفظ الرسالة، وستظهر لدى الطرف الآخر عند اتصال التطبيق');
+    // Notification is best-effort and must never block sending.
+    Promise.resolve().then(()=>addNotification('💌 رسالة جديدة من '+senderName(MY_ROLE),new Date(item.at)<=new Date()?text:'لديك رسالة مجدولة','mail')).catch(console.warn);
+  } catch(err) {
+    console.error('Mail send failed:',err);
+    show('❌ تعذر الإرسال: '+(err?.code==='PERMISSION_DENIED'?'قواعد Firebase تمنع الكتابة':err?.message||'تحقق من الاتصال'),true);
+  } finally {if(btn){btn.disabled=false;btn.textContent='💌 إرسال الرسالة';}}
+};
 
-function renderMails(){ const el = document.getElementById('mailList'); const items = [...state.mails].sort((a,b)=>new Date(b.at)-new Date(a.at)); if(!items.length){el.innerHTML = `<div class="empty"><div class="e-icon">💌</div><p>ما في رسائل بعد</p></div>`; return;} el.innerHTML = items.map(m => { const delivered = new Date(m.at) <= new Date(); return `<div class="mail-item ${delivered?'delivered':'pending'}"><h4>${delivered?'📬 وصلت':'⏳ في الطريق'}${m.by?' — من '+senderName(m.by):''}</h4><p>${delivered ? escapeHtml(m.text) : 'رسالة ستصل '+timeUntil(m.at)}</p><div class="mail-meta"><span>⏰ ${fmtDateTime(m.at)}</span><button onclick="window.deleteMail('${m.id}')" style="color:#c62828;font-size:.8rem">حذف</button></div></div>`; }).join(''); }
-window.deleteMail = async function(id){ if(!confirm('حذف الرسالة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/mails/'+id));}catch(e){} } state.mails = state.mails.filter(m => m.id !== id); renderMails(); }
+function renderMails(){
+  const el=document.getElementById('mailList');
+  const items=[...state.mails].filter(m=>m.by===MY_ROLE || m.to===MY_ROLE || !m.to).sort((a,b)=>new Date(b.createdAt||b.at)-new Date(a.createdAt||a.at));
+  if(!items.length){el.innerHTML='<div class="empty"><div class="e-icon">💌</div><p>لا توجد رسائل حتى الآن</p><p>تحقق من فتح رابط عيوشة الخاص على هاتفها ومن اتصال الجهازين بنفس قاعدة البيانات.</p></div>';return;}
+  el.innerHTML=items.map(m=>{
+    const outgoing=m.by===MY_ROLE, delivered=new Date(m.at)<=new Date(), visible=outgoing||delivered;
+    const status=outgoing?(delivered?'📤 مُرسلة':'⏳ مجدولة'):(delivered?'📬 واردة':'🔒 رسالة قادمة');
+    return `<article class="mail-item ${delivered?'delivered':'pending'}" style="padding:17px;margin-bottom:12px;border:1px solid var(--border);background:white"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h4>${status}</h4><small>${escapeHtml(senderName(m.by))}</small></div><p style="white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0">${visible?escapeHtml(m.text):'ستظهر الرسالة عند موعد وصولها 💗'}</p><div class="mail-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>🕒 ${fmtDateTime(m.at)}</span>${outgoing?`<button onclick="window.deleteMail('${m.id}')" style="color:#c62828;font-size:.8rem">🗑️ حذف</button>`:''}</div></article>`;
+  }).join('');
+}
+window.deleteMail = async function(id){
+  const mail=state.mails.find(m=>m.id===id);
+  if(!mail || mail.by!==MY_ROLE)return;
+  if(!confirm('حذف الرسالة لدى الطرفين؟'))return;
+  try{if(!firebaseReady||!db)throw new Error('غير متصل');await remove(ref(db,'app/mails/'+id));toast('تم حذف الرسالة');}
+  catch(e){console.error(e);toast('❌ تعذر حذف الرسالة');}
+};
 
 let tempPhoto = null;
 window.addMemory = function(type){ 
@@ -666,6 +703,8 @@ async function boot(){
   const urlRole = urlParams.get('for');
   if(urlRole === 'her' || urlRole === 'me'){ MY_ROLE = urlRole; localStorage.setItem('ayousha_role', urlRole); }
   else { MY_ROLE = localStorage.getItem('ayousha_role') || 'me'; localStorage.setItem('ayousha_role', MY_ROLE); }
+  // Each device must use its own role; the shared link ?for=her assigns the recipient role.
+  window.currentMailRole=MY_ROLE;
 
   const savedCfg = lsGet('config', null);
   if(savedCfg){ config = { ...config, ...savedCfg }; }
@@ -704,7 +743,7 @@ async function boot(){
   }
   setInterval(updateCountdown, 1000);
   setInterval(updateGreet, 60000);
-  setInterval(()=>{ checkReadyItems(); }, 20000);
+  setInterval(()=>{ checkReadyItems(); renderMails(); }, 20000);
 }
 document.addEventListener('click', () => { initAudio(); }, { once: true });
 document.addEventListener('touchstart', () => { initAudio(); }, { once: true });
