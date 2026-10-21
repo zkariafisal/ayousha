@@ -132,6 +132,21 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
   padding: 20px;
 }
 </style>
+<style>
+/* Interactive message experience */
+#mailList{display:flex;flex-direction:column;gap:12px;padding:12px 4px}
+#mailList .chat-row{display:flex;width:100%;scroll-margin-top:110px}
+#mailList .chat-row.mine{justify-content:flex-start}#mailList .chat-row.theirs{justify-content:flex-end}
+#mailList .chat-bubble{max-width:88%;min-width:55%;border-radius:20px;padding:14px 16px;box-shadow:0 5px 18px #56334b12;border:1px solid #ecdde7;background:#fff;color:#352737}
+#mailList .mine .chat-bubble{background:linear-gradient(145deg,#ffe2ed,#fff0f6);border-color:#f5bbd1;border-top-right-radius:5px}
+#mailList .theirs .chat-bubble{background:linear-gradient(145deg,#f4eaff,#fff);border-color:#e0cdf4;border-top-left-radius:5px}
+#mailList .chat-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.82rem;font-weight:800}
+#mailList .chat-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.85;margin:10px 0;color:#332639}
+#mailList .chat-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.73rem;opacity:.8}
+#mailList .chat-row.highlight .chat-bubble{outline:3px solid #e887af;animation:mailGlow 1.4s ease}
+@keyframes mailGlow{0%,100%{transform:scale(1)}45%{transform:scale(1.025)}}
+.notif-item{cursor:pointer;transition:transform .18s,background .18s}.notif-item:active{transform:scale(.98)}
+</style>
 </head>
 <body>
 
@@ -306,27 +321,43 @@ function initAudio(){ if(!audioCtx){ try{audioCtx = new (window.AudioContext || 
 document.addEventListener('click', initAudio, {once:false});
 function playBeep(){ try{ initAudio(); if(!audioCtx)return; const now = audioCtx.currentTime; [880, 1100].forEach((freq, i) => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.value = freq; osc.connect(gain); gain.connect(audioCtx.destination); gain.gain.setValueAtTime(0.0001, now + i * 0.15); gain.gain.exponentialRampToValueAtTime(0.25, now + i * 0.15 + 0.02); gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.15 + 0.3); osc.start(now + i * 0.15); osc.stop(now + i * 0.15 + 0.32); }); }catch(e){} }
 
+const SOUND_PREF_KEY='ayousha_sounds_enabled';
+let soundsEnabled=localStorage.getItem(SOUND_PREF_KEY)!=='false';
+function playEventSound(type='mail', outgoing=false){
+ if(!soundsEnabled)return;
+ try{initAudio();if(!audioCtx||audioCtx.state!=='running')return;
+ const notes={mail:[660,880,1175],surprise:[523,784,1047,1318],memory:[587,784],ping:[784,988,784],mood:[440,659],answer:[659,880],notification:[740,988],send:[660,880]}[outgoing?'send':type]||[700,950];
+ const t=audioCtx.currentTime;notes.forEach((freq,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=outgoing?'sine':'triangle';o.frequency.setValueAtTime(freq,t+i*.115);o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(.0001,t+i*.115);g.gain.exponentialRampToValueAtTime(.09,t+i*.115+.015);g.gain.exponentialRampToValueAtTime(.0001,t+i*.115+.19);o.start(t+i*.115);o.stop(t+i*.115+.2);});
+ }catch(e){console.warn('Sound unavailable',e)}
+}
+window.toggleSounds=function(){soundsEnabled=!soundsEnabled;localStorage.setItem(SOUND_PREF_KEY,String(soundsEnabled));toast(soundsEnabled?'🔊 تم تشغيل الأصوات':'🔇 تم كتم الأصوات');if(soundsEnabled)playEventSound('surprise');};
+function eventDestination(type){return ({mail:'mail',surprise:'surprises',memory:'memories',ping:'home',mood:'mood',answer:'home'})[type]||'notifications'}
+function openEventDestination(type,id){const view=eventDestination(type);if(document.getElementById('view-'+view))switchView(view);else switchView('notifications');if(type==='mail'&&id){setTimeout(()=>{const row=[...document.querySelectorAll('[data-mail-id]')].find(e=>e.dataset.mailId===id);if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.classList.add('highlight');setTimeout(()=>row.classList.remove('highlight'),2600)}},250)}}
+window.openEventDestination=openEventDestination;
+function handleDeepLink(){const p=new URLSearchParams(location.search);const type=p.get('open'),id=p.get('item');if(type){openEventDestination(type,id);p.delete('open');p.delete('item');history.replaceState({},'',location.pathname+'?'+p.toString())}}
+let receivedEventIds=new Set(),eventsPrimed=false;
+function processIncomingNotifications(items){const incoming=items.filter(n=>n.to===MY_ROLE);if(eventsPrimed){for(const n of incoming){if(!receivedEventIds.has(n.id)){playEventSound(n.type);if(navigator.vibrate)navigator.vibrate([100,70,130]);toast('🔔 '+n.title)}}}receivedEventIds=new Set(incoming.map(n=>n.id));eventsPrimed=true;}
 async function requestNotifPermission(){ if(!('Notification' in window))return false; if(Notification.permission === 'granted')return true; if(Notification.permission === 'denied')return false; try{ const p = await Notification.requestPermission(); return p === 'granted'; }catch(e){return false;} }
-function showAppNotification(title, body){ playBeep(); if(navigator.vibrate)navigator.vibrate([200, 100, 200]); toast('🔔 ' + title); if(Notification.permission === 'granted'){ try{ new Notification(title, { body: body || '', icon: ICON_URL, badge: ICON_URL, silent: true }); }catch(e){} } }
+function showAppNotification(title, body, type='notification', itemId=''){ playEventSound(type); if(navigator.vibrate)navigator.vibrate([200, 100, 200]); toast('🔔 ' + title); if(Notification.permission === 'granted'){ try{ new Notification(title, { body: body || '', icon: ICON_URL, badge: ICON_URL, silent: true, data:{type,itemId} }); }catch(e){} } }
 
-async function addNotification(title, body, type) {
+async function addNotification(title, body, type, itemId='') {
   if(!firebaseReady || !db) return;
   const to = MY_ROLE === 'me' ? 'her' : 'me';
-  const notif = { from: MY_ROLE, to, title, body, type, at: new Date().toISOString(), read: false };
+  const notif = { from: MY_ROLE, to, title, body, type, itemId, at: new Date().toISOString(), read: false };
   try {
     await push(ref(db, 'app/notifications'), notif);
-    sendFCM(to, title, body);
+    sendFCM(to, title, body, type, itemId);
   } catch(e) { console.warn('addNotif err', e); }
 }
 
-async function sendFCM(toRole, title, body) {
+async function sendFCM(toRole, title, body, type='notification', itemId='') {
   const targetToken = config[toRole]?.fcmToken;
   if(!targetToken){ console.info('لا يوجد رمز إشعارات للطرف الآخر، لكن الرسالة محفوظة في قاعدة البيانات'); return; }
   try {
     const response = await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: targetToken, title, body })
+      body: JSON.stringify({ token: targetToken, title, body, type, itemId, role:toRole })
     });
     const resData = await response.json();
     if(resData.success) console.log('✅ FCM Sent Successfully');
@@ -349,7 +380,7 @@ function renderNotifs(tab) {
   el.innerHTML = items.map(n => {
     const isUnread = tab === 'inbox' && !n.read;
     let icon = '🔔'; if(n.type === 'mail') icon = '💌'; if(n.type === 'surprise') icon = '🎁'; if(n.type === 'memory') icon = '📸'; if(n.type === 'ping') icon = '💗'; if(n.type === 'mood') icon = '🌙'; if(n.type === 'answer') icon = '📝';
-    return `<div class="notif-item ${isUnread ? 'unread' : ''}"><div class="notif-icon">${icon}</div><div class="notif-body"><h4>${escapeHtml(n.title)} ${tab === 'sent' ? '(أرسلت)' : ''}</h4><p>${escapeHtml(n.body)}</p><div class="notif-time">${fmtDateTime(n.at)}</div></div></div>`;
+    return `<div class="notif-item ${isUnread ? 'unread' : ''}" onclick="window.openEventDestination('${n.type}','${n.itemId||''}')" role="button" tabindex="0"><div class="notif-icon">${icon}</div><div class="notif-body"><h4>${escapeHtml(n.title)} ${tab === 'sent' ? '(أرسلت)' : ''}</h4><p>${escapeHtml(n.body)}</p><div class="notif-time">${fmtDateTime(n.at)}</div></div></div>`;
   }).join('');
 }
 
@@ -452,13 +483,13 @@ async function initFCM(){
       await set(ref(db, `config/${MY_ROLE}/fcmToken`), token);
       console.log('✅ FCM Token saved:', token);
     }
-    onMessage(messaging, (payload) => { showAppNotification(payload.notification.title, payload.notification.body); });
+    onMessage(messaging, (payload) => { const d=payload.data||{};showAppNotification(payload.notification?.title||d.title||'رسالة جديدة',payload.notification?.body||d.body||'',d.type||'notification',d.itemId||''); });
   } catch(e) { console.warn('FCM Init error:', e); }
 }
 
 function startSync(){
   if(!firebaseReady || !db)return;
-  onValue(ref(db, 'app/notifications'), s => { const v = s.val(); allNotifs = v ? Object.entries(v).map(([id,item])=>({id, ...item})).sort((a,b)=>new Date(b.at)-new Date(a.at)) : []; updateNotifBell(); if(document.getElementById('view-notifications').classList.contains('active')) { renderNotifs(currentNotifTab); } });
+  onValue(ref(db, 'app/notifications'), s => { const v = s.val(); allNotifs = v ? Object.entries(v).map(([id,item])=>({id, ...item})).sort((a,b)=>new Date(b.at)-new Date(a.at)) : []; updateNotifBell(); processIncomingNotifications(allNotifs); if(document.getElementById('view-notifications').classList.contains('active')) { renderNotifs(currentNotifTab); } });
   onValue(ref(db, 'app/meetupDate'), s => { state.meetupDate = s.val() || ''; updateCountdown(); });
   onValue(ref(db, 'app/settings'), s => { if(s.val()) state.settings = s.val(); updateGreet(); });
   onValue(ref(db, 'app/answers'), s => { state.answers = s.val() || {}; renderDaily(); });
@@ -484,9 +515,9 @@ const DEFAULT_QUESTIONS = ["لو عندك يوم كامل فاضي، شو أول
 function getDailyQuestion(){const key = getTodayKey(); if(state.answers[key]?.q)return state.answers[key].q; const idx = Math.floor(new Date().setHours(0,0,0,0) / 86400000); return DEFAULT_QUESTIONS[idx % DEFAULT_QUESTIONS.length];}
 function renderDaily(){ const key = getTodayKey(); const q = getDailyQuestion(); document.getElementById('dailyQ').textContent = q; const ta = document.getElementById('dailyAnswer'); const a = state.answers[key]; if(document.activeElement !== ta)ta.value = a?.a || ''; const saved = document.getElementById('answerSaved'); if(a?.a)saved.innerHTML = `<div class="answer-saved">💚 محفوظ — ${fmtDateTime(a.t)}${a.by ? ' — ' + senderName(a.by) : ''}</div>`; else saved.innerHTML = ''; }
 let dailyTimer = null;
-document.addEventListener('input', e => { if(e.target.id === 'dailyAnswer'){ clearTimeout(dailyTimer); dailyTimer = setTimeout(async () => { const key = getTodayKey(); const payload = { q: getDailyQuestion(), a: e.target.value, t: new Date().toISOString(), by: MY_ROLE }; state.answers[key] = payload; if(firebaseReady && db){ try{await set(ref(db, 'app/answers/'+key), payload);}catch(err){} } if(e.target.value.trim()) addNotification('إجابة سؤال اليوم', e.target.value.slice(0,80), 'answer'); document.getElementById('answerSaved').innerHTML = e.target.value.trim() ? '<div class="answer-saved">💚 ينحفظ تلقائياً</div>' : ''; }, 1000); } });
+document.addEventListener('input', e => { if(e.target.id === 'dailyAnswer'){ clearTimeout(dailyTimer); dailyTimer = setTimeout(async () => { const key = getTodayKey(); const payload = { q: getDailyQuestion(), a: e.target.value, t: new Date().toISOString(), by: MY_ROLE }; state.answers[key] = payload; if(firebaseReady && db){ try{await set(ref(db, 'app/answers/'+key), payload);}catch(err){} } if(e.target.value.trim()) addNotification('إجابة سؤال اليوم', e.target.value.slice(0,80), 'answer');playEventSound('answer',true); document.getElementById('answerSaved').innerHTML = e.target.value.trim() ? '<div class="answer-saved">💚 ينحفظ تلقائياً</div>' : ''; }, 1000); } });
 
-async function sendPing(){ const ping = { at: new Date().toISOString(), by: MY_ROLE }; state.pings.unshift({id:uid(), ...ping}); renderPings(); if(firebaseReady && db){ try{await push(ref(db, 'app/pings'), ping);}catch(e){} } addNotification('أنا أفكر فيك', 'اضغطي لتعرفي المزيد 💗', 'ping'); toast('💗 وصل حبك'); burstHearts(); }
+async function sendPing(){ const ping = { at: new Date().toISOString(), by: MY_ROLE }; state.pings.unshift({id:uid(), ...ping}); renderPings(); if(firebaseReady && db){ try{await push(ref(db, 'app/pings'), ping);}catch(e){} } addNotification('أنا أفكر فيك', 'اضغطي لتعرفي المزيد 💗', 'ping');playEventSound('ping',true); toast('💗 وصل حبك'); burstHearts(); }
 window.sendPing = sendPing;
 function renderPings(){ const el = document.getElementById('pingLog'); if(!state.pings.length){el.textContent = 'لسا ما أرسلتِ ولا مرة 💭'; return;} const sorted = [...state.pings].sort((a,b)=>new Date(b.at)-new Date(a.at)); const last = sorted[0]; const byName = last.by ? ` (${senderName(last.by)})` : ''; el.innerHTML = `💗 آخر مرة: ${fmtDateTime(last.at)}${byName} — المجموع: <b>${state.pings.length}</b> مرة`; }
 function burstHearts(){ for(let i=0;i<12;i++){ const h = document.createElement('div'); h.textContent = ['💗','💖','🌸','✨','💕'][i%5]; h.style.cssText = `position:fixed;left:${50+(Math.random()-0.5)*40}%;bottom:200px;font-size:${1+Math.random()*1.5}rem;pointer-events:none;z-index:999;transition:all 1.5s ease;opacity:1;`; document.body.appendChild(h); requestAnimationFrame(()=>{ h.style.transform = `translate(${(Math.random()-0.5)*200}px, -${200+Math.random()*200}px) rotate(${(Math.random()-0.5)*60}deg)`; h.style.opacity = '0'; }); setTimeout(()=>h.remove(), 1600); } }
@@ -502,7 +533,7 @@ window.saveSurprise = async function(){
     const item = { text, at: new Date(timeVal).toISOString(), opened: false, by: MY_ROLE }; 
     if(firebaseReady && db){ await push(ref(db, 'app/surprises'), item); } 
     closeModal(); 
-    addNotification('مفاجأة جديدة', text, 'surprise'); 
+    addNotification('مفاجأة جديدة', text, 'surprise');playEventSound('surprise',true); 
     toast('🎁 مفاجأة محفوظة'); 
   } catch(err) { console.error(err); toast('⚠️ حدث خطأ، تأكد من صحة التاريخ'); }
 }
@@ -540,9 +571,9 @@ window.saveMail = async function(){
       await Promise.race([operation,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('انتهت مهلة الاتصال (15 ثانية). تحقق من الإنترنت وقواعد Firebase قبل إعادة الإرسال.')),15000);})]);
     } finally {clearTimeout(timer);}
     closeModal();
-    toast('✅ تم حفظ الرسالة، وستظهر لدى الطرف الآخر عند اتصال التطبيق');
+    playEventSound('mail',true);toast('✅ تم حفظ الرسالة، وستظهر لدى الطرف الآخر عند اتصال التطبيق');
     // Notification is best-effort and must never block sending.
-    Promise.resolve().then(()=>addNotification('💌 رسالة جديدة من '+senderName(MY_ROLE),new Date(item.at)<=new Date()?text:'لديك رسالة مجدولة','mail')).catch(console.warn);
+    Promise.resolve().then(()=>addNotification('💌 رسالة جديدة من '+senderName(MY_ROLE),new Date(item.at)<=new Date()?text:'لديك رسالة مجدولة','mail',operation.key)).catch(console.warn);
   } catch(err) {
     console.error('Mail send failed:',err);
     show('❌ تعذر الإرسال: '+(err?.code==='PERMISSION_DENIED'?'قواعد Firebase تمنع الكتابة':err?.message||'تحقق من الاتصال'),true);
@@ -550,14 +581,12 @@ window.saveMail = async function(){
 };
 
 function renderMails(){
-  const el=document.getElementById('mailList');
-  const items=[...state.mails].filter(m=>m.by===MY_ROLE || m.to===MY_ROLE || !m.to).sort((a,b)=>new Date(b.createdAt||b.at)-new Date(a.createdAt||a.at));
-  if(!items.length){el.innerHTML='<div class="empty"><div class="e-icon">💌</div><p>لا توجد رسائل حتى الآن</p><p>تحقق من فتح رابط عيوشة الخاص على هاتفها ومن اتصال الجهازين بنفس قاعدة البيانات.</p></div>';return;}
-  el.innerHTML=items.map(m=>{
-    const outgoing=m.by===MY_ROLE, delivered=new Date(m.at)<=new Date(), visible=outgoing||delivered;
-    const status=outgoing?(delivered?'📤 مُرسلة':'⏳ مجدولة'):(delivered?'📬 واردة':'🔒 رسالة قادمة');
-    return `<article class="mail-item ${delivered?'delivered':'pending'}" style="padding:17px;margin-bottom:12px;border:1px solid var(--border);background:white"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h4>${status}</h4><small>${escapeHtml(senderName(m.by))}</small></div><p style="white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0">${visible?escapeHtml(m.text):'ستظهر الرسالة عند موعد وصولها 💗'}</p><div class="mail-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>🕒 ${fmtDateTime(m.at)}</span>${outgoing?`<button onclick="window.deleteMail('${m.id}')" style="color:#c62828;font-size:.8rem">🗑️ حذف</button>`:''}</div></article>`;
-  }).join('');
+ const el=document.getElementById('mailList');if(!el)return;
+ const items=[...state.mails].filter(m=>m.by===MY_ROLE||m.to===MY_ROLE||!m.to).sort((a,b)=>new Date(a.createdAt||a.at)-new Date(b.createdAt||b.at));
+ if(!items.length){el.innerHTML='<div class="empty"><div class="e-icon">💌</div><p>ابدآ أول رسالة حب 💗</p></div>';return;}
+ el.innerHTML=items.map(m=>{const mine=m.by===MY_ROLE,ready=new Date(m.at)<=new Date(),visible=mine||ready;
+ return `<article class="chat-row ${mine?'mine':'theirs'}" data-mail-id="${escapeHtml(m.id)}"><div class="chat-bubble"><div class="chat-head"><span>${mine?'💗 أنا':'💜 '+escapeHtml(senderName(m.by))}</span><span>${ready?(mine?'✓ أُرسلت':'📩 واردة'):'⏳ مجدولة'}</span></div><p class="chat-text">${visible?escapeHtml(m.text):'🔒 ستفتح هذه الرسالة في موعدها'}</p><div class="chat-foot"><span>🕒 ${fmtDateTime(m.at)}</span>${mine?`<button onclick="window.deleteMail('${m.id}')" aria-label="حذف الرسالة">🗑️</button>`:''}</div></div></article>`;
+ }).join('');
 }
 window.deleteMail = async function(id){
   const mail=state.mails.find(m=>m.id===id);
@@ -633,7 +662,7 @@ window.saveMemory = async function(type){
   } 
   if(firebaseReady && db){ try{await push(ref(db, 'app/memories'), item);}catch(e){ console.warn(e); } } 
   closeModal(); 
-  addNotification('ذكرى جديدة', title || 'صورة جديدة', 'memory'); 
+  addNotification('ذكرى جديدة', title || 'صورة جديدة', 'memory');playEventSound('memory',true); 
   toast('📸 الذكرى محفوظة'); 
 }
 
@@ -657,7 +686,7 @@ const MOOD_RESPONSES = { happy: ["😊 فرحتك تفرحني."], tired: ["😴
 function getMoodValue(m){ if(typeof m === 'string')return m; if(m && m.mood)return m.mood; return null; }
 function renderMood(){ const key = getTodayKey(); const current = getMoodValue(state.moods[key]); document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('selected', b.dataset.mood === current)); renderMoodResponse(current); }
 function renderMoodResponse(mood){ const el = document.getElementById('moodResponse'); if(!mood){el.innerHTML = ''; return;} el.innerHTML = `<div class="mood-response">${(MOOD_RESPONSES[mood]||['💗'])[0]}</div>`; }
-document.querySelectorAll('.mood-btn').forEach(btn => { btn.addEventListener('click', async () => { const key = getTodayKey(); const mood = btn.dataset.mood; const payload = { mood, by: MY_ROLE, at: new Date().toISOString() }; state.moods[key] = payload; renderMood(); if(firebaseReady && db){ try{await set(ref(db, 'app/moods/'+key), payload);}catch(e){} } addNotification('مزاج جديد', btn.textContent.trim(), 'mood'); toast('سجلنا مزاجك 💭'); }); });
+document.querySelectorAll('.mood-btn').forEach(btn => { btn.addEventListener('click', async () => { const key = getTodayKey(); const mood = btn.dataset.mood; const payload = { mood, by: MY_ROLE, at: new Date().toISOString() }; state.moods[key] = payload; renderMood(); if(firebaseReady && db){ try{await set(ref(db, 'app/moods/'+key), payload);}catch(e){} } addNotification('مزاج جديد', btn.textContent.trim(), 'mood');playEventSound('mood',true); toast('سجلنا مزاجك 💭'); }); });
 
 function openSettings(){
   const notifStatus = !('Notification' in window) ? '<div class="info-box warn">⚠️ متصفحك لا يدعم الإشعارات</div>' : Notification.permission === 'granted' ? '<div class="info-box ok">✅ الإشعارات مفعّلة</div>' : Notification.permission === 'denied' ? '<div class="info-box warn">❌ الإشعارات مرفوضة — افتح إعدادات المتصفح واسمح بها</div>' : '<div class="info-box">🔔 الإشعارات غير مفعّلة</div>';
@@ -672,7 +701,7 @@ function openSettings(){
     ${notifStatus}
     <div class="modal-actions" style="flex-direction:column">
       <button class="btn btn-soft btn-full" onclick="window.askNotifPermission()">🔔 تفعيل الإشعارات</button>
-      <button class="btn btn-soft btn-full" onclick="window.testNotification()">🧪 اختبار الإشعار</button>
+      <button class="btn btn-soft btn-full" onclick="window.testNotification()">🧪 اختبار الإشعار</button><button class="btn btn-soft btn-full" onclick="window.toggleSounds()">🔊 تشغيل / كتم أصوات التفاعل</button>
     </div>
     ${isOwner ? `<h4>إدارة</h4><div class="modal-actions" style="flex-direction:column"><button class="btn btn-soft btn-full" onclick="window.resendHerLink()">🔗 عرض رابط عيوشة</button><button class="btn btn-danger btn-full" onclick="window.openSetupAgain()">🔧 إعادة الإعداد</button></div>` : ''}
   `);
@@ -744,6 +773,7 @@ async function boot(){
   setInterval(updateCountdown, 1000);
   setInterval(updateGreet, 60000);
   setInterval(()=>{ checkReadyItems(); renderMails(); }, 20000);
+  setTimeout(handleDeepLink,1200);
 }
 document.addEventListener('click', () => { initAudio(); }, { once: true });
 document.addEventListener('touchstart', () => { initAudio(); }, { once: true });
