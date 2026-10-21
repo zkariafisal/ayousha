@@ -68,7 +68,6 @@ main{max-width:900px;margin:0 auto;padding:0 16px}
 .think-btn small{font-size:.75rem;font-weight:400;opacity:.9}
 @keyframes pulse{0%,100%{box-shadow:0 12px 40px rgba(216,27,96,.4),inset 0 -6px 20px rgba(0,0,0,.15)}50%{box-shadow:0 12px 60px rgba(216,27,96,.7),inset 0 -6px 20px rgba(0,0,0,.15)}}
 .ping-log{margin-top:14px;font-size:.82rem;color:var(--muted);text-align:center}
-/* Notifications List */
 .notif-item{background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;border:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;position:relative}
 .notif-item.unread{border-right:4px solid var(--primary);background:#fffafb}
 .notif-icon{width:40px;height:40px;border-radius:50%;background:#fce4ec;display:grid;place-items:center;font-size:1.2rem;flex-shrink:0}
@@ -76,7 +75,6 @@ main{max-width:900px;margin:0 auto;padding:0 16px}
 .notif-body h4{font-size:.95rem;margin-bottom:4px;font-weight:700}
 .notif-body p{font-size:.85rem;color:var(--muted);margin-bottom:6px;word-break:break-word}
 .notif-time{font-size:.7rem;color:#aaa}
-/* Surprises, Mails, etc. (Kept from previous) */
 .surprise-item,.mail-item,.mem-card,.mood-btn{border-radius:var(--radius-sm);box-shadow:var(--shadow)}
 nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-top:1px solid var(--border);padding:8px 6px calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;align-items:center;z-index:50;max-width:900px;margin:0 auto;border-radius:24px 24px 0 0}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:14px;color:var(--muted);font-size:.7rem;font-weight:600;transition:all .2s;position:relative}
@@ -111,6 +109,28 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
 #splashScreen img{max-width:85%;max-height:70vh;object-fit:contain;border-radius:20px;box-shadow:0 10px 30px rgba(216,27,96,0.15);margin-bottom:20px}
 .spinner{width:40px;height:40px;border:3px solid #f8bbd0;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ======== تنسيق الصور المصغرة والمكبرة ======== */
+.mem-card img.mem-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: transform 0.3s ease;
+}
+.mem-card img.mem-img.fullscreen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  background: rgba(0,0,0,0.9);
+  z-index: 9999;
+  border-radius: 0;
+  padding: 20px;
+}
 </style>
 </head>
 <body>
@@ -245,7 +265,7 @@ const firebaseConfig = {
 const DEFAULT_VAPID_KEY = "BPpUV-YcYpV9OFhV2BkYllEar1_BsupWxIHP83ZDBPBozGV7mSnZqsIglbrYLWFs1E8WbXzPb577iT7D-LcZ_r8";
 const ICON_URL = 'https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png'; 
 const APP_START = Date.now();
-const LS = 'ayousha_v7_';
+const LS = 'ayousha_v8_'; // تم تحديث الإصدار لمسح الكاش القديم
 
 let MY_ROLE = null;
 let db = null;
@@ -295,15 +315,13 @@ async function addNotification(title, body, type) {
   const notif = { from: MY_ROLE, to, title, body, type, at: new Date().toISOString(), read: false };
   try {
     await push(ref(db, 'app/notifications'), notif);
-    sendFCM(to, title, body); // استدعاء دالة الإرسال
+    sendFCM(to, title, body);
   } catch(e) { console.warn('addNotif err', e); }
 }
 
-// التعديل هنا: نرسل الطلب لدالة Vercel الآمنة
 async function sendFCM(toRole, title, body) {
   const targetToken = config[toRole]?.fcmToken;
   if(!targetToken) return;
-  
   try {
     const response = await fetch('/api/notify', {
       method: 'POST',
@@ -488,17 +506,104 @@ function renderMails(){ const el = document.getElementById('mailList'); const it
 async function deleteMail(id){ if(!confirm('حذف الرسالة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/mails/'+id));}catch(e){} } state.mails = state.mails.filter(m => m.id !== id); renderMails(); }
 window.deleteMail = deleteMail;
 
+/* ============================================================
+   🌟 قسم الذكريات والصور (تم تعديله)
+   ============================================================ */
 let tempPhoto = null;
-function addMemory(type){ if(type === 'text'){ openModal(`<h3>📝 ذكرى نصية</h3><label>العنوان</label><input id="memTitle"><label>الذكرى</label><textarea id="memText"></textarea><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('text')">حفظ</button></div>`); } else { tempPhoto = null; openModal(`<h3>📷 ذكرى صورة</h3><label>العنوان</label><input id="memTitle"><label>اختاري صورة</label><input type="file" id="memFile" accept="image/*" onchange="previewPhoto(event)"><div id="photoPreview" style="margin-top:10px"></div><small class="help">⚠️ اختر صورة أقل من 500KB.</small><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('photo')">حفظ</button></div>`); } }
+
+function addMemory(type){ 
+  if(type === 'text'){ 
+    openModal(`<h3>📝 ذكرى نصية</h3><label>العنوان</label><input id="memTitle"><label>الذكرى</label><textarea id="memText"></textarea><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('text')">حفظ</button></div>`); 
+  } else { 
+    tempPhoto = null; 
+    openModal(`<h3>📷 ذكرى صورة</h3><label>العنوان</label><input id="memTitle"><label>اختاري صورة (أي حجم)</label><input type="file" id="memFile" accept="image/*" onchange="previewPhoto(event)"><div id="photoPreview" style="margin-top:10px"></div><small class="help">💡 سيتم ضغط الصورة تلقائياً لتوفير المساحة، وستظهر كصورة مصغرة في الأرشيف. اضغطي عليها لرؤيتها بالحجم الكامل.</small><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('photo')">حفظ</button></div>`); 
+  } 
+}
 window.addMemory = addMemory;
-function previewPhoto(e){ const f = e.target.files[0]; if(!f)return; if(f.size > 800000){toast('الصورة كبيرة — اختر أصغر من 800KB'); return;} const r = new FileReader(); r.onload = ev => { tempPhoto = ev.target.result; document.getElementById('photoPreview').innerHTML = `<img src="${tempPhoto}" style="width:100%;border-radius:12px;max-height:240px;object-fit:cover">`; }; r.readAsDataURL(f); }
+
+// دالة ضغط الصورة باستخدام Canvas
+function compressImage(file, maxWidth, maxHeight, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = event => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
+        } else {
+          if (height > maxHeight) { width *= maxHeight / height; height = maxHeight; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality)); // ضغط بصيغة JPEG
+      };
+      img.onerror = error => reject(error);
+    };
+    reader.onerror = error => reject(error);
+  });
+}
+
+function previewPhoto(e){ 
+  const f = e.target.files[0]; 
+  if(!f)return; 
+  toast('⏳ جاري ضغط الصورة...');
+  // ضغط الصورة إلى أقصى عرض/ارتفاع 1200 بكسل وجودة 0.7
+  compressImage(f, 1200, 1200, 0.7).then(compressedBase64 => {
+    tempPhoto = compressedBase64; 
+    document.getElementById('photoPreview').innerHTML = `<img src="${tempPhoto}" style="width:100%;border-radius:12px;max-height:240px;object-fit:cover">`; 
+    toast('✅ تم تجهيز الصورة');
+  }).catch(err => {
+    console.error('Compression error:', err);
+    toast('⚠️ حدث خطأ في معالجة الصورة');
+  });
+}
 window.previewPhoto = previewPhoto;
-async function saveMemory(type){ const title = document.getElementById('memTitle')?.value.trim() || ''; const item = { type, title, at: new Date().toISOString(), by: MY_ROLE }; if(type === 'text'){ const text = document.getElementById('memText').value.trim(); if(!text){toast('اكتبي الذكرى'); return;} item.text = text; } else { if(!tempPhoto){toast('اختاري صورة'); return;} item.src = tempPhoto; tempPhoto = null; } if(firebaseReady && db){ try{await push(ref(db, 'app/memories'), item);}catch(e){} } renderMemories(); closeModal(); addNotification('ذكرى جديدة', title || 'صورة جديدة', 'memory'); toast('📸 الذكرى محفوظة'); }
+
+async function saveMemory(type){ 
+  const title = document.getElementById('memTitle')?.value.trim() || ''; 
+  const item = { type, title, at: new Date().toISOString(), by: MY_ROLE }; 
+  if(type === 'text'){ 
+    const text = document.getElementById('memText').value.trim(); 
+    if(!text){toast('اكتبي الذكرى'); return;} 
+    item.text = text; 
+  } else { 
+    if(!tempPhoto){toast('اختاري صورة أولاً'); return;} 
+    item.src = tempPhoto; 
+    tempPhoto = null; 
+  } 
+  if(firebaseReady && db){ try{await push(ref(db, 'app/memories'), item);}catch(e){} } 
+  renderMemories(); closeModal(); addNotification('ذكرى جديدة', title || 'صورة جديدة', 'memory'); toast('📸 الذكرى محفوظة'); 
+}
 window.saveMemory = saveMemory;
-function renderMemories(){ const el = document.getElementById('memGrid'); if(!state.memories.length){el.innerHTML = `<div class="empty"><div class="e-icon">📸</div><p>أرشيفنا فاضي</p></div>`; return;} el.innerHTML = state.memories.map(m => { let body = ''; if(m.type === 'photo' && m.src)body = `<img src="${m.src}">`; else if(m.text)body = `<div class="mem-text">${escapeHtml(m.text)}</div>`; return `<div class="mem-card">${body}${m.title?`<div style="padding:0 10px;font-weight:700;font-size:.85rem">${escapeHtml(m.title)}</div>`:''}<div class="mem-date">${fmtDate(m.at)}</div>${m.by?`<div class="mem-sender">من: ${senderName(m.by)}</div>`:''}<button class="mem-del" onclick="deleteMemory('${m.id}')">✕</button></div>`; }).join(''); }
+
+// دالة تبديل حجم الصورة
+window.toggleImage = function(el) {
+  el.classList.toggle('fullscreen');
+};
+
+function renderMemories(){ 
+  const el = document.getElementById('memGrid'); 
+  if(!state.memories.length){el.innerHTML = `<div class="empty"><div class="e-icon">📸</div><p>أرشيفنا فاضي</p></div>`; return;} 
+  el.innerHTML = state.memories.map(m => { 
+    let body = ''; 
+    if(m.type === 'photo' && m.src) body = `<img src="${m.src}" class="mem-img" onclick="toggleImage(this)">`; 
+    else if(m.text) body = `<div class="mem-text">${escapeHtml(m.text)}</div>`; 
+    return `<div class="mem-card">${body}${m.title?`<div style="padding:0 10px;font-weight:700;font-size:.85rem">${escapeHtml(m.title)}</div>`:''}<div class="mem-date">${fmtDate(m.at)}</div>${m.by?`<div class="mem-sender">من: ${senderName(m.by)}</div>`:''}<button class="mem-del" onclick="deleteMemory('${m.id}')">✕</button></div>`; 
+  }).join(''); 
+}
 async function deleteMemory(id){ if(!confirm('حذف الذكرى؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/memories/'+id));}catch(e){} } state.memories = state.memories.filter(m => m.id !== id); renderMemories(); }
 window.deleteMemory = deleteMemory;
 
+/* ============================================================
+   المزاج والإعدادات
+   ============================================================ */
 const MOOD_RESPONSES = { happy: ["😊 فرحتك تفرحني."], tired: ["😴 ارتاحي حبيبتي."], sad: ["🥺 ما أحب أشوفك زعلانة."], missing: ["💭 وأنا مشتاق لك أكثر."], angry: ["😤 أنا معك."], calm: ["😌 هدوءك جميل."], excited: ["🤩 شاركيني الحماس!"], sick: ["🤒 سلامتك."] };
 function getMoodValue(m){ if(typeof m === 'string')return m; if(m && m.mood)return m.mood; return null; }
 function renderMood(){ const key = getTodayKey(); const current = getMoodValue(state.moods[key]); document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('selected', b.dataset.mood === current)); renderMoodResponse(current); }
@@ -588,4 +693,4 @@ document.addEventListener('touchstart', () => { initAudio(); }, { once: true });
 boot();
 </script>
 </body>
-  </html>
+</html>
