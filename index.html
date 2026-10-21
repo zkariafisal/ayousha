@@ -644,7 +644,10 @@ window.launchGameModal = function(type){
         ${[0,1,2,3,4,5,6,7,8].map(i=>`<button id="xo-${i}" class="btn btn-soft" style="height:70px;font-size:2rem;" onclick="window.playXO(${i})">?</button>`).join('')}
       </div>
       <div id="xoStatus" style="text-align:center;font-weight:bold;margin:10px 0;">الدور: ❌ (زكريا)</div>
-      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn btn-soft" style="flex:1;" onclick="window.openGameChatBox('xo_session_1')">💬 دردشة اللعبة</button>
+        <button class="btn btn-soft" style="flex:1;" onclick="closeModal()">إغلاق</button>
+      </div>
     `);
   } else if(type==='cards'){
     openModal(`
@@ -812,6 +815,71 @@ window.showIslandModal = function(){
       <div style="margin-top:15px;font-weight:bold;color:#d81b60;">التقدم الحالي: المستوى 2 🌟</div>
     </div>
   `);
+};
+
+
+// ===== In-Game Chat Feature ("التحدث مع بعض داخل الألعاب") =====
+let activeGameId = null;
+let gameChatUnsubscribe = null;
+
+window.openGameChatBox = function(gameId) {
+  activeGameId = gameId;
+  if(gameChatUnsubscribe) { gameChatUnsubscribe(); gameChatUnsubscribe = null; }
+  
+  const chatRef = ref(db, `games/${gameId}/chat`);
+  
+  const modalHtml = `
+    <h3>💬 محادثة اللعبة المباشرة</h3>
+    <div id="gameChatMessages" style="background:#f9f1f5;border:1px solid #f1dce6;border-radius:12px;height:180px;overflow-y:auto;padding:10px;margin-bottom:10px;display:flex;flex-direction:column;gap:6px;font-size:.85rem;">
+      <div style="text-align:center;color:#887581;">جاري تحميل محادثة اللعبة...</div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <input id="gameChatInput" placeholder="اكتب رسالة أثناء اللعب..." style="flex:1;padding:10px;border-radius:10px;border:1px solid #f2d9e4;font-size:.9rem;" onkeydown="if(event.key==='Enter')window.sendGameChatMessage('${gameId}')">
+      <button class="btn btn-primary" style="padding:10px 14px;" onclick="window.sendGameChatMessage('${gameId}')">➤</button>
+    </div>
+    <div class="modal-actions" style="margin-top:10px;"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق المحادثة</button></div>
+  `;
+  
+  // We can open this inside a sub-modal or add it to the current game modal
+  openModal(modalHtml);
+  
+  gameChatUnsubscribe = onValue(chatRef, (snapshot) => {
+    const msgs = snapshot.val() || {};
+    const box = document.getElementById('gameChatMessages');
+    if(!box) return;
+    const items = Object.values(msgs).sort((a,b)=>a.at - b.at);
+    if(!items.length) {
+      box.innerHTML = '<div style="text-align:center;color:#887581;">تحدثا هنا أثناء اللعب! 💗</div>';
+      return;
+    }
+    box.innerHTML = items.map(m => {
+      const mine = m.by === MY_ROLE;
+      return `<div style="text-align:${mine?'right':'left'};margin:2px 0;">
+        <span style="background:${mine?'#fce7f0':'#fff'};padding:6px 10px;border-radius:10px;display:inline-block;max-width:85%;border:1px solid #f2d9e4;">
+          <b>${senderName(m.by)}:</b> ${escapeHtml(m.text)}
+        </span>
+      </div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  });
+};
+
+window.sendGameChatMessage = async function(gameId) {
+  const input = document.getElementById('gameChatInput');
+  if(!input) return;
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  try {
+    await push(ref(db, `games/${gameId}/chat`), {
+      text,
+      by: MY_ROLE,
+      at: Date.now()
+    });
+    playEventSound('ping', true);
+  } catch(e) {
+    toast('تعذر إرسال الرسالة داخل اللعبة');
+  }
 };
 
 boot(); };
@@ -1269,7 +1337,10 @@ window.launchGameModal = function(type){
         ${[0,1,2,3,4,5,6,7,8].map(i=>`<button id="xo-${i}" class="btn btn-soft" style="height:70px;font-size:2rem;" onclick="window.playXO(${i})">?</button>`).join('')}
       </div>
       <div id="xoStatus" style="text-align:center;font-weight:bold;margin:10px 0;">الدور: ❌ (زكريا)</div>
-      <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn btn-soft" style="flex:1;" onclick="window.openGameChatBox('xo_session_1')">💬 دردشة اللعبة</button>
+        <button class="btn btn-soft" style="flex:1;" onclick="closeModal()">إغلاق</button>
+      </div>
     `);
   } else if(type==='cards'){
     openModal(`
@@ -1437,6 +1508,71 @@ window.showIslandModal = function(){
       <div style="margin-top:15px;font-weight:bold;color:#d81b60;">التقدم الحالي: المستوى 2 🌟</div>
     </div>
   `);
+};
+
+
+// ===== In-Game Chat Feature ("التحدث مع بعض داخل الألعاب") =====
+let activeGameId = null;
+let gameChatUnsubscribe = null;
+
+window.openGameChatBox = function(gameId) {
+  activeGameId = gameId;
+  if(gameChatUnsubscribe) { gameChatUnsubscribe(); gameChatUnsubscribe = null; }
+  
+  const chatRef = ref(db, `games/${gameId}/chat`);
+  
+  const modalHtml = `
+    <h3>💬 محادثة اللعبة المباشرة</h3>
+    <div id="gameChatMessages" style="background:#f9f1f5;border:1px solid #f1dce6;border-radius:12px;height:180px;overflow-y:auto;padding:10px;margin-bottom:10px;display:flex;flex-direction:column;gap:6px;font-size:.85rem;">
+      <div style="text-align:center;color:#887581;">جاري تحميل محادثة اللعبة...</div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <input id="gameChatInput" placeholder="اكتب رسالة أثناء اللعب..." style="flex:1;padding:10px;border-radius:10px;border:1px solid #f2d9e4;font-size:.9rem;" onkeydown="if(event.key==='Enter')window.sendGameChatMessage('${gameId}')">
+      <button class="btn btn-primary" style="padding:10px 14px;" onclick="window.sendGameChatMessage('${gameId}')">➤</button>
+    </div>
+    <div class="modal-actions" style="margin-top:10px;"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق المحادثة</button></div>
+  `;
+  
+  // We can open this inside a sub-modal or add it to the current game modal
+  openModal(modalHtml);
+  
+  gameChatUnsubscribe = onValue(chatRef, (snapshot) => {
+    const msgs = snapshot.val() || {};
+    const box = document.getElementById('gameChatMessages');
+    if(!box) return;
+    const items = Object.values(msgs).sort((a,b)=>a.at - b.at);
+    if(!items.length) {
+      box.innerHTML = '<div style="text-align:center;color:#887581;">تحدثا هنا أثناء اللعب! 💗</div>';
+      return;
+    }
+    box.innerHTML = items.map(m => {
+      const mine = m.by === MY_ROLE;
+      return `<div style="text-align:${mine?'right':'left'};margin:2px 0;">
+        <span style="background:${mine?'#fce7f0':'#fff'};padding:6px 10px;border-radius:10px;display:inline-block;max-width:85%;border:1px solid #f2d9e4;">
+          <b>${senderName(m.by)}:</b> ${escapeHtml(m.text)}
+        </span>
+      </div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  });
+};
+
+window.sendGameChatMessage = async function(gameId) {
+  const input = document.getElementById('gameChatInput');
+  if(!input) return;
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  try {
+    await push(ref(db, `games/${gameId}/chat`), {
+      text,
+      by: MY_ROLE,
+      at: Date.now()
+    });
+    playEventSound('ping', true);
+  } catch(e) {
+    toast('تعذر إرسال الرسالة داخل اللعبة');
+  }
 };
 
 boot();
