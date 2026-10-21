@@ -155,6 +155,16 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
 .chat-bubble audio{max-width:230px;width:100%}.chat-bubble video{max-width:100%}
 .chat-quoted{border-right:3px solid #d85b98;padding:4px 8px;background:#ffffff80;font-size:.76rem;border-radius:5px}
 body.chat-dark #view-mail .messenger-shell{background:#201d29;color:#fff}body.chat-dark #mailList .chat-bubble{background:#343044;color:#fff;border-color:#51435b}body.chat-dark #mailList .chat-text{color:#fff}
+
+/* Ayousha V9: interactive shared experiences */
+.v9-panel{background:linear-gradient(130deg,#fff9fc,#f9efff);border:1px solid #f3d9eb;border-radius:18px;padding:13px;margin:12px 0;color:#5d3553;line-height:1.9;font-size:.9rem}
+.v9-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}
+.v9-actions button{min-height:43px;white-space:normal;font-size:.81rem;padding:8px}
+.v9-search{width:100%;padding:13px;border:1px solid #efc9db;border-radius:14px;margin:8px 0;background:#fff}
+.v9-entry{background:white;border-radius:14px;padding:10px;margin:8px 0;border:1px solid #f4ddea;overflow-wrap:anywhere}
+.v9-soft{color:#986982;font-size:.8rem}.v9-reveal{animation:v9appear .55s ease both}
+@keyframes v9appear{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+@media(max-width:340px){.v9-actions{grid-template-columns:1fr}}
 </style>
 <style>
 /* Interactive message experience */
@@ -215,7 +225,7 @@ body.chat-dark #view-mail .messenger-shell{background:#201d29;color:#fff}body.ch
       <div class="card-title"><span>☀️</span> سؤال اليوم</div>
       <div class="q-text" id="dailyQ">جاري التحميل...</div>
       <textarea class="answer-input" id="dailyAnswer" placeholder="اكتبي ردك هنا... (ينحفظ تلقائياً)"></textarea>
-      <div id="answerSaved"></div>
+      <div id="answerSaved"></div><div id="dailyTogether" class="v9-panel"></div><div class="v9-actions"><button class="btn btn-soft" onclick="v9RandomQuestion()">🎲 سؤال عشوائي</button><button class="btn btn-soft" onclick="v9Quiz()">🧠 كم تعرفني؟</button><button class="btn btn-soft" onclick="v9QuestionHistory()">📅 أرشيف الأسئلة</button></div>
     </div>
     <div class="card">
       <div class="card-title"><span>💭</span> أنا أفكر فيكِ الآن</div>
@@ -232,14 +242,14 @@ body.chat-dark #view-mail .messenger-shell{background:#201d29;color:#fff}body.ch
       <p class="muted" style="margin-bottom:14px">كل مفاجأة تنفتح في وقتها — ويصل إشعار فوري للطرف الآخر.</p>
       <button class="btn btn-gold btn-full" onclick="openAddSurprise()">➕ أضيفي مفاجأة</button>
     </div>
-    <div id="surpriseList"></div>
+    <div class="v9-actions"><button class="btn btn-soft" onclick="v9Gift()">🎀 هدية تفاعلية</button><button class="btn btn-soft" onclick="v9Puzzle()">🧩 أحجية رسالة</button><button class="btn btn-soft" onclick="v9Lucky()">🎰 صندوق الحظ</button><button class="btn btn-soft" onclick="v9Occasion()">📅 مناسبة خاصة</button><button class="btn btn-soft" onclick="v9FutureLetter()">💌 رسالة للمستقبل</button></div><div id="surpriseList"></div>
   </section>
 
   <section id="view-mail" class="view">
     <div class="messenger-shell">
       <header class="messenger-header"><div class="messenger-avatar">💗</div><div class="messenger-title"><strong id="chatPartnerName">عيوشة</strong><small id="chatPresence">جارٍ التحقق من الاتصال...</small></div><button class="messenger-lock" onclick="window.toggleChatDark()" title="الوضع الليلي">☾</button><button class="messenger-lock" onclick="window.sendPing()" title="اشتقت لك">💗</button></header>
       <div id="chatPinned" class="chat-pinned" hidden></div><div id="chatTyping" class="chat-typing" aria-live="polite"></div><div id="mailList" class="messenger-messages" role="log" aria-live="polite" aria-label="المحادثة"></div>
-      <div id="chatReply" class="chat-reply" hidden></div><form id="instantMailForm" class="messenger-composer" onsubmit="window.sendInstantMail(event)"><button type="button" class="chat-attach" onclick="window.chooseChatAttachment()" title="إرفاق صورة أو فيديو أو صوت">＋</button><input id="chatAttachment" type="file" accept="image/*,video/*,audio/*" hidden onchange="window.sendChatAttachment(event)"><button type="button" id="voiceRecordBtn" class="chat-attach" onclick="window.toggleVoiceRecording()" title="تسجيل صوت">🎙️</button><textarea id="instantMailText" rows="1" maxlength="5000" placeholder="اكتب رسالة..." aria-label="نص الرسالة" oninput="window.resizeChatInput(this);window.chatTypingInput()"></textarea><button id="instantMailSend" type="submit" aria-label="إرسال الرسالة">➤</button></form>
+      <div id="chatReply" class="chat-reply" hidden></div><form id="instantMailForm" class="messenger-composer" onsubmit="window.sendInstantMail(event)"><textarea id="instantMailText" rows="1" maxlength="5000" placeholder="اكتب رسالة..." aria-label="نص الرسالة" oninput="window.resizeChatInput(this);window.chatTypingInput()"></textarea><button id="instantMailSend" type="submit" aria-label="إرسال الرسالة">➤</button></form>
       <div id="instantMailStatus" class="messenger-status" role="status" aria-live="polite"></div>
     </div>
   </section>
@@ -253,7 +263,7 @@ body.chat-dark #view-mail .messenger-shell{background:#201d29;color:#fff}body.ch
         <button class="btn btn-soft" style="flex:1" onclick="addMemory('photo')">📷 صورة</button>
       </div>
     </div>
-    <div class="mem-grid" id="memGrid"></div>
+    <div class="v9-actions"><button class="btn btn-soft" onclick="v9OnThisDay()">🕰️ في مثل هذا اليوم</button><button class="btn btn-soft" onclick="v9MemoryBook()">📖 كتاب ذكرياتنا</button><button class="btn btn-soft" onclick="v9MemoryMovie()">🎞️ عرض الذكريات</button><button class="btn btn-soft" onclick="v9MemoryMap()">🗺️ الأماكن</button></div><input class="v9-search" id="memorySearch" placeholder="🔎 ابحث في ذكرياتنا" oninput="renderMemories()"><div class="mem-grid" id="memGrid"></div>
   </section>
 
   <section id="view-mood" class="view">
@@ -270,7 +280,7 @@ body.chat-dark #view-mail .messenger-shell{background:#201d29;color:#fff}body.ch
         <button class="mood-btn" data-mood="excited"><span class="emoji">🤩</span>متحمسة</button>
         <button class="mood-btn" data-mood="sick"><span class="emoji">🤒</span>مريضة</button>
       </div>
-      <div id="moodResponse"></div>
+      <div id="moodResponse"></div><div id="v9BothMoods" class="v9-panel"></div><div class="v9-actions"><button class="btn btn-soft" onclick="v9NeedYou()">🫂 أحتاج أن أتحدث معك</button><button class="btn btn-soft" onclick="v9Rose()">🌹 أرسل وردة</button><button class="btn btn-soft" onclick="v9MoodHistory()">📊 تقويم المشاعر</button><button class="btn btn-soft" onclick="v9MoodSound()">🎵 صوت مريح</button></div>
     </div>
   </section>
 
@@ -548,10 +558,14 @@ function startSync(){
   onValue(ref(db, 'app/meetupDate'), s => { state.meetupDate = s.val() || ''; updateCountdown(); });
   onValue(ref(db, 'app/settings'), s => { if(s.val()) state.settings = s.val(); updateGreet(); });
   onValue(ref(db, 'app/answers'), s => { state.answers = s.val() || {}; renderDaily(); });
-  onValue(ref(db, 'app/surprises'), s => { const v = s.val(); state.surprises = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderSurprises(); checkReadyItems(); });
+  onValue(ref(db,'app/dailyResponses'),s=>{v9Daily=s.val()||{};renderDaily();renderV9Dashboard();});
+  onValue(ref(db,'app/dailyPrompts'),s=>{v9Prompts=s.val()||{};renderDaily();});
+  onValue(ref(db,'app/v9Moods'),s=>{v9Moods=s.val()||{};renderV9Moods();renderV9Dashboard();});
+  onValue(ref(db,'app/v9Occasions'),s=>{v9Occasions=s.val()||{};renderV9Dashboard();});
+  onValue(ref(db, 'app/surprises'), s => { const v = s.val(); state.surprises = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderSurprises();renderV9Dashboard(); checkReadyItems(); });
   onValue(ref(db, '.info/connected'), s => { const connected=s.val()===true; window.mailConnected=connected; setSyncStatus(connected?'online':'offline', connected?'متصل بقاعدة البيانات':'غير متصل — تحقق من الإنترنت'); }, e=>console.error('Connection monitor',e));
   onValue(ref(db, 'app/mails'), s => { const v = s.val(); state.mails = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMails(); markDelivered().then(markChatMessages); if(pendingDeepLink)focusRequestedMail(pendingDeepLink); }, e=>{ console.error('Mail sync:',e); setSyncStatus('offline','تعذر قراءة البريد'); toast('⚠️ تعذّر تحميل الرسائل: '+e.message); });
-  onValue(ref(db, 'app/memories'), s => { const v = s.val(); state.memories = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMemories(); });
+  onValue(ref(db, 'app/memories'), s => { const v = s.val(); state.memories = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMemories();renderV9Dashboard(); });
   onValue(ref(db, 'app/moods'), s => { state.moods = s.val() || {}; renderMood(); });
   setupChatPresence();
   onValue(ref(db, 'app/pings'), s => { const v = s.val(); state.pings = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderPings(); });
@@ -568,10 +582,10 @@ function updateGreet(){ const h = new Date().getHours(); const name = state.sett
 function updateCountdown(){ const el = document.getElementById('countdown'); if(!state.meetupDate){ el.innerHTML = '<div style="grid-column:1/-1;text-align:center;opacity:.8;font-size:.85rem">اضغطي ⚙️ لتحديد يوم اللقاء</div>'; return; } const diff = new Date(state.meetupDate) - new Date(); if(diff <= 0){ el.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:1rem;font-weight:700">🎉 وصلنا! اليوم نلتقي</div>'; return; } const d = Math.floor(diff/86400000); const hh = Math.floor((diff%86400000)/3600000); const mm = Math.floor((diff%3600000)/60000); const ss = Math.floor((diff%60000)/1000); el.innerHTML = `<div class="cd-cell"><b>${d}</b><small>يوم</small></div><div class="cd-cell"><b>${pad(hh)}</b><small>ساعة</small></div><div class="cd-cell"><b>${pad(mm)}</b><small>دقيقة</small></div><div class="cd-cell"><b>${pad(ss)}</b><small>ثانية</small></div>`; }
 
 const DEFAULT_QUESTIONS = ["لو عندك يوم كامل فاضي، شو أول شي تعمليه؟","شو أحلى شي صار معك هذا الأسبوع؟","إيش الشي اللي لو سمعتيه مني اليوم يفرحك؟","لو نسافر بكرة، وين نروح؟","شو أكثر شي يضحكك لما تتذكريه؟","لو كان عندك قوة خارقة وحدة، شو تختاري؟","شو أكلة نفسك فيها اليوم؟","إيش الشي اللي تحبي فينا كأزواج؟","شو أغنية تعبر عن حالتك اليوم؟","أحلى هدية تلقيتيها مني؟","شو نفسك نعمل أول ما نشوف بعض؟","شو أكثر لحظة حسيتي فيها إني أحبك؟","شو حلمك الصغير لهذا الشهر؟","شو أكثر شي يريحك لما تسمعيه مني؟","لو تختاري مكان نعيش فيه، وين يكون؟","شو الشي اللي دايمًا يخليك تبتسمي؟"];
-function getDailyQuestion(){const key = getTodayKey(); if(state.answers[key]?.q)return state.answers[key].q; const idx = Math.floor(new Date().setHours(0,0,0,0) / 86400000); return DEFAULT_QUESTIONS[idx % DEFAULT_QUESTIONS.length];}
-function renderDaily(){ const key = getTodayKey(); const q = getDailyQuestion(); document.getElementById('dailyQ').textContent = q; const ta = document.getElementById('dailyAnswer'); const a = state.answers[key]; if(document.activeElement !== ta)ta.value = a?.a || ''; const saved = document.getElementById('answerSaved'); if(a?.a)saved.innerHTML = `<div class="answer-saved">💚 محفوظ — ${fmtDateTime(a.t)}${a.by ? ' — ' + senderName(a.by) : ''}</div>`; else saved.innerHTML = ''; }
+function getDailyQuestion(){const key = getTodayKey(); if(v9Prompts[key])return v9Prompts[key];if(v9Daily[key]?.me?.q)return v9Daily[key].me.q;if(v9Daily[key]?.her?.q)return v9Daily[key].her.q; const idx = Math.floor(new Date().setHours(0,0,0,0) / 86400000); return DEFAULT_QUESTIONS[idx % DEFAULT_QUESTIONS.length];}
+function renderDaily(){ const key = getTodayKey(); const q = getDailyQuestion(); document.getElementById('dailyQ').textContent = q; const ta = document.getElementById('dailyAnswer'); const a = v9Daily[key]?.[MY_ROLE] || (state.answers[key]?.by===MY_ROLE?state.answers[key]:null); if(document.activeElement !== ta)ta.value = a?.a || '';  const saved = document.getElementById('answerSaved'); if(a?.a)saved.innerHTML = `<div class="answer-saved">💚 محفوظ — ${fmtDateTime(a.t)}${a.by ? ' — ' + senderName(a.by) : ''}</div>`; else saved.innerHTML = ''; renderV9Daily(); }
 let dailyTimer = null;
-document.addEventListener('input', e => { if(e.target.id === 'dailyAnswer'){ clearTimeout(dailyTimer); dailyTimer = setTimeout(async () => { const key = getTodayKey(); const payload = { q: getDailyQuestion(), a: e.target.value, t: new Date().toISOString(), by: MY_ROLE }; state.answers[key] = payload; if(firebaseReady && db){ try{await set(ref(db, 'app/answers/'+key), payload);}catch(err){} } if(e.target.value.trim()) addNotification('إجابة سؤال اليوم', e.target.value.slice(0,80), 'answer');playEventSound('answer',true); document.getElementById('answerSaved').innerHTML = e.target.value.trim() ? '<div class="answer-saved">💚 ينحفظ تلقائياً</div>' : ''; }, 1000); } });
+document.addEventListener('input', e => { if(e.target.id === 'dailyAnswer'){ clearTimeout(dailyTimer); dailyTimer = setTimeout(async () => { const key = getTodayKey(); const payload = { q: getDailyQuestion(), a: e.target.value, t: new Date().toISOString(), by: MY_ROLE }; state.answers[key] = payload; if(firebaseReady && db){ try{await set(ref(db, 'app/dailyResponses/'+key+'/'+MY_ROLE), payload);}catch(err){console.warn('Daily save',err);} } renderV9Daily(); if(e.target.value.trim()) v9NotifyOnce('answer',key,'💭 إجابة سؤال اليوم','افتح سؤال اليوم لترى إجابتكما');playEventSound('answer',true); document.getElementById('answerSaved').innerHTML = e.target.value.trim() ? '<div class="answer-saved">💚 ينحفظ تلقائياً</div>' : ''; }, 1000); } });
 
 async function sendPing(){ const ping = { at: new Date().toISOString(), by: MY_ROLE }; state.pings.unshift({id:uid(), ...ping}); renderPings(); if(firebaseReady && db){ try{await push(ref(db, 'app/pings'), ping);}catch(e){} } addNotification('أنا أفكر فيك', 'اضغطي لتعرفي المزيد 💗', 'ping');playEventSound('ping',true); toast('💗 وصل حبك'); burstHearts(); }
 window.sendPing = sendPing;
@@ -593,7 +607,7 @@ window.saveSurprise = async function(){
     toast('🎁 مفاجأة محفوظة'); 
   } catch(err) { console.error(err); toast('⚠️ حدث خطأ، تأكد من صحة التاريخ'); }
 }
-function renderSurprises(){ const el = document.getElementById('surpriseList'); const items = [...state.surprises].sort((a,b)=>new Date(a.at)-new Date(b.at)); if(!items.length){el.innerHTML = `<div class="empty"><div class="e-icon">🎁</div><p>ما في مفاجآت بعد</p></div>`; return;} el.innerHTML = items.map(s => { const ready = new Date(s.at) <= new Date(); const byLabel = s.by ? `<div class="surprise-sender">من: ${senderName(s.by)}</div>` : ''; return `<div class="surprise-item ${ready?'unlocked':'locked'}"><div class="surprise-icon">${ready?'✅':'🔒'}</div><div class="surprise-body"><p>${ready ? escapeHtml(s.text) : '🔒 مفاجأة مقفلة — '+timeUntil(s.at)}</p><div class="surprise-time">⏰ ${fmtDateTime(s.at)}</div>${byLabel}<span class="badge ${ready?'badge-ready':'badge-locked'}">${ready?'جاهزة':'مقفلة'}</span></div><button onclick="window.deleteSurprise('${s.id}')" style="color:#c62828;font-size:1.2rem;padding:4px">✕</button></div>`; }).join(''); }
+function renderSurprises(){ const el = document.getElementById('surpriseList'); const items = [...state.surprises].sort((a,b)=>new Date(a.at)-new Date(b.at)); if(!items.length){el.innerHTML = `<div class="empty"><div class="e-icon">🎁</div><p>ما في مفاجآت بعد</p></div>`; return;} el.innerHTML = items.map(s => { const ready = new Date(s.at) <= new Date(); const byLabel = s.by ? `<div class="surprise-sender">من: ${senderName(s.by)}</div>` : ''; return `<div class="surprise-item ${ready?'unlocked':'locked'}"><div class="surprise-icon">${ready?'✅':'🔒'}</div><div class="surprise-body"><p>${ready ? (s.kind ? escapeHtml(s.kind)+' — اضغط لفتحها 🎁' : escapeHtml(s.text)) : '🔒 مفاجأة مقفلة — '+timeUntil(s.at)}</p><div class="surprise-time">⏰ ${fmtDateTime(s.at)}</div>${byLabel}<span class="badge ${ready?'badge-ready':'badge-locked'}">${ready?'جاهزة':'مقفلة'}</span>${ready&&s.kind?`<button class="btn btn-soft" onclick="v9OpenGift('${s.id}')">🎁 افتح المفاجأة</button>`:''}</div><button onclick="window.deleteSurprise('${s.id}')" style="color:#c62828;font-size:1.2rem;padding:4px">✕</button></div>`; }).join(''); }
 window.deleteSurprise = async function(id){ if(!confirm('حذف المفاجأة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/surprises/'+id));}catch(e){} } state.surprises = state.surprises.filter(s => s.id !== id); renderSurprises(); }
 
 // Legacy compose entry points now open the same instant conversation.
@@ -775,8 +789,9 @@ window.toggleImage = function(el) {
 
 function renderMemories(){ 
   const el = document.getElementById('memGrid'); 
-  if(!state.memories.length){el.innerHTML = `<div class="empty"><div class="e-icon">📸</div><p>أرشيفنا فاضي</p></div>`; return;} 
-  el.innerHTML = state.memories.map(m => { 
+  const term=(document.getElementById('memorySearch')?.value||'').trim().toLowerCase();const matching=state.memories.filter(m=>((m.title||'')+' '+(m.text||'')+' '+(m.place||'')).toLowerCase().includes(term));
+  if(!matching.length){el.innerHTML = `<div class="empty"><div class="e-icon">📸</div><p>أرشيفنا فاضي</p></div>`; return;} 
+  el.innerHTML = matching.map(m => { 
     let body = ''; 
     if(m.type === 'photo' && m.src) body = `<img src="${m.src}" class="mem-img" onclick="window.toggleImage(this)">`; 
     else if(m.text) body = `<div class="mem-text">${escapeHtml(m.text)}</div>`; 
@@ -787,9 +802,9 @@ window.deleteMemory = async function(id){ if(!confirm('حذف الذكرى؟'))r
 
 const MOOD_RESPONSES = { happy: ["😊 فرحتك تفرحني."], tired: ["😴 ارتاحي حبيبتي."], sad: ["🥺 ما أحب أشوفك زعلانة."], missing: ["💭 وأنا مشتاق لك أكثر."], angry: ["😤 أنا معك."], calm: ["😌 هدوءك جميل."], excited: ["🤩 شاركيني الحماس!"], sick: ["🤒 سلامتك."] };
 function getMoodValue(m){ if(typeof m === 'string')return m; if(m && m.mood)return m.mood; return null; }
-function renderMood(){ const key = getTodayKey(); const current = getMoodValue(state.moods[key]); document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('selected', b.dataset.mood === current)); renderMoodResponse(current); }
+function renderMood(){ const key = getTodayKey(); const current = getMoodValue(v9Moods[key]?.[MY_ROLE] || (state.moods[key]?.by===MY_ROLE?state.moods[key]:null)); document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('selected', b.dataset.mood === current)); renderMoodResponse(current);renderV9Moods(); }
 function renderMoodResponse(mood){ const el = document.getElementById('moodResponse'); if(!mood){el.innerHTML = ''; return;} el.innerHTML = `<div class="mood-response">${(MOOD_RESPONSES[mood]||['💗'])[0]}</div>`; }
-document.querySelectorAll('.mood-btn').forEach(btn => { btn.addEventListener('click', async () => { const key = getTodayKey(); const mood = btn.dataset.mood; const payload = { mood, by: MY_ROLE, at: new Date().toISOString() }; state.moods[key] = payload; renderMood(); if(firebaseReady && db){ try{await set(ref(db, 'app/moods/'+key), payload);}catch(e){} } addNotification('مزاج جديد', btn.textContent.trim(), 'mood');playEventSound('mood',true); toast('سجلنا مزاجك 💭'); }); });
+document.querySelectorAll('.mood-btn').forEach(btn => { btn.addEventListener('click', async () => { const key = getTodayKey(); const mood = btn.dataset.mood; const payload = { mood, by: MY_ROLE, at: new Date().toISOString() }; v9Moods[key] ||= {};v9Moods[key][MY_ROLE]=payload;renderMood();if(firebaseReady&&db){try{await set(ref(db,'app/v9Moods/'+key+'/'+MY_ROLE),payload);}catch(e){toast('تعذر حفظ المزاج');}} addNotification('مزاج جديد', btn.textContent.trim(), 'mood');playEventSound('mood',true); toast('سجلنا مزاجك 💭'); }); });
 
 function openSettings(){
   const notifStatus = !('Notification' in window) ? '<div class="info-box warn">⚠️ متصفحك لا يدعم الإشعارات</div>' : Notification.permission === 'granted' ? '<div class="info-box ok">✅ الإشعارات مفعّلة</div>' : Notification.permission === 'denied' ? '<div class="info-box warn">❌ الإشعارات مرفوضة — افتح إعدادات المتصفح واسمح بها</div>' : '<div class="info-box">🔔 الإشعارات غير مفعّلة</div>';
@@ -883,6 +898,43 @@ async function boot(){
 }
 document.addEventListener('click', () => { initAudio(); }, { once: true });
 document.addEventListener('touchstart', () => { initAudio(); }, { once: true });
+// V9 shared experiences. Chat composer intentionally supports text only.
+let v9Daily={},v9Prompts={},v9Moods={},v9Occasions={},v9Ambient=null;
+const v9Questions=[...DEFAULT_QUESTIONS,'ما الذكرى التي تريد أن نعيشها من جديد؟','ما الشيء الذي يجعل يومك أجمل؟','لو أرسلنا رسالة لأنفسنا بعد سنة ماذا نقول؟','ما أكثر موقف أضحكنا؟','ما أجمل عادة تحب أن نستمر عليها؟'];
+const v9Other=()=>MY_ROLE==='me'?'her':'me';
+const v9Esc=x=>escapeHtml(String(x??''));
+const v9Date=()=>getTodayKey();
+const v9Time=x=>{try{return new Date(x).toLocaleDateString('ar',{year:'numeric',month:'short',day:'numeric'});}catch(e){return ''}};
+function v9NotifyOnce(type,key,title,body){const k='v9_notice_'+type+'_'+key+'_'+MY_ROLE;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');addNotification(title,body,type).catch(console.warn);}
+function renderV9Daily(){const el=document.getElementById('dailyTogether');if(!el)return;const a=v9Daily[v9Date()]||{},mine=a[MY_ROLE],other=a[v9Other()];let html='<b>💞 إجابتكما اليوم</b>';if(mine?.a?.trim()&&other?.a?.trim())html+=`<div class="v9-entry v9-reveal"><b>💗 ${v9Esc(senderName(MY_ROLE))}</b><p>${v9Esc(mine.a)}</p></div><div class="v9-entry v9-reveal"><b>💜 ${v9Esc(senderName(v9Other()))}</b><p>${v9Esc(other.a)}</p></div><button class="btn btn-soft" onclick="v9SaveAnswers()">💌 احفظ الإجابتين في الذكريات</button>`;else html+=`<p>🔒 تظهر الإجابتان عندما تجيبان معًا. ${mine?.a?.trim()?'أجبتَ، بانتظار الطرف الآخر.':'اكتب إجابتك لتبدأ.'}</p>`;el.innerHTML=html;}
+window.v9RandomQuestion=async()=>{if(!db)return toast('تحقق من الاتصال');const key=v9Date();if(v9Daily[key]?.me?.a||v9Daily[key]?.her?.a)return toast('لا يمكن تغيير السؤال بعد بدء الإجابات');const q=v9Questions[Math.floor(Math.random()*v9Questions.length)];try{await set(ref(db,'app/dailyPrompts/'+key),q);toast('🎲 سؤال جديد لكما');}catch(e){toast('تعذر تحديث السؤال');}};
+window.v9Quiz=()=>{const q=['ما اللون الذي يفضله الطرف الآخر؟','ما الطعام المفضل لديه؟','ما المكان الذي يتمنى زيارته؟','ما أكثر شيء يجعله يضحك؟'][Math.floor(Math.random()*4)];openModal(`<h3>🧠 كم تعرفني؟</h3><p>${v9Esc(q)}</p><textarea id="v9QuizAnswer" placeholder="اكتب تخمينك"></textarea><button class="btn btn-primary btn-full" onclick="v9SubmitQuiz()">💗 أرسل التخمين</button>`);};
+window.v9SubmitQuiz=async()=>{const a=document.getElementById('v9QuizAnswer')?.value.trim();if(!a)return toast('اكتب تخمينك');try{await push(ref(db,'app/memories'),{type:'text',title:'🧠 كم تعرفني؟',text:a,at:new Date().toISOString(),by:MY_ROLE});closeModal();toast('تم حفظ تخمينك؛ قارن إجابتكما معًا');}catch(e){toast('تعذر الحفظ');}};
+window.v9QuestionHistory=()=>{const days=Object.entries(v9Daily).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,35);openModal('<h3>📅 أرشيف الأسئلة</h3>'+(days.map(([k,v])=>`<div class="v9-entry"><b>${v9Esc(k)}</b><p>${v9Esc(v.me?.q||v.her?.q||'سؤال اليوم')}</p><small>${v.me?.a&&v.her?.a?'💞 أجبتما معًا':'⏳ لم تكتمل الإجابات'}</small></div>`).join('')||'<p>لا توجد إجابات بعد</p>'));};
+window.v9SaveAnswers=async()=>{const a=v9Daily[v9Date()];if(!a?.me?.a||!a?.her?.a)return;try{await push(ref(db,'app/memories'),{type:'text',title:'💭 إجابتانا في '+v9Date(),text:`${a.me.q||a.her.q}\n${senderName('me')}: ${a.me.a}\n${senderName('her')}: ${a.her.a}`,at:new Date().toISOString(),by:MY_ROLE});toast('حُفظت إجابتكما 💗');}catch(e){toast('تعذر الحفظ');}};
+function renderV9Moods(){const el=document.getElementById('v9BothMoods');if(!el)return;const x=v9Moods[v9Date()]||{},names={happy:'😊 سعيد',tired:'😴 متعب',sad:'🥺 حزين',missing:'💭 مشتاق',angry:'😤 متضايق',calm:'😌 هادئ',excited:'🤩 متحمس',sick:'🤒 مريض'};el.innerHTML=`<b>💞 مزاجنا اليوم</b><div class="v9-entry">💗 ${v9Esc(senderName('me'))}: ${names[x.me?.mood]||'لم يحدد بعد'}</div><div class="v9-entry">💜 ${v9Esc(senderName('her'))}: ${names[x.her?.mood]||'لم تحدد بعد'}</div><p class="v9-soft">مشاركة المشاعر اختيارية، ويمكن تغيير المزاج في أي وقت.</p>`;}
+window.v9NeedYou=()=>v9Support('🫂 أحتاج أن أتحدث معك','أحب أن نتحدث عندما يتاح لك الوقت 💗');
+window.v9Rose=()=>v9Support('🌹 وردة لك','هذه وردة لتجعل يومك أجمل 🌹');
+async function v9Support(title,body){try{await addNotification(title,body,'mood');playEventSound('mood',true);toast('💗 أُرسلت اللفتة');}catch(e){toast('تعذر إرسال التنبيه');}}
+window.v9MoodHistory=()=>{const days=Object.entries(v9Moods).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,31);openModal('<h3>📊 تقويم مشاعرنا</h3>'+(days.map(([d,x])=>`<div class="v9-entry"><b>${v9Esc(d)}</b><p>💗 ${v9Esc(x.me?.mood||'—')} · 💜 ${v9Esc(x.her?.mood||'—')}</p></div>`).join('')||'<p>لم تُسجل مشاعر بعد</p>'));};
+window.v9MoodSound=()=>{if(v9Ambient){v9Ambient.pause();v9Ambient=null;return toast('تم إيقاف الصوت');}try{const C=window.AudioContext||window.webkitAudioContext;const ctx=new C(),osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.value=220;gain.gain.value=.025;osc.connect(gain).connect(ctx.destination);osc.start();v9Ambient={pause(){osc.stop();ctx.close()}};toast('🎵 صوت هادئ — اضغط مرة أخرى للإيقاف');}catch(e){toast('تعذر تشغيل الصوت');}};
+function renderV9Dashboard(){const el=document.getElementById('v9Dashboard');if(!el)return;const a=v9Daily[v9Date()]||{},m=v9Moods[v9Date()]||{};el.innerHTML=`<b>☀️ يومنا معًا</b><div class="v9-entry">💭 سؤال اليوم: ${a.me?.a&&a.her?.a?'💗 مكتمل':'⏳ بانتظار الإجابتين'}</div><div class="v9-entry">🌙 المزاج: ${m.me?.mood&&m.her?.mood?'💗 شاركتما':'💭 بانتظار المشاركة'}</div><div class="v9-entry">📸 الذكريات: ${state.memories.length} · 🎁 المفاجآت: ${state.surprises.length}</div><div class="v9-actions"><button class="btn btn-soft" onclick="v9Badges()">🏆 أوسمتنا</button><button class="btn btn-soft" onclick="v9OccasionList()">📅 مناسباتنا</button></div>`;}
+window.v9Badges=()=>{const count=state.memories.length,sp=state.surprises.length,days=Object.values(v9Daily).filter(x=>x.me?.a&&x.her?.a).length;openModal(`<h3>🏆 إنجازاتنا المشتركة</h3><div class="v9-entry">📸 صانع الذكريات: ${count}/10 ${count>=10?'🏅':''}</div><div class="v9-entry">🎁 ملك المفاجآت: ${sp}/10 ${sp>=10?'🏅':''}</div><div class="v9-entry">💗 نعرف بعضنا: ${days}/20 ${days>=20?'🏅':''}</div><p class="v9-soft">هذه الأوسمة للاحتفال بالمشاركة وليست مقياسًا للمحبة.</p>`);};
+window.v9Gift=()=>v9MakeSurprise('🎀 هدية تفاعلية');
+window.v9Puzzle=()=>v9MakeSurprise('🧩 أحجية رسالة');
+window.v9FutureLetter=()=>v9MakeSurprise('💌 رسالة من الماضي');
+function v9MakeSurprise(kind){openModal(`<h3>${kind}</h3><label>رسالتك السرية</label><textarea id="v9SurpriseText" placeholder="اكتب الرسالة"></textarea><label>موعد الفتح (اختياري)</label><input type="datetime-local" id="v9SurpriseDate"><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="v9SaveGift('${kind}')">🎁 أرسل</button></div>`);}
+window.v9SaveGift=async kind=>{const text=document.getElementById('v9SurpriseText')?.value.trim(),date=document.getElementById('v9SurpriseDate')?.value;if(!text)return toast('اكتب رسالتك');try{await push(ref(db,'app/surprises'),{text,kind,at:date?new Date(date).toISOString():new Date().toISOString(),by:MY_ROLE});closeModal();await addNotification('🎁 مفاجأة جديدة',kind,'surprise');toast('تم إرسال المفاجأة');}catch(e){toast('تعذر حفظ المفاجأة');}};
+window.v9OpenGift=id=>{const x=state.surprises.find(a=>a.id===id);if(!x||new Date(x.at)>new Date())return;const content=v9Esc(x.text);if(x.kind?.includes('أحجية')){let revealed=0;const words=x.text.split(/\s+/);const show=()=>{const count=Math.min(words.length,revealed);openModal(`<h3>🧩 اجمع الرسالة</h3><div class="v9-panel v9-reveal">${v9Esc(words.slice(0,count).join(' '))} ${count<words.length?'❔ '.repeat(Math.min(5,words.length-count)): '💗'}</div><button class="btn btn-primary btn-full" id="v9Reveal">${count<words.length?'🧩 اكشف قطعة':'💗 اكتملت الرسالة'}</button>`);document.getElementById('v9Reveal').onclick=()=>{revealed++;show()};};show();}else{openModal(`<h3>${v9Esc(x.kind||'🎁 مفاجأة')}</h3><div class="v9-panel v9-reveal">🎀 🎁 ✨<p>${content}</p>💗</div>`);burstHearts();}};
+window.v9Lucky=()=>{const picks=['🌹 وردة افتراضية','💗 اكتب ثلاث صفات تحبها','💌 أرسل رسالة جميلة','📸 تذكر لحظة مميزة','🎲 اطرح سؤالًا مضحكًا'];openModal(`<h3>🎰 صندوق الحظ</h3><div class="v9-panel v9-reveal">${picks[Math.floor(Math.random()*picks.length)]}</div><button class="btn btn-primary" onclick="v9Lucky()">🎲 جرب مرة أخرى</button>`);burstHearts();};
+window.v9Occasion=()=>openModal(`<h3>📅 مناسبة خاصة</h3><label>اسم المناسبة</label><input id="v9OccasionName" placeholder="ذكرى جميلة"><label>التاريخ</label><input id="v9OccasionDate" type="date"><button class="btn btn-primary btn-full" onclick="v9SaveOccasion()">حفظ المناسبة</button>`);
+window.v9SaveOccasion=async()=>{const name=document.getElementById('v9OccasionName')?.value.trim(),date=document.getElementById('v9OccasionDate')?.value;if(!name||!date)return toast('أدخل الاسم والتاريخ');try{await push(ref(db,'app/v9Occasions'),{name,date,by:MY_ROLE});closeModal();toast('📅 حُفظت المناسبة');}catch(e){toast('تعذر الحفظ');}};
+window.v9OccasionList=()=>openModal('<h3>📅 مناسباتنا</h3>'+(Object.values(v9Occasions).map(x=>`<div class="v9-entry">🎂 ${v9Esc(x.name)} — ${v9Esc(x.date)}</div>`).join('')||'<p>لم تضيفا مناسبات بعد</p>'));
+window.v9OnThisDay=()=>{const d=new Date(),matches=state.memories.filter(m=>{const x=new Date(m.at);return x.getMonth()===d.getMonth()&&x.getDate()===d.getDate()&&x.getFullYear()<d.getFullYear()});openModal('<h3>🕰️ في مثل هذا اليوم</h3>'+(matches.map(x=>`<div class="v9-entry"><b>${v9Esc(x.title||'ذكرى')}</b><p>${v9Esc(x.text||'📸 صورة من الماضي')}</p><small>${v9Date()}</small></div>`).join('')||'<p>لا توجد ذكريات في هذا التاريخ من سنوات سابقة.</p>'));};
+window.v9MemoryBook=()=>{const items=[...state.memories].sort((a,b)=>new Date(a.at)-new Date(b.at));let i=0;if(!items.length)return toast('أضيفا ذكريات أولًا');const show=()=>{const m=items[i];openModal(`<h3>📖 كتاب ذكرياتنا — ${i+1}/${items.length}</h3><div class="v9-panel v9-reveal">${m.src?`<img src="${v9Esc(m.src)}" style="width:100%;max-height:260px;object-fit:contain">`:''}<h3>${v9Esc(m.title||'ذكرياتنا')}</h3><p>${v9Esc(m.text||'')}</p><small>${v9Esc(v9Time(m.at))}</small></div><div class="modal-actions"><button class="btn btn-soft" id="v9PrevPage">السابق</button><button class="btn btn-primary" id="v9NextPage">التالي</button></div>`);document.getElementById('v9PrevPage').onclick=()=>{i=(i-1+items.length)%items.length;show()};document.getElementById('v9NextPage').onclick=()=>{i=(i+1)%items.length;show()};};show();};
+window.v9MemoryMovie=()=>{const items=state.memories.filter(m=>m.src||m.text);if(!items.length)return toast('أضيفا ذكريات أولًا');let i=0;const show=()=>{const m=items[i];openModal(`<h3>🎞️ عرض ذكرياتنا ${i+1}/${items.length}</h3><div class="v9-panel v9-reveal">${m.src?`<img src="${v9Esc(m.src)}" style="width:100%;max-height:300px;object-fit:contain">`:''}<p>${v9Esc(m.title||m.text||'ذكرى جميلة')}</p></div><button class="btn btn-primary btn-full" id="v9MovieNext">الذكرى التالية ▶</button>`);document.getElementById('v9MovieNext').onclick=()=>{i=(i+1)%items.length;show()};};show();};
+window.v9MemoryMap=()=>{const items=state.memories.filter(m=>m.place);openModal('<h3>🗺️ أماكن ذكرياتنا</h3>'+(items.map(m=>`<div class="v9-entry">📍 ${v9Esc(m.place)} — ${v9Esc(m.title||'ذكرى')}</div>`).join('')||'<p>لا توجد أماكن محفوظة بعد. يمكنك إضافتها إلى ذكرياتك القادمة.</p>'));};
+
 boot();
 </script>
 </body>
