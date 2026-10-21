@@ -265,7 +265,7 @@ const firebaseConfig = {
 const DEFAULT_VAPID_KEY = "BPpUV-YcYpV9OFhV2BkYllEar1_BsupWxIHP83ZDBPBozGV7mSnZqsIglbrYLWFs1E8WbXzPb577iT7D-LcZ_r8";
 const ICON_URL = 'https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png'; 
 const APP_START = Date.now();
-const LS = 'ayousha_v8_'; // تم تحديث الإصدار لمسح الكاش القديم
+const LS = 'ayousha_v8_';
 
 let MY_ROLE = null;
 let db = null;
@@ -500,17 +500,20 @@ window.deleteSurprise = deleteSurprise;
 
 function openComposeMail(){ openModal(`<h3>💌 رسالة حنين</h3><label>إلى</label><input value="${escapeHtml(MY_ROLE==='me' ? state.settings.wifeName : state.settings.myName)}" readonly><label>نص الرسالة</label><textarea id="mailText" placeholder="اكتبي من قلبك..." style="min-height:120px"></textarea><label>توصل في</label><input type="datetime-local" id="mailTime"><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMail()">إرسال</button></div>`); document.getElementById('mailTime').value = toLocalISO(new Date(Date.now()+86400000)); }
 window.openComposeMail = openComposeMail;
-async function saveMail(){ const text = document.getElementById('mailText').value.trim(); const time = document.getElementById('mailTime').value; if(!text || !time){toast('املئي الحقول'); return;} const item = { text, at: new Date(time).toISOString(), read: false, by: MY_ROLE }; if(firebaseReady && db){ try{await push(ref(db, 'app/mails'), item);}catch(e){} } renderMails(); closeModal(); addNotification('رسالة حنين', text, 'mail'); toast('💌 رسالتك في الطريق'); }
-window.saveMail = saveMail;
+async function saveMail(){ 
+  const text = document.getElementById('mailText').value.trim(); 
+  const time = document.getElementById('mailTime').value; 
+  if(!text || !time){toast('املئي الحقول'); return;} 
+  const item = { text, at: new Date(time).toISOString(), read: false, by: MY_ROLE }; 
+  if(firebaseReady && db){ try{await push(ref(db, 'app/mails'), item);}catch(e){} } 
+  renderMails(); closeModal(); addNotification('رسالة حنين', text, 'mail'); toast('💌 رسالتك في الطريق'); 
+}
+window.saveMail = saveMail; /* ✅ تم تصدير الدالة هنا لحل المشكلة */
 function renderMails(){ const el = document.getElementById('mailList'); const items = [...state.mails].sort((a,b)=>new Date(b.at)-new Date(a.at)); if(!items.length){el.innerHTML = `<div class="empty"><div class="e-icon">💌</div><p>ما في رسائل بعد</p></div>`; return;} el.innerHTML = items.map(m => { const delivered = new Date(m.at) <= new Date(); return `<div class="mail-item ${delivered?'delivered':'pending'}"><h4>${delivered?'📬 وصلت':'⏳ في الطريق'}${m.by?' — من '+senderName(m.by):''}</h4><p>${delivered ? escapeHtml(m.text) : 'رسالة ستصل '+timeUntil(m.at)}</p><div class="mail-meta"><span>⏰ ${fmtDateTime(m.at)}</span><button onclick="deleteMail('${m.id}')" style="color:#c62828;font-size:.8rem">حذف</button></div></div>`; }).join(''); }
 async function deleteMail(id){ if(!confirm('حذف الرسالة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/mails/'+id));}catch(e){} } state.mails = state.mails.filter(m => m.id !== id); renderMails(); }
 window.deleteMail = deleteMail;
 
-/* ============================================================
-   🌟 قسم الذكريات والصور (تم تعديله)
-   ============================================================ */
 let tempPhoto = null;
-
 function addMemory(type){ 
   if(type === 'text'){ 
     openModal(`<h3>📝 ذكرى نصية</h3><label>العنوان</label><input id="memTitle"><label>الذكرى</label><textarea id="memText"></textarea><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('text')">حفظ</button></div>`); 
@@ -521,7 +524,6 @@ function addMemory(type){
 }
 window.addMemory = addMemory;
 
-// دالة ضغط الصورة باستخدام Canvas
 function compressImage(file, maxWidth, maxHeight, quality) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -542,7 +544,7 @@ function compressImage(file, maxWidth, maxHeight, quality) {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality)); // ضغط بصيغة JPEG
+        resolve(canvas.toDataURL('image/jpeg', quality));
       };
       img.onerror = error => reject(error);
     };
@@ -554,7 +556,6 @@ function previewPhoto(e){
   const f = e.target.files[0]; 
   if(!f)return; 
   toast('⏳ جاري ضغط الصورة...');
-  // ضغط الصورة إلى أقصى عرض/ارتفاع 1200 بكسل وجودة 0.7
   compressImage(f, 1200, 1200, 0.7).then(compressedBase64 => {
     tempPhoto = compressedBase64; 
     document.getElementById('photoPreview').innerHTML = `<img src="${tempPhoto}" style="width:100%;border-radius:12px;max-height:240px;object-fit:cover">`; 
@@ -583,7 +584,6 @@ async function saveMemory(type){
 }
 window.saveMemory = saveMemory;
 
-// دالة تبديل حجم الصورة
 window.toggleImage = function(el) {
   el.classList.toggle('fullscreen');
 };
@@ -601,9 +601,6 @@ function renderMemories(){
 async function deleteMemory(id){ if(!confirm('حذف الذكرى؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/memories/'+id));}catch(e){} } state.memories = state.memories.filter(m => m.id !== id); renderMemories(); }
 window.deleteMemory = deleteMemory;
 
-/* ============================================================
-   المزاج والإعدادات
-   ============================================================ */
 const MOOD_RESPONSES = { happy: ["😊 فرحتك تفرحني."], tired: ["😴 ارتاحي حبيبتي."], sad: ["🥺 ما أحب أشوفك زعلانة."], missing: ["💭 وأنا مشتاق لك أكثر."], angry: ["😤 أنا معك."], calm: ["😌 هدوءك جميل."], excited: ["🤩 شاركيني الحماس!"], sick: ["🤒 سلامتك."] };
 function getMoodValue(m){ if(typeof m === 'string')return m; if(m && m.mood)return m.mood; return null; }
 function renderMood(){ const key = getTodayKey(); const current = getMoodValue(state.moods[key]); document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('selected', b.dataset.mood === current)); renderMoodResponse(current); }
