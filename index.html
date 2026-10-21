@@ -338,7 +338,7 @@ function handleDeepLink(){const p=new URLSearchParams(location.search);const typ
 let receivedEventIds=new Set(),eventsPrimed=false;
 function processIncomingNotifications(items){const incoming=items.filter(n=>n.to===MY_ROLE);if(eventsPrimed){for(const n of incoming){if(!receivedEventIds.has(n.id)){playEventSound(n.type);if(navigator.vibrate)navigator.vibrate([100,70,130]);toast('🔔 '+n.title)}}}receivedEventIds=new Set(incoming.map(n=>n.id));eventsPrimed=true;}
 async function requestNotifPermission(){ if(!('Notification' in window))return false; if(Notification.permission === 'granted')return true; if(Notification.permission === 'denied')return false; try{ const p = await Notification.requestPermission(); return p === 'granted'; }catch(e){return false;} }
-function showAppNotification(title, body, type='notification', itemId=''){ playEventSound(type); if(navigator.vibrate)navigator.vibrate([200, 100, 200]); toast('🔔 ' + title); if(Notification.permission === 'granted'){ try{ new Notification(title, { body: body || '', icon: ICON_URL, badge: ICON_URL, silent: true, data:{type,itemId} }); }catch(e){} } }
+function showAppNotification(title, body, type='notification', itemId=''){ playEventSound(type); if(navigator.vibrate)navigator.vibrate([200, 100, 200]); toast('🔔 ' + title); if(Notification.permission === 'granted'){ try{ navigator.serviceWorker.ready.then(reg => reg.showNotification(title, { body: body || '', icon: ICON_URL, badge: ICON_URL, tag:'ayousha-foreground-'+Date.now(), data:{url:location.origin+location.pathname+'?for='+MY_ROLE+'&open='+encodeURIComponent(type)+'&item='+encodeURIComponent(itemId)} })); }catch(e){} } }
 
 async function addNotification(title, body, type, itemId='') {
   if(!firebaseReady || !db) return;
@@ -351,7 +351,8 @@ async function addNotification(title, body, type, itemId='') {
 }
 
 async function sendFCM(toRole, title, body, type='notification', itemId='') {
-  const targetToken = config[toRole]?.fcmToken;
+  let targetToken = config[toRole]?.fcmToken;
+  try { const latest = await get(ref(db, `config/${toRole}/fcmToken`)); if(latest.exists()) targetToken=latest.val(); }catch(e){ console.warn('FCM token refresh:',e); }
   if(!targetToken){ console.info('لا يوجد رمز إشعارات للطرف الآخر، لكن الرسالة محفوظة في قاعدة البيانات'); return; }
   try {
     const response = await fetch('/api/notify', {
@@ -476,14 +477,14 @@ async function initFCM(){
   try {
     const { getMessaging, getToken, onMessage } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js");
     const messaging = getMessaging(firebaseApp);
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return;
-    const token = await getToken(messaging, { vapidKey: config.vapidKey });
+    if (Notification.permission !== 'granted') return;
+    const registration = await navigator.serviceWorker.ready;
+    const token = await getToken(messaging, { vapidKey: config.vapidKey, serviceWorkerRegistration: registration });
     if(token) {
       await set(ref(db, `config/${MY_ROLE}/fcmToken`), token);
       console.log('✅ FCM Token saved:', token);
     }
-    onMessage(messaging, (payload) => { const d=payload.data||{};showAppNotification(payload.notification?.title||d.title||'رسالة جديدة',payload.notification?.body||d.body||'',d.type||'notification',d.itemId||''); });
+    onMessage(messaging, (payload) => { const d=payload.data||{};showAppNotification(d.title||'رسالة جديدة',d.body||'',d.type||'notification',d.itemId||''); });
   } catch(e) { console.warn('FCM Init error:', e); }
 }
 
@@ -499,7 +500,7 @@ function startSync(){
   onValue(ref(db, 'app/memories'), s => { const v = s.val(); state.memories = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMemories(); });
   onValue(ref(db, 'app/moods'), s => { state.moods = s.val() || {}; renderMood(); });
   onValue(ref(db, 'app/pings'), s => { const v = s.val(); state.pings = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderPings(); });
-  setSyncStatus('online', 'متصل — الإشعارات تعمل');
+  setSyncStatus('online', 'متصل بقاعدة البيانات');
 }
 
 function switchView(name){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById('view-'+name).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view === name)); window.scrollTo({top:0, behavior:'smooth'}); if(name === 'notifications') { renderNotifs('inbox'); markNotifsRead(); } }
@@ -756,14 +757,14 @@ async function boot(){
   const setupDone = await isSetupComplete();
   if(setupDone){
     await loadConfigFromFirebase(); startSync(); initFCM();
-    setSyncStatus('online', 'متصل — الإشعارات تعمل'); toast('👋 أهلاً ' + senderName(MY_ROLE));
+    setSyncStatus('online', 'متصل بقاعدة البيانات'); toast('👋 أهلاً ' + senderName(MY_ROLE));
   } else {
     if(MY_ROLE === 'her'){
       showWaitingScreen();
       const t = setInterval(async () => {
         if(await isSetupComplete()){
           clearInterval(t); await loadConfigFromFirebase(); hideFullScreen(); startSync(); initFCM();
-          setSyncStatus('online', 'متصل — الإشعارات تعمل'); toast('🎉 التطبيق جاهز');
+          setSyncStatus('online', 'متصل بقاعدة البيانات'); toast('🎉 التطبيق جاهز');
         }
       }, 3000);
     } else {
@@ -774,6 +775,8 @@ async function boot(){
   setInterval(updateGreet, 60000);
   setInterval(()=>{ checkReadyItems(); renderMails(); }, 20000);
   setTimeout(handleDeepLink,1200);
+  window.addEventListener('pageshow', handleDeepLink);
+  navigator.serviceWorker?.addEventListener('message', event => { if(event.data?.type==='OPEN_AYOUSHA'){location.href=event.data.url;} });
 }
 document.addEventListener('click', () => { initAudio(); }, { once: true });
 document.addEventListener('touchstart', () => { initAudio(); }, { once: true });
