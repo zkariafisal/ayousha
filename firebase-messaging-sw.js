@@ -23,6 +23,7 @@ messaging.onBackgroundMessage(payload=>{
   icon:'/icon.png',badge:'/icon.png',
   tag:'ayousha-'+type+'-'+(d.itemId||Date.now()),
   vibrate:[180,90,180],silent:false,requireInteraction:false,
+  renotify:true, timestamp:Date.now(),
   data:{url:url.href,type,itemId:d.itemId||''}
  });
 });

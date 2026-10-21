@@ -403,7 +403,7 @@ function handleDeepLink(){
 let receivedEventIds=new Set(),eventsPrimed=false;
 function processIncomingNotifications(items){const incoming=items.filter(n=>n.to===MY_ROLE);if(eventsPrimed){for(const n of incoming){if(!receivedEventIds.has(n.id)){playEventSound(n.type);if(navigator.vibrate)navigator.vibrate([100,70,130]);toast('🔔 '+n.title)}}}receivedEventIds=new Set(incoming.map(n=>n.id));eventsPrimed=true;}
 async function requestNotifPermission(){ if(!('Notification' in window))return false; if(Notification.permission === 'granted')return true; if(Notification.permission === 'denied')return false; try{ const p = await Notification.requestPermission(); return p === 'granted'; }catch(e){return false;} }
-function showAppNotification(title, body, type='notification', itemId=''){ playEventSound(type); if(navigator.vibrate)navigator.vibrate([200, 100, 200]); toast('🔔 ' + title); if(Notification.permission === 'granted'){ try{ navigator.serviceWorker.ready.then(reg => reg.showNotification(title, { body: body || '', icon: ICON_URL, badge: ICON_URL, tag:'ayousha-foreground-'+Date.now(), data:{url:location.origin+'/index.html?for='+MY_ROLE+'&open='+encodeURIComponent(type)+'&item='+encodeURIComponent(itemId)} })); }catch(e){} } }
+function showAppNotification(title, body, type='notification', itemId=''){ playEventSound(type); if(navigator.vibrate)navigator.vibrate([200, 100, 200]); toast('🔔 ' + title); if(Notification.permission === 'granted'){ try{ navigator.serviceWorker.ready.then(reg => reg.showNotification(title, { body: body || '', icon: ICON_URL, badge: ICON_URL, tag:'ayousha-foreground-'+Date.now(), silent:false, vibrate:[180,90,180], data:{url:location.origin+'/index.html?for='+MY_ROLE+'&open='+encodeURIComponent(type)+'&item='+encodeURIComponent(itemId)} })); }catch(e){} } }
 
 async function addNotification(title, body, type, itemId='') {
   if(!firebaseReady || !db) return;
@@ -538,7 +538,7 @@ async function loadConfigFromFirebase(){
 async function isSetupComplete(){ try{ const snap = await get(ref(db, 'config/setupComplete')); return !!snap.val(); }catch(e){return false;} }
 
 async function initFCM(){
-  if(!config.vapidKey) return;
+  if(!config.vapidKey) { console.warn('FCM VAPID key missing: background notifications unavailable'); return; }
   try {
     const { getMessaging, getToken, onMessage } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js");
     const messaging = getMessaging(firebaseApp);
@@ -898,6 +898,9 @@ async function boot(){
   window.addEventListener('pageshow', handleDeepLink);
   window.addEventListener('popstate', handleDeepLink);
   navigator.serviceWorker?.addEventListener('message', event => { if(event.data?.type==='OPEN_AYOUSHA'){location.assign(event.data.url);} });
+  // Re-register the push token when returning to the app (e.g. after browser updates).
+  let lastFcmRefresh=0;
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden && Date.now()-lastFcmRefresh>3600000){lastFcmRefresh=Date.now();if(firebaseReady)initFCM();}});
 }
 document.addEventListener('click', () => { initAudio(); }, { once: true });
 document.addEventListener('touchstart', () => { initAudio(); }, { once: true });
