@@ -81,7 +81,6 @@ nav.bottom{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:10
 .v9-panel{background:linear-gradient(130deg,#fff9fc,#f9efff);border:1px solid #f3d9eb;border-radius:18px;padding:13px;margin:12px 0;color:#5d3553;line-height:1.8;font-size:.9rem}
 .v9-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0 16px}
 .v9-entry{background:white;border-radius:14px;padding:10px;margin:8px 0;border:1px solid #f4ddea}
-.v9-soft{color:#986982;font-size:.8rem}
 .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:12px 20px;border-radius:14px;font-size:.9rem;font-weight:600;opacity:0;transition:all .3s;z-index:200;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #splashScreen{position:fixed;inset:0;background:#fdf6f9;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease}
@@ -110,6 +109,8 @@ nav.bottom{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:10
 .in-game-chat-bar input{border:none;background:transparent;flex:1;padding:8px 10px;outline:none;font-size:.88rem}
 .in-game-chat-bar button{background:var(--primary);color:#fff;width:34px;height:34px;border-radius:50%;display:grid;place-items:center}
 #drawCanvas{border:2px dashed var(--primary);border-radius:14px;background:#fff;cursor:crosshair;touch-action:none;display:block;margin:0 auto}
+.notif-item{background:#fff;padding:12px;border-radius:14px;border:1px solid #f2d9e4;margin-bottom:8px;cursor:pointer;transition:transform .15s}
+.notif-item:active{transform:scale(.98)}
 </style>
 </head>
 <body>
@@ -120,7 +121,7 @@ nav.bottom{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:10
 </div>
 
 <header>
-  <div class="brand"><div class="brand-logo">🌸</div><div><h1>عيون عيوشة</h1><small>ألعاب مشتركة وإشعارات لحظية بيننا</small></div></div>
+  <div class="brand"><div class="brand-logo">🌸</div><div><h1>عيون عيوشة</h1><small>ألعاب مشتركة وتنبيهات فورية بيننا</small></div></div>
   <div class="header-actions">
     <button class="icon-btn" id="notifBell" onclick="switchView('notifications')" title="الإشعارات" aria-label="مركز الإشعارات">🔔<span class="badge-dot"></span></button>
     <button class="icon-btn" onclick="openSettings()" title="الإعدادات">⚙️</button>
@@ -166,9 +167,9 @@ nav.bottom{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:10
   <section id="view-games" class="view">
     <div class="greet" style="background:linear-gradient(135deg,#7b1fa2,#4a148c);margin-bottom:16px;">
       <h2>🎮 عالمنا نلعب</h2>
-      <p>ألعاب وتحديات ثنائية تفاعلية بالتناوب المباشر بين قلبينا 💕</p>
+      <p>ألعاب ثنائية تفاعلية بالتناوب المباشر بين قلبينا 💕</p>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-gold" onclick="window.launchGameModal('trivia')">🧠 لعبة التريفيا والخداع (جديدة!)</button>
+        <button class="btn btn-gold" onclick="window.launchGameModal('trivia')">🧠 لعبة الترفيه والخداع (الخيارات الـ 4)</button>
         <button class="btn btn-soft" style="background:rgba(255,255,255,.2);color:#fff;" onclick="window.launchGameModal('story')">📖 قصة نكتبها معًا</button>
       </div>
     </div>
@@ -190,7 +191,7 @@ nav.bottom{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:10
       <div class="card-title"><span>💞</span> أقسام التحديات بيننا</div>
       <div class="v9-actions">
         <button class="btn btn-soft" onclick="window.openGameCat('hearts')">💗 ألعاب القلوب والرسائل</button>
-        <button class="btn btn-soft" onclick="window.openGameCat('smart')">🧠 تريفيا وألغاز الذكاء</button>
+        <button class="btn btn-soft" onclick="window.openGameCat('smart')">🧠 الترفيه والخداع والذكاء</button>
         <button class="btn btn-soft" onclick="window.openGameCat('fun')">🎨 الرسم والتخمين</button>
         <button class="btn btn-soft" onclick="window.openGameCat('vs')">⚔️ التحدي والمبارزة</button>
       </div>
@@ -200,7 +201,7 @@ nav.bottom{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:10
     <div class="card">
       <div class="card-title"><span>⭐</span> قائمة الألعاب الثنائية المشتركة</div>
       <div style="display:flex;flex-direction:column;gap:11px;margin-top:8px;">
-        <button class="btn btn-primary btn-full" style="background:linear-gradient(135deg,#9c27b0,#e91e63);" onclick="window.launchGameModal('trivia')">🧠 لعبة التريفيا والخداع (تمويه + نقاط الخصم)</button>
+        <button class="btn btn-primary btn-full" style="background:linear-gradient(135deg,#9c27b0,#e91e63);" onclick="window.launchGameModal('trivia')">🧠 لعبة الترفيه والخداع (نظام 4 خيارات + نقاط التمويه)</button>
         <button class="btn btn-primary btn-full" onclick="window.launchGameModal('story')">📖 قصة نكتبها معًا (جملة البداية من النظام + تناوب)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('xo')">❌⭕ لعبة XO (شات ذاتي الحذف 5 ثوانٍ)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('draw')">🎨 ارسم وخمّن (رسم حي + تخمين الشريك بالتبادل)</button>
@@ -309,6 +310,8 @@ const firebaseConfig = {
 };
 
 const DEFAULT_VAPID_KEY = "BPpUV-YcYpV9OFhV2BkYllEar1_BsupWxIHP83ZDBPBozGV7mSnZqsIglbrYLWFs1E8WbXzPb577iT7D-LcZ_r8";
+const ICON_URL = 'https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png'; 
+
 let MY_ROLE = 'me';
 let db = null;
 let firebaseApp = null;
@@ -331,20 +334,49 @@ function pad(n){return String(n).padStart(2,'0');}
 function senderName(by){if(!by)return '';if(by==='system')return '✨ بداية القصة (النظام)';return by==='me'?(state.settings.myName||'حبيبي'):(state.settings.wifeName||'عيوشة');}
 function otherRole(){return MY_ROLE==='me'?'her':'me';}
 
+// Web Audio & Vibration
 let audioCtx = null;
-function initAudio(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){} } }
+function initAudio(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
+  }
+  if(audioCtx && audioCtx.state === 'suspended'){
+    audioCtx.resume().catch(()=>{});
+  }
+}
+document.addEventListener('click', initAudio, { once: false });
+document.addEventListener('touchstart', initAudio, { once: false });
+
 function playEventSound(type='mail'){
   try {
-    initAudio(); if(!audioCtx) return;
-    const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
-    osc.type = 'triangle'; osc.frequency.setValueAtTime(type==='win'?784:587, audioCtx.currentTime);
-    osc.connect(g); g.connect(audioCtx.destination);
-    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.12, audioCtx.currentTime + 0.03);
-    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.28);
-    osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    initAudio();
+    if(!audioCtx) return;
+    const notes = {
+      mail: [660, 880, 1175],
+      game: [523, 659, 784, 1047],
+      win: [523, 659, 784, 1047, 1318],
+      ping: [784, 988, 784],
+      answer: [659, 880],
+      surprise: [523, 784, 1047],
+      notification: [740, 988]
+    }[type] || [660, 880];
+
+    const t = audioCtx.currentTime;
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t + i * 0.09);
+      osc.connect(g);
+      g.connect(audioCtx.destination);
+      g.gain.setValueAtTime(0.0001, t + i * 0.09);
+      g.gain.exponentialRampToValueAtTime(0.12, t + i * 0.09 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.09 + 0.22);
+      osc.start(t + i * 0.09);
+      osc.stop(t + i * 0.09 + 0.24);
+    });
   } catch(e){}
 }
+
 function burstHearts(){
   for(let i=0;i<14;i++){
     const h = document.createElement('div');
@@ -371,6 +403,9 @@ async function addSharedHearts(amount=5){
   } catch(e){}
 }
 
+/* =========================================================
+   نظام الإشعارات الموحد مع الصوت والاهتزاز والتحويل التلقائي (Deep Link)
+   ========================================================= */
 async function addNotification(title, body, type='game', itemId=''){
   if(!firebaseReady || !db) return;
   const to = otherRole();
@@ -386,12 +421,99 @@ async function sendFCM(toRole, title, body, type='game', itemId=''){
     const snap = await get(ref(db, `config/${toRole}/fcmToken`));
     const token = snap.val();
     if(!token) return;
+    const targetUrl = `${location.origin}/index.html?for=${toRole}&open=${encodeURIComponent(type)}&item=${encodeURIComponent(itemId)}`;
     fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, title, body, type, itemId, role: toRole })
+      body: JSON.stringify({ token, title, body, type, itemId, role: toRole, url: targetUrl })
     }).catch(()=>{});
   } catch(e){}
+}
+
+function showAppNotification(title, body, type='notification', itemId=''){
+  playEventSound(type);
+  if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  toast('🔔 ' + title + (body ? ': ' + body : ''));
+  if('Notification' in window && Notification.permission === 'granted'){
+    try {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.showNotification(title, {
+          body: body || '',
+          icon: ICON_URL,
+          badge: ICON_URL,
+          tag: 'ayousha-fg-' + Date.now(),
+          vibrate: [200, 100, 200, 100, 200],
+          data: {
+            url: `${location.origin}/index.html?for=${MY_ROLE}&open=${encodeURIComponent(type)}&item=${encodeURIComponent(itemId)}`,
+            type,
+            itemId
+          }
+        });
+      });
+    } catch(e){}
+  }
+}
+
+let receivedEventIds = new Set(), eventsPrimed = false;
+function processIncomingNotifications(items){
+  const incoming = items.filter(n => n.to === MY_ROLE);
+  if(eventsPrimed){
+    for(const n of incoming){
+      if(!receivedEventIds.has(n.id)){
+        showAppNotification(n.title, n.body, n.type, n.itemId || '');
+      }
+    }
+  }
+  receivedEventIds = new Set(incoming.map(n => n.id));
+  eventsPrimed = true;
+}
+
+window.openEventDestination = function(type, id){
+  if(type === 'game'){
+    switchView('games');
+    if(id){
+      setTimeout(() => {
+        window.launchGameModal(id);
+      }, 300);
+    }
+    return;
+  }
+  if(type === 'mail'){
+    switchView('mail');
+    return;
+  }
+  if(type === 'surprise'){
+    switchView('surprise');
+    return;
+  }
+  if(type === 'memory'){
+    switchView('memories');
+    return;
+  }
+  if(type === 'ping' || type === 'answer'){
+    switchView('home');
+    if(type === 'answer'){
+      setTimeout(() => document.querySelector('.question-box')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+    }
+    return;
+  }
+  if(type === 'mood'){
+    switchView('mood');
+    return;
+  }
+  switchView('notifications');
+};
+
+function handleDeepLink(){
+  const p = new URLSearchParams(location.search);
+  const type = p.get('open');
+  const id = p.get('item');
+  if(!type) return;
+  window.openEventDestination(type, id);
+  p.delete('open');
+  p.delete('item');
+  const newSearch = p.toString() ? '?' + p.toString() : '';
+  history.replaceState({}, '', location.pathname + newSearch + location.hash);
 }
 
 window.openModal = function(html){
@@ -456,19 +578,37 @@ window.sendGameInlineMsg = async function(gamePath){
 };
 
 /* =========================================================
-   1. 🧠 لعبة التريفيا والخداع (Trivia & Bluff Challenge)
+   1. 🧠 لعبة الترفيه والخداع (قاعدة بيانات ضخمة + نظام 4 خيارات)
    ========================================================= */
 const TRIVIA_BANK = [
-  { id: 1, cat: "غرائب", q: "ما هو الحيوان الثديي الوحيد الذي لا يستطيع القفز نهائياً؟", real: "الفيل" },
-  { id: 2, cat: "تاريخ", q: "كم سنة استمرت حرب المئة عام الشهيرة بين إنجلترا وفرنسا؟", real: "116 سنة" },
-  { id: 3, cat: "جغرافيا", q: "ما هي عاصمة أستراليا الرسمية؟", real: "كانبيرا" },
-  { id: 4, cat: "علوم", q: "كم عدد القلوب لدى كائن الأخطبوط في أعماق البحار؟", real: "3 قلوب" },
-  { id: 5, cat: "غرائب", q: "ما هو الطائر الوحيد القادر على الطيران إلى الخلف؟", real: "طائر الطنان" },
-  { id: 6, cat: "علوم", q: "ما هو الغاز الذي يشكل النسبة الأكبر في الغلاف الجوي للأرض؟", real: "النيتروجين" },
-  { id: 7, cat: "فنون", q: "في أي عام مشى أول إنسان (نيل أرمسترونغ) على سطح القمر؟", real: "1969" },
-  { id: 8, cat: "جغرافيا", q: "ما هي أصغر دولة مستقلة في العالم من حيث المساحة؟", real: "الفاتيكان" },
-  { id: 9, cat: "علوم", q: "ما هو الكوكب الأقرب إلى الشمس في نظامنا الشمسي؟", real: "عطارد" },
-  { id: 10, cat: "تاريخ", q: "أي حضارة قديمة هي التي اخترعت الورق لأول مرة في التاريخ؟", real: "الحضارة الصينية" }
+  { id: 1, cat: "غرائب", q: "ما هو الحيوان الثديي الوحيد الذي لا يستطيع القفز نهائياً؟", real: "الفيل", decoy: "فرس النهر" },
+  { id: 2, cat: "تاريخ", q: "كم سنة استمرت حرب المئة عام الشهيرة بين إنجلترا وفرنسا؟", real: "116 سنة", decoy: "100 سنة" },
+  { id: 3, cat: "جغرافيا", q: "ما هي عاصمة أستراليا الرسمية وليست سيدني كما يظن الكثيرون؟", real: "كانبيرا", decoy: "ملبورن" },
+  { id: 4, cat: "علوم", q: "كم عدد القلوب لدى كائن الأخطبوط في أعماق البحار؟", real: "3 قلوب", decoy: "قلبان" },
+  { id: 5, cat: "غرائب", q: "ما هو الطائر الوحيد في العالم القادر على الطيران إلى الخلف؟", real: "طائر الطنان", decoy: "السنونو" },
+  { id: 6, cat: "علوم", q: "ما هو الغاز الأكثر وفرة في الغلاف الجوي لكوكب الأرض؟", real: "النيتروجين", decoy: "الأكسجين" },
+  { id: 7, cat: "تاريخ", q: "في أي عام مشى رائد الفضاء نيل أرمسترونغ لأول مرة على سطح القمر؟", real: "1969", decoy: "1972" },
+  { id: 8, cat: "جغرافيا", q: "ما هي أصغر دولة مستقلة في العالم من حيث المساحة وعدد السكان؟", real: "الفاتيكان", decoy: "موناكو" },
+  { id: 9, cat: "علوم", q: "ما هو الكوكب الأقرب إلى الشمس في نظامنا الشمسي؟", real: "عطارد", decoy: "الزهرة" },
+  { id: 10, cat: "تاريخ", q: "أي حضارة قديمة هي التي اخترعت الورق لأول مرة في التاريخ؟", real: "الحضارة الصينية", decoy: "الفراعنة" },
+  { id: 11, cat: "فنون", q: "في أي مدينة إيطالية شهيرة يقع برج بيزا المائل؟", real: "مدينة بيزا", decoy: "مدينة فلورنسا" },
+  { id: 12, cat: "غرائب", q: "ما هو لون حليب أنثى فرس النهر الطبيعي؟", real: "وردي", decoy: "أصفر خفيف" },
+  { id: 13, cat: "حيوانات", q: "كم عدد عيون نحلة العسل العادية؟", real: "5 عيون", decoy: "عينان مركبتان فقط" },
+  { id: 14, cat: "جغرافيا", q: "ما هو أطول نهر في قارة آسيا؟", real: "نهر اليانغتسي", decoy: "نهر الميكونغ" },
+  { id: 15, cat: "أكلات وثقافات", q: "في أي دولة تم ابتكار حلوى التيراميسو الشهيرة أول مرة؟", real: "إيطاليا", decoy: "فرنسا" },
+  { id: 16, cat: "رياضة", q: "كم عدد اللاعبين في فريق كرة السلة داخل الملعب أثناء المباراة؟", real: "5 لاعبين", decoy: "6 لاعبين" },
+  { id: 17, cat: "علوم", q: "ما هو العضو الوحيد في جسم الإنسان القادر على تجديد خلاياه وإعادة بناء نفسه؟", real: "الكبد", decoy: "الرئة" },
+  { id: 18, cat: "تاريخ", q: "من هو القائد التاريخي الذي اجتاز جبال الألب بصحبة الأفيال؟", real: "حنبعل", decoy: "يوليوس قيصر" },
+  { id: 19, cat: "غرائب", q: "ما هو المعدن الوحيد الذي يكون في حالة سائلة في درجة حرارة الغرفة العادية؟", real: "الزئبق", decoy: "الغاليوم" },
+  { id: 20, cat: "جغرافيا", q: "في أي محيط تقع أعمق نقطة على سطح الأرض (خندق ماريانا)؟", real: "المحيط الهادئ", decoy: "المحيط الأطلسي" },
+  { id: 21, cat: "حيوانات", q: "كم عدد أصابع أقدام حيوان الكسلان الشهير؟", real: "3 أصابع", decoy: "4 أصابع" },
+  { id: 22, cat: "فنون", q: "من هو الرسام العالمي صاحب لوحة 'ليلة النجوم' (Starry Night)؟", real: "فنسنت فان غوخ", decoy: "بابلو بيكاسو" },
+  { id: 23, cat: "أكلات وثقافات", q: "ما هي الفاكهة الآسيوية الشهيرة برائحتها النفاذة جداً والتي يُمنع إدخالها للفنادق؟", real: "الدوريان", decoy: "الجاك فروت" },
+  { id: 24, cat: "رياضة", q: "كم عدد الحلقات الملونة في الشعار الرسمي للألعاب الأولمبية؟", real: "5 حلقات", decoy: "6 حلقات" },
+  { id: 25, cat: "تاريخ", q: "ما هي أقدم عاصمة مأهولة بالسكان بشكل مستمر حتى اليوم في العالم؟", real: "دمشق", decoy: "أثينا" },
+  { id: 26, cat: "علوم", q: "ما هو الكائن الأطول عمراً على وجه الأرض وتعيش بعض أنواعه مئات السنين؟", real: "قرش غرينلاند", decoy: "سلحفاة غالاباغوس" },
+  { id: 27, cat: "غرائب", q: "ما هو الشيء الذي يزداد طوله في الصيف بحوالي 15 سم بسبب التمدد الحراري؟", real: "برج إيفل", decoy: "ساعة بيغ بن" },
+  { id: 28, cat: "جغرافيا", q: "ما هي أكبر جزيرة في البحر الأبيض المتوسط من حيث المساحة؟", real: "صقلية", decoy: "قبرص" }
 ];
 
 window.openTriviaGame = function(){
@@ -477,7 +617,7 @@ window.openTriviaGame = function(){
   if(window._activeGameUnsub) window._activeGameUnsub();
 
   window.openModal(`
-    <h3>🧠 لعبة التريفيا والخداع</h3>
+    <h3>🧠 لعبة الترفيه والخداع</h3>
     <div id="triviaContent">جاري تحميل الغرفة...</div>
     ${window.renderGameChatUI('games/trivia')}
     <div style="margin-top:10px;"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
@@ -492,19 +632,25 @@ window.openTriviaGame = function(){
 
     if(!t || t.status === 'setup'){
       cEl.innerHTML = `
-        <p class="muted">قانون اللعبة: يُطرح سؤال عام، يكتب كل منكما إجابة وهمية مقنعة لخداع الآخر، ثم تختارون الإجابة الحقيقية!<br>
-        🎯 <b>+2 نقطة</b> للإجابة الحقيقية | 🎭 <b>+1 نقطة</b> لكل من يبتلع طعم إجابتك الوهمية!</p>
+        <p class="muted">قانون لعبة الترفيه والخداع: يُطرح سؤال عام ويكون له <b>4 خيارات</b>:<br>
+        1. خيار منك ✍️ | 2. خيار من عيوشة ✍️ | 3. إجابة حقيقية من الجهاز 💻 | 4. تمويه ذكي من الجهاز 🤖<br><br>
+        🎯 <b>+2 نقطة</b> لمن يكتشف الإجابة الحقيقية!<br>
+        🎭 <b>+1 نقطة</b> لكل من يبتلع طعم إجابتك التمويهية ويختارها!</p>
         <div style="margin:15px 0;">
-          <label style="font-weight:bold;font-size:.85rem;">اختر الفئة:</label>
+          <label style="font-weight:bold;font-size:.85rem;">اختر الفئة المطلوبة:</label>
           <select id="trivCatSelect" style="margin-top:4px;">
             <option value="الكل">كل الفئات المتنوعة 🌍</option>
             <option value="غرائب">غرائب ومعلومات عجيبة 😲</option>
             <option value="تاريخ">تاريخ وحضارات 📜</option>
             <option value="علوم">علوم وطبيعة 🔬</option>
             <option value="جغرافيا">جغرافيا ودول 🗺️</option>
+            <option value="حيوانات">كائنات وحيوانات 🐾</option>
+            <option value="أكلات وثقافات">أكلات وثقافات 🍕</option>
+            <option value="رياضة">رياضة وأرقام قياسية ⚽</option>
+            <option value="فنون">فنون وثقافة 🎨</option>
           </select>
         </div>
-        <button class="btn btn-primary btn-full" onclick="window.startTriviaRound()">🚀 بدء لعبة التريفيا الآن</button>
+        <button class="btn btn-primary btn-full" onclick="window.startTriviaRound()">🚀 بدء اللعبة وتوليد السؤال</button>
       `;
       return;
     }
@@ -514,39 +660,39 @@ window.openTriviaGame = function(){
     const myGuess = t.guesses?.[MY_ROLE];
     const otherGuess = t.guesses?.[otherRole()];
 
-    // 1. مرحلة كتابة الإجابات التمويهية
+    // 1. مرحلة التمويه (كتابة الإجابات التمويهية)
     if(t.status === 'faking'){
       if(!myFake){
         cEl.innerHTML = `
           <div class="v9-panel"><b>فئة [${escapeHtml(t.currentQ.cat)}]:</b><br><span style="font-size:1.05rem;color:#ad1457;">${escapeHtml(t.currentQ.q)}</span></div>
-          <p class="muted">🎭 <b>مرحلة التمويه:</b> اكتب إجابة تبدو صحيحة ومقنعة جداً لتخدع ${senderName(otherRole())}:</p>
-          <input id="fakeAnsInput" placeholder="اكتب تمويهك المضلل هنا..." style="margin:8px 0;">
+          <p class="muted">🎭 <b>مرحلة التمويه:</b> اكتب إجابة وهمية تبدو صحيحة ومقنعة لخداع ${senderName(otherRole())}:</p>
+          <input id="fakeAnsInput" placeholder="اكتب تمويهك الذكي هنا..." style="margin:8px 0;">
           <button class="btn btn-primary btn-full" onclick="window.submitFakeAnswer()">🎭 إرسال الإجابة التمويهية</button>
         `;
       } else {
         cEl.innerHTML = `
           <div class="v9-panel"><b>السؤال:</b> ${escapeHtml(t.currentQ.q)}</div>
           <div class="v9-panel" style="background:#fff8e1;color:#795548;text-align:center;">
-            🔒 <b>تم حفظ إجابتك التمويهية: "${escapeHtml(myFake)}"</b><br>
-            بانتظار أن يكتب <b>${senderName(otherRole())}</b> إجابته التمويهية لنبدأ مرحلة الاختيار! ⏳
+            🔒 <b>تم حفظ تمويهك: "${escapeHtml(myFake)}"</b><br>
+            بانتظار أن يكتب <b>${senderName(otherRole())}</b> تمويهه لاكتمال الخيارات الأربعة! ⏳
           </div>
         `;
       }
     }
 
-    // 2. مرحلة الاختيار من القائمة (الحقيقية + التمويهات)
+    // 2. مرحلة الاختيار من بين الخيارات الـ 4
     else if(t.status === 'guessing'){
       if(!myGuess){
         const options = t.shuffledOptions || [];
         cEl.innerHTML = `
           <div class="v9-panel"><b>السؤال:</b> ${escapeHtml(t.currentQ.q)}</div>
-          <p class="muted">🎯 <b>مرحلة الاختيار:</b> أي من هذه الإجابات هي <u>الحقيقة</u>؟ (احذر من تمويه شريكك!):</p>
+          <p class="muted">🎯 <b>مرحلة الاختيار:</b> أمامك 4 خيارات (الحقيقة، تمويهك، تمويه شريكك، تمويه الجهاز):</p>
           <div style="display:flex;flex-direction:column;gap:8px;margin:12px 0;">
-            ${options.map(opt => {
+            ${options.map((opt, idx) => {
               const isMine = (opt === myFake);
               return `
                 <button class="btn btn-soft" style="justify-content:flex-start;text-align:right;" ${isMine?'disabled title="إجابتك التمويهية"':`onclick="window.submitTriviaGuess('${escapeHtml(opt)}')"`}>
-                  ${isMine ? `🔒 ${escapeHtml(opt)} (تمويهك أنت)` : `🔘 ${escapeHtml(opt)}`}
+                  ${isMine ? `🔒 ${idx+1}. ${escapeHtml(opt)} (تمويهك أنت)` : `🔘 ${idx+1}. ${escapeHtml(opt)}`}
                 </button>
               `;
             }).join('')}
@@ -557,32 +703,35 @@ window.openTriviaGame = function(){
           <div class="v9-panel"><b>السؤال:</b> ${escapeHtml(t.currentQ.q)}</div>
           <div class="v9-panel" style="background:#fff8e1;color:#795548;text-align:center;">
             🎯 <b>اخترت: "${escapeHtml(myGuess)}"</b><br>
-            بانتظار اختيار <b>${senderName(otherRole())}</b> لكشف النتائج ونقاط الخداع! 💕
+            بانتظار اختيار <b>${senderName(otherRole())}</b> لكشف الإجابة الحقيقية والنتائج! 💕
           </div>
         `;
       }
     }
 
-    // 3. مرحلة كشف النتائج واحتساب النقاط
+    // 3. مرحلة النتائج وتوزيع النقاط
     else if(t.status === 'results'){
       const meChoseReal = (myGuess === t.currentQ.real);
       const otherChoseReal = (otherGuess === t.currentQ.real);
       const meFooledOther = (otherGuess === myFake);
       const otherFooledMe = (myGuess === otherFake);
+      const meFooledByDevice = (myGuess === t.currentQ.decoy);
+      const otherFooledByDevice = (otherGuess === t.currentQ.decoy);
 
       cEl.innerHTML = `
         <div class="v9-panel" style="text-align:center;background:#e8f5e9;color:#1b5e20;">
-          <h4 style="margin-bottom:6px;">🎉 الإجابة الصحيحة هي: <b>"${escapeHtml(t.currentQ.real)}"</b></h4>
-          <hr style="border:0;border-top:1px dashed #a5d6a7;margin:8px 0;">
+          <h4 style="margin-bottom:6px;">🎉 الإجابة الصحيحة الحقيقية: <b>"${escapeHtml(t.currentQ.real)}"</b></h4>
+          <small style="color:#555;">تمويه الجهاز كان: "${escapeHtml(t.currentQ.decoy)}"</small>
+          <hr style="border:0;border-top:1px dashed #a5d6a7;margin:10px 0;">
           <div style="text-align:right;font-size:.9rem;line-height:1.9;">
-            💗 <b>${senderName(MY_ROLE)}:</b> اختار "${escapeHtml(myGuess)}" ${meChoseReal?'(صح ✅ +2 نقطة)':'(خطأ ❌)'} ${otherFooledMe?`— <span style="color:#d81b60;">انخدع بتمويه ${senderName(otherRole())}!</span>`:''}<br>
-            💜 <b>${senderName(otherRole())}:</b> اختار "${escapeHtml(otherGuess)}" ${otherChoseReal?'(صح ✅ +2 نقطة)':'(خطأ ❌)'} ${meFooledOther?`— <span style="color:#2e7d32;font-weight:bold;">انخدع بتمويهك! (+1 نقطة لك 🎭)</span>`:''}<br>
-            <div style="margin-top:6px;font-weight:bold;color:#ad1457;">
-              📊 النقاط الإجمالية: ${senderName('me')}: ${t.scores?.me||0} نقطة | ${senderName('her')}: ${t.scores?.her||0} نقطة
+            💗 <b>${senderName(MY_ROLE)}:</b> اختار "${escapeHtml(myGuess)}" ${meChoseReal?'(صح ✅ +2 نقطة)':'(خطأ ❌)'} ${otherFooledMe?`— <span style="color:#d81b60;font-weight:bold;">انخدع بتمويه ${senderName(otherRole())}!</span>`:''}${meFooledByDevice?'— انخدع بتمويه الجهاز! 🤖':''}<br>
+            💜 <b>${senderName(otherRole())}:</b> اختار "${escapeHtml(otherGuess)}" ${otherChoseReal?'(صح ✅ +2 نقطة)':'(خطأ ❌)'} ${meFooledOther?`— <span style="color:#2e7d32;font-weight:bold;">انخدع بتمويهك! (+1 نقطة لك 🎭)</span>`:''}${otherFooledByDevice?'— انخدع بتمويه الجهاز! 🤖':''}<br>
+            <div style="margin-top:8px;font-weight:bold;color:#ad1457;font-size:1rem;">
+              📊 رصيد النقاط: ${senderName('me')}: ${t.scores?.me||0} نقطة | ${senderName('her')}: ${t.scores?.her||0} نقطة
             </div>
           </div>
         </div>
-        <button class="btn btn-primary btn-full" onclick="window.nextTriviaQuestion()">🎯 الجولة التالية</button>
+        <button class="btn btn-primary btn-full" onclick="window.nextTriviaQuestion()">🎯 السؤال التالي</button>
       `;
     }
   });
@@ -602,7 +751,8 @@ window.startTriviaRound = async function(){
     scores: { me: 0, her: 0 },
     round: 1
   });
-  addNotification('🧠 بدأت لعبة التريفيا والخداع!', `سؤال جديد في فئة [${picked.cat}]! ادخل واكتب تمويهك المضلل!`, 'game');
+  playEventSound('game');
+  addNotification('🧠 بدأت لعبة الترفيه والخداع!', `سؤال جديد في فئة [${picked.cat}]! ادخل واكتب تمويهك المضلل!`, 'game', 'trivia');
 };
 
 window.submitFakeAnswer = async function(){
@@ -611,17 +761,19 @@ window.submitFakeAnswer = async function(){
   const trivRef = ref(db, 'games/trivia');
   await set(ref(db, `games/trivia/fakeAnswers/${MY_ROLE}`), val);
   toast('🎭 تم حفظ تمويهك بنجاح');
-  addNotification('🎭 كتبت تمويهي في التريفيا!', `${senderName(MY_ROLE)} انتهى من كتابة تمويهه، ادخل واكتب تمويهك!`, 'game');
+  playEventSound('mail');
+  addNotification('🎭 كتبت تمويهي في لعبة الترفيه والخداع!', `${senderName(MY_ROLE)} انتهى من كتابة تمويهه، ادخل واكتب تمويهك!`, 'game', 'trivia');
 
-  // تحقق هل كتب كلاهما التمويه
   const snap = await get(trivRef);
   const data = snap.val();
   if(data.fakeAnswers?.me && data.fakeAnswers?.her){
-    const opts = [data.currentQ.real, data.fakeAnswers.me, data.fakeAnswers.her].sort(() => Math.random() - 0.5);
+    // إنشاء الخيارات الأربعة: الحقيقية، تمويه اللاعب 1، تمويه اللاعب 2، تمويه الجهاز
+    const opts = [data.currentQ.real, data.currentQ.decoy, data.fakeAnswers.me, data.fakeAnswers.her].sort(() => Math.random() - 0.5);
     await update(trivRef, {
       status: 'guessing',
       shuffledOptions: opts
     });
+    addNotification('🎯 اكتملت خيارات لعبة الترفيه والخداع!', 'تجمعت الخيارات الـ 4، ادخل واختر الإجابة الحقيقية!', 'game', 'trivia');
   }
 };
 
@@ -629,6 +781,7 @@ window.submitTriviaGuess = async function(chosenOpt){
   const trivRef = ref(db, 'games/trivia');
   await set(ref(db, `games/trivia/guesses/${MY_ROLE}`), chosenOpt);
   toast('🎯 تم تسجيل اختيارك');
+  playEventSound('ping');
 
   const snap = await get(trivRef);
   const data = snap.val();
@@ -636,7 +789,7 @@ window.submitTriviaGuess = async function(chosenOpt){
     let scMe = data.scores?.me || 0;
     let scHer = data.scores?.her || 0;
 
-    // حساب النقاط
+    // احتساب النقاط
     if(data.guesses.me === data.currentQ.real) scMe += 2;
     if(data.guesses.her === data.currentQ.real) scHer += 2;
     if(data.guesses.me === data.fakeAnswers.her) scHer += 1;
@@ -648,6 +801,7 @@ window.submitTriviaGuess = async function(chosenOpt){
     });
     addSharedHearts(10);
     playEventSound('win');
+    addNotification('🎉 ظهرت نتائج جولة الترفيه والخداع!', 'ادخل لرؤية من خدع الآخر ومن أصاب الحقيقة!', 'game', 'trivia');
   }
 };
 
@@ -663,11 +817,13 @@ window.nextTriviaQuestion = async function(){
     shuffledOptions: [],
     round: (data.round || 1) + 1
   });
-  toast('🎲 جولة تريفيا جديدة بدأت!');
+  playEventSound('game');
+  toast('🎲 جولة جديدة بدأت في لعبة الترفيه والخداع!');
+  addNotification('🎲 جولة ترفيه وخداع جديدة!', 'سؤال جديد ينتظرك، ادخل واكتب تمويهك!', 'game', 'trivia');
 };
 
 /* =========================================================
-   2. 📖 قصة نكتبها معًا (تبدأ من النظام + تبادل الأدوار + شات)
+   2. 📖 قصة نكتبها معًا
    ========================================================= */
 const STORY_STARTERS = [
   "في مساء هادئ وجميل، وصل إلى باب عيوشة صندوق وردي مربوط بشريط ذهبي وبداخله مفتاح غامض ورسالة...",
@@ -755,7 +911,7 @@ window.submitStorySentence = async function(){
     await set(ref(db, 'games/story/lastTurn'), MY_ROLE);
     if(input) input.value = '';
     addSharedHearts(5);
-    await addNotification('📖 دورك في القصة المشتركة!', `${senderName(MY_ROLE)} كتب: "${text.slice(0,35)}..." دورك لتكمل القصة!`, 'game');
+    await addNotification('📖 دورك في القصة المشتركة!', `${senderName(MY_ROLE)} كتب: "${text.slice(0,35)}..." دورك لتكمل القصة!`, 'game', 'story');
     playEventSound('mail');
     toast('✅ وصلت جملتك وأرسلنا إشعاراً لشريكك!');
   } catch(e){
@@ -776,7 +932,7 @@ window.resetStoryWithNewStarter = async function(){
 };
 
 /* =========================================================
-   3. ❌⭕ لعبة XO المشتركة (تناوب + شات 5 ثوانٍ)
+   3. ❌⭕ لعبة XO المشتركة
    ========================================================= */
 window.openXOGame = function(){
   if(!db) return toast('جاري الاتصال...');
@@ -854,9 +1010,9 @@ window.makeXOMove = async function(idx){
 
   if(winner && winner !== 'draw'){
     addSharedHearts(10);
-    addNotification('🏆 فوز في لعبة XO!', `فاز ${senderName(MY_ROLE)} في تحدي XO!`, 'game');
+    addNotification('🏆 فوز في لعبة XO!', `فاز ${senderName(MY_ROLE)} في تحدي XO!`, 'game', 'xo');
   } else if(!winner){
-    addNotification('❌⭕ دورك في XO', `لعب ${senderName(MY_ROLE)} دوره، حان دورك!`, 'game');
+    addNotification('❌⭕ دورك في XO', `لعب ${senderName(MY_ROLE)} دوره، حان دورك!`, 'game', 'xo');
   }
 };
 
@@ -871,7 +1027,7 @@ window.resetXOGame = async function(){
 };
 
 /* =========================================================
-   4. 🎨 ارسم وخمّن (رسم حي + تخمين الشريك بالتبادل + شات)
+   4. 🎨 ارسم وخمّن
    ========================================================= */
 const DRAW_WORDS = ["شمس ☀️", "قلب 💖", "قطة 🐱", "فنجان قهوة ☕", "سيارة 🚗", "وردة 🌹", "قمر 🌙", "بيت 🏡", "تاج 👑", "نظارة 👓"];
 
@@ -923,13 +1079,11 @@ window.openDrawGame = function(){
     const isDrawer = (d.drawer === MY_ROLE);
 
     if(isDrawer){
-      // الرسام الحالي
       canvasArea.style.display = 'block';
       guessArea.style.display = 'none';
       status.innerHTML = `🎨 <b>دورك في الرسم!</b> ارسم الكلمة السرية: <span style="color:#d81b60;font-size:1.15rem;">[${escapeHtml(d.word)}]</span>`;
       setTimeout(initDrawingCanvas, 150);
     } else {
-      // المخمن الحالي
       canvasArea.style.display = 'none';
       guessArea.style.display = 'block';
       if(d.drawing){
@@ -973,7 +1127,8 @@ window.submitDrawData = async function(){
   const dataUrl = c.toDataURL('image/png');
   await update(ref(db, 'games/draw'), { drawing: dataUrl });
   toast('📤 أُرسلت الرسمة لشريكك ليخمن!');
-  addNotification('🎨 أرسلت لك رسمة جديدة!', `${senderName(MY_ROLE)} رسم لك رسماً جميلاً، ادخل وخمّن الكلمة!`, 'game');
+  playEventSound('game');
+  addNotification('🎨 أرسلت لك رسمة جديدة!', `${senderName(MY_ROLE)} رسم لك رسماً جميلاً، ادخل وخمّن الكلمة!`, 'game', 'draw');
 };
 window.submitUserGuess = async function(){
   const input = document.getElementById('userGuessWordInput');
@@ -988,7 +1143,6 @@ window.submitUserGuess = async function(){
     burstHearts();
     addSharedHearts(15);
     toast('🎉 تخمين صحيح وعبقري! فزتما بـ +15 قلباً');
-    // تبادل الأدوار
     const nextWord = DRAW_WORDS[Math.floor(Math.random() * DRAW_WORDS.length)];
     await set(ref(db, 'games/draw'), {
       drawer: otherRole(),
@@ -997,7 +1151,7 @@ window.submitUserGuess = async function(){
       guessed: true,
       lastMsg: null
     });
-    addNotification('🎉 تخمينك كان صحيحاً!', `خمن ${senderName(MY_ROLE)} الرسمة بنجاح، والآن حان دوره في الرسم!`, 'game');
+    addNotification('🎉 تخمينك كان صحيحاً!', `خمن ${senderName(MY_ROLE)} الرسمة بنجاح، والآن حان دوره في الرسم!`, 'game', 'draw');
   } else {
     toast('❌ محاولة قريبة، حاول ثانية!');
     playEventSound('ping');
@@ -1005,7 +1159,7 @@ window.submitUserGuess = async function(){
 };
 
 /* =========================================================
-   5. 🔢 خمن الرقم السري (تناوب المبارزة + شات)
+   5. 🔢 خمن الرقم السري
    ========================================================= */
 window.openGuessNumGame = function(){
   if(!db) return toast('جاري الاتصال...');
@@ -1079,7 +1233,7 @@ window.makeSecretNumberGuess = async function(){
     winner = MY_ROLE;
     burstHearts();
     addSharedHearts(20);
-    addNotification('🏆 فوز في تخمين الرقم!', `خمن ${senderName(MY_ROLE)} الرقم السري [${d.secret}] بنجاح!`, 'game');
+    addNotification('🏆 فوز في تخمين الرقم!', `خمن ${senderName(MY_ROLE)} الرقم السري [${d.secret}] بنجاح!`, 'game', 'guessNum');
   } else if(num < d.secret){
     hint = '📈 الرقم السري **أكبر** من ' + num;
   } else {
@@ -1095,6 +1249,9 @@ window.makeSecretNumberGuess = async function(){
     history: newHist
   });
   playEventSound('ping');
+  if(!winner){
+    addNotification('🔢 دورك في تخمين الرقم!', `خمن ${senderName(MY_ROLE)} دوراً جديداً، حان دورك!`, 'game', 'guessNum');
+  }
 };
 
 window.resetSecretNumGame = async function(){
@@ -1108,7 +1265,7 @@ window.resetSecretNumGame = async function(){
 };
 
 /* =========================================================
-   6. 🎁 افتح الباب الصحيح (تناوب الجولات + شات)
+   6. 🎁 افتح الباب الصحيح
    ========================================================= */
 window.openDoorsGame = function(){
   if(!db) return toast('جاري الاتصال...');
@@ -1172,11 +1329,11 @@ window.pickSharedDoor = async function(num){
     winningDoor: nextWinDoor,
     lastPick: { by: MY_ROLE, door: num, win, at: Date.now() }
   });
-  addNotification('🚪 فُتح باب جديد في اللعبة!', `فتح ${senderName(MY_ROLE)} الباب رقم [${num}]! دورك الآن لفتح بابك!`, 'game');
+  addNotification('🚪 فُتح باب جديد في اللعبة!', `فتح ${senderName(MY_ROLE)} الباب رقم [${num}]! دورك الآن لفتح بابك!`, 'game', 'doors');
 };
 
 /* =========================================================
-   7. 💌 اختر رقمًا واكتشف رسالتك (تناوب فتح القلوب + شات)
+   7. 💌 اختر رقمًا واكتشف رسالتك
    ========================================================= */
 const CARD_MESSAGES = {
   1: "اذكري أجمل شيء حدث لك معي هذا الأسبوع 💗",
@@ -1243,11 +1400,11 @@ window.pickSharedCard = async function(n){
     turn: otherRole(),
     lastCard: { num: n, msg, by: MY_ROLE, at: Date.now() }
   });
-  addNotification('💌 تم فتح قلب جديد!', `فتح ${senderName(MY_ROLE)} الكرت رقم [${n}]: "${msg.slice(0,30)}..." دورك لتفتح كرتك!`, 'game');
+  addNotification('💌 تم فتح قلب جديد!', `فتح ${senderName(MY_ROLE)} الكرت رقم [${n}]: "${msg.slice(0,30)}..." دورك لتفتح كرتك!`, 'game', 'cards');
 };
 
 /* =========================================================
-   8. 🧩 حل اللغز قبلي (حل سري + كشف الجوابين)
+   8. 🧩 حل اللغز قبلي
    ========================================================= */
 const PUZZLES_POOL = [
   { q: "شيء كلما أخذت منه كبر، فما هو؟", a: ["حفرة", "الحفرة"] },
@@ -1335,7 +1492,7 @@ window.submitPuzzleAnswer = async function(){
   await set(ref(db, `games/puzzle/answers/${MY_ROLE}`), ans);
   playEventSound('ping');
   toast('🔒 تم حفظ إجابتك بسرية!');
-  addNotification('🧩 تم حل اللغز!', `${senderName(MY_ROLE)} كتب إجابته وينتظرك لكشف الفائز!`, 'game');
+  addNotification('🧩 تم حل اللغز!', `${senderName(MY_ROLE)} كتب إجابته وينتظرك لكشف الفائز!`, 'game', 'puzzle');
 };
 
 window.nextPuzzleRound = async function(){
@@ -1412,7 +1569,7 @@ window.pickTelepathyChoice = async function(idx){
   await set(ref(db, `games/telepathy/choices/${MY_ROLE}`), idx);
   playEventSound('ping');
   toast('✨ تم حفظ اختيارك');
-  addNotification('⚡ تحدي تخاطر القلوب!', `${senderName(MY_ROLE)} اختار جوابه، ادخل واختر لنرى هل تتطابق أفكاركما!`, 'game');
+  addNotification('⚡ تحدي تخاطر القلوب!', `${senderName(MY_ROLE)} اختار جوابه، ادخل واختر لنرى هل تتطابق أفكاركما!`, 'game', 'telepathy');
 };
 window.nextTelepathyQuestion = async function(){
   const next = TELEPATHY_QUESTIONS[Math.floor(Math.random() * TELEPATHY_QUESTIONS.length)];
@@ -1446,14 +1603,14 @@ window.spinTheWheel = async function(){
     box.innerHTML = `🎯 <b>تحديكما الآن:</b><br><span style="color:#ad1457;font-size:1.15rem;margin-top:6px;display:block;">${task}</span>`;
     burstHearts();
     addSharedHearts(5);
-    addNotification('🎡 تحدي رومانسي جديد!', `لف ${senderName(MY_ROLE)} العجلة: ${task.slice(0,30)}...`, 'game');
+    addNotification('🎡 تحدي رومانسي جديد!', `لف ${senderName(MY_ROLE)} العجلة: ${task.slice(0,30)}...`, 'game', 'spin');
   }, 1000);
 };
 
 window.showBadgesModal = function(){
   openModal(`
     <h3>🏆 أوسمتنا وإنجازاتنا</h3>
-    <div class="v9-entry">🧠 ملوك التريفيا والخداع — 🏅 نشط</div>
+    <div class="v9-entry">🧠 ملوك الترفيه والخداع — 🏅 نشط</div>
     <div class="v9-entry">📖 روائيّو الحب (القصة المشتركة) — 🏅 نشط</div>
     <div class="v9-entry">🎨 فنانو عالمنا المشترك — 🏅 مكتمل</div>
     <div class="v9-entry">💞 روح واحدة وتخاطر قلوب — 🏅 100%</div>
@@ -1610,7 +1767,7 @@ function renderNotifs(tab='inbox'){
   const items = allNotifs.filter(n => tab === 'inbox' ? n.to === MY_ROLE : n.from === MY_ROLE);
   if(!items.length){ listEl.innerHTML = '<div style="text-align:center;padding:30px;color:#887581;">📭 لا توجد إشعارات حالياً</div>'; return; }
   listEl.innerHTML = items.map(n => `
-    <div style="background:#fff;padding:12px;border-radius:14px;border:1px solid #f2d9e4;margin-bottom:8px;">
+    <div class="notif-item" onclick="window.openEventDestination('${n.type}','${n.itemId||''}')">
       <h4 style="font-size:.95rem;color:#ad1457;">${escapeHtml(n.title)}</h4>
       <p style="font-size:.85rem;color:#555;">${escapeHtml(n.body)}</p>
       <small style="color:#aaa;font-size:.7rem;">${new Date(n.at).toLocaleTimeString('ar')}</small>
@@ -1689,7 +1846,10 @@ window.openSettings = function(){
     <input id="setNameHer" value="${escapeHtml(state.settings.wifeName)}">
     <label style="font-size:.85rem;font-weight:bold;margin-top:8px;">موعد اللقاء</label>
     <input type="datetime-local" id="setMeetup" value="${state.meetupDate ? state.meetupDate.slice(0,16) : ''}">
-    <div class="modal-actions"><button class="btn btn-primary btn-full" onclick="window.saveSettings()">💾 حفظ الإعدادات</button></div>
+    <div class="modal-actions" style="flex-direction:column;gap:8px;margin-top:14px;">
+      <button class="btn btn-soft btn-full" onclick="window.askNotifPermission()">🔔 تفعيل أذونات الإشعارات على الهاتف</button>
+      <button class="btn btn-primary btn-full" onclick="window.saveSettings()">💾 حفظ الإعدادات</button>
+    </div>
   `);
 };
 window.saveSettings = async function(){
@@ -1703,6 +1863,34 @@ window.saveSettings = async function(){
   closeModal(); updateGreet(); updateCountdown(); toast('✅ تم حفظ الإعدادات');
 };
 
+window.askNotifPermission = async function(){
+  if(!('Notification' in window)) return toast('متصفحك لا يدعم الإشعارات');
+  const res = await Notification.requestPermission();
+  if(res === 'granted'){
+    toast('✅ تم تفعيل الإشعارات بنجاح!');
+    initFCM();
+  } else {
+    toast('❌ تم رفض الإذن من إعدادات المتصفح');
+  }
+};
+
+async function initFCM(){
+  try {
+    const { getMessaging, getToken, onMessage } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js");
+    const messaging = getMessaging(firebaseApp);
+    if(Notification.permission !== 'granted') return;
+    const registration = await navigator.serviceWorker.ready;
+    const token = await getToken(messaging, { vapidKey: DEFAULT_VAPID_KEY, serviceWorkerRegistration: registration });
+    if(token){
+      await set(ref(db, `config/${MY_ROLE}/fcmToken`), token);
+    }
+    onMessage(messaging, payload => {
+      const d = payload.data || {};
+      showAppNotification(d.title || payload.notification?.title || 'رسالة جديدة', d.body || payload.notification?.body || '', d.type || 'notification', d.itemId || '');
+    });
+  } catch(e){}
+}
+
 async function boot(){
   setTimeout(() => { const s = document.getElementById('splashScreen'); if(s){ s.style.opacity = '0'; setTimeout(()=>s.remove(), 600); } }, 1600);
   const urlParams = new URLSearchParams(location.search);
@@ -1713,6 +1901,10 @@ async function boot(){
   firebaseApp = initializeApp(firebaseConfig);
   db = getDatabase(firebaseApp);
   firebaseReady = true;
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
+  }
 
   onValue(ref(db, '.info/connected'), s => {
     const ok = s.val() === true;
@@ -1736,6 +1928,7 @@ async function boot(){
     allNotifs = v ? Object.entries(v).map(([id,item])=>({id, ...item})).sort((a,b)=>new Date(b.at)-new Date(a.at)) : [];
     const unread = allNotifs.filter(n => n.to === MY_ROLE && !n.read).length;
     document.getElementById('notifBell')?.classList.toggle('has-badge', unread > 0);
+    processIncomingNotifications(allNotifs);
     renderNotifs(currentNotifTab);
   });
 
@@ -1752,6 +1945,11 @@ async function boot(){
   });
   onValue(ref(db, 'app/settings'), s => { if(s.val()) state.settings = s.val(); updateGreet(); });
   onValue(ref(db, 'app/meetupDate'), s => { state.meetupDate = s.val() || ''; updateCountdown(); });
+
+  initFCM();
+  setTimeout(handleDeepLink, 800);
+  window.addEventListener('pageshow', handleDeepLink);
+  window.addEventListener('popstate', handleDeepLink);
 
   setInterval(updateCountdown, 1000);
   setInterval(updateGreet, 60000);
