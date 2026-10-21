@@ -10,7 +10,7 @@ firebase.initializeApp({
   appId:'1:68680035248:web:212c41987a40628969c475'
 });
 const messaging=firebase.messaging();
-const symbols={mail:'💌',surprise:'🎁',memory:'📸',ping:'💗',mood:'🌙',answer:'📝'};
+const symbols={mail:'💌',surprise:'🎁',memory:'📸',ping:'💗',mood:'🌙',answer:'📝',quiz:'🧠',random:'🎲'};
 messaging.onBackgroundMessage(payload=>{
  const d=payload.data||{};
  const type=d.type||'notification';

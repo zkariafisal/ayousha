@@ -165,6 +165,7 @@ body.chat-dark #view-mail .messenger-shell{background:#201d29;color:#fff}body.ch
 .v9-soft{color:#986982;font-size:.8rem}.v9-reveal{animation:v9appear .55s ease both}
 @keyframes v9appear{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
 @media(max-width:340px){.v9-actions{grid-template-columns:1fr}}
+.v10-close{position:sticky;top:0;float:left;z-index:30;border:0;background:#fff0f5;color:#b31260;border-radius:50%;width:42px;height:42px;font-size:23px;font-weight:800;cursor:pointer;box-shadow:0 2px 12px #b3126022}.v10-close:active{transform:scale(.93)}
 </style>
 <style>
 /* Interactive message experience */
@@ -224,8 +225,8 @@ body.chat-dark #view-mail .messenger-shell{background:#201d29;color:#fff}body.ch
     <div class="card question-box">
       <div class="card-title"><span>☀️</span> سؤال اليوم</div>
       <div class="q-text" id="dailyQ">جاري التحميل...</div>
-      <textarea class="answer-input" id="dailyAnswer" placeholder="اكتبي ردك هنا... (ينحفظ تلقائياً)"></textarea>
-      <div id="answerSaved"></div><div id="dailyTogether" class="v9-panel"></div><div class="v9-actions"><button class="btn btn-soft" onclick="v9RandomQuestion()">🎲 سؤال عشوائي</button><button class="btn btn-soft" onclick="v9Quiz()">🧠 كم تعرفني؟</button><button class="btn btn-soft" onclick="v9QuestionHistory()">📅 أرشيف الأسئلة</button></div>
+      <textarea class="answer-input" id="dailyAnswer" placeholder="اكتب إجابتك ثم اضغط حفظ"></textarea>
+      <button class="btn btn-primary btn-full" id="saveDailyBtn" onclick="saveDailyAnswer()" style="margin:10px 0">💾 حفظ الإجابة وإرسالها</button><div id="answerSaved"></div><div id="dailyTogether" class="v9-panel"></div><div class="v9-actions"><button class="btn btn-soft" onclick="v9RandomQuestion()">🎲 سؤال عشوائي</button><button class="btn btn-soft" onclick="v9Quiz()">🧠 كم تعرفني؟</button><button class="btn btn-soft" onclick="v9QuestionHistory()">📅 أرشيف الأسئلة</button></div>
     </div>
     <div class="card">
       <div class="card-title"><span>💭</span> أنا أفكر فيكِ الآن</div>
@@ -378,7 +379,7 @@ function playEventSound(type='mail', outgoing=false){
  }catch(e){console.warn('Sound unavailable',e)}
 }
 window.toggleSounds=function(){soundsEnabled=!soundsEnabled;localStorage.setItem(SOUND_PREF_KEY,String(soundsEnabled));toast(soundsEnabled?'🔊 تم تشغيل الأصوات':'🔇 تم كتم الأصوات');if(soundsEnabled)playEventSound('surprise');};
-function eventDestination(type){return ({mail:'mail',surprise:'surprises',memory:'memories',ping:'home',mood:'mood',answer:'home'})[type]||'notifications'}
+function eventDestination(type){return ({mail:'mail',surprise:'surprises',memory:'memories',ping:'home',mood:'mood',answer:'home',quiz:'home',random:'home',occasion:'surprise'})[type]||'notifications'}
 let pendingDeepLink = null;
 function focusRequestedMail(id, attempts=0){
  const row=[...document.querySelectorAll('[data-mail-id]')].find(e=>e.dataset.mailId===id);
@@ -389,7 +390,7 @@ function focusRequestedMail(id, attempts=0){
 function openEventDestination(type,id){
  const view=eventDestination(type);
  if(document.getElementById('view-'+view))switchView(view);else switchView('notifications');
- if(type==='mail'&&id){pendingDeepLink=id;setTimeout(()=>focusRequestedMail(id),300);}
+ if(type==='answer'){setTimeout(()=>document.querySelector('.question-box')?.scrollIntoView({behavior:'smooth',block:'center'}),350);} if(type==='mail'&&id){pendingDeepLink=id;setTimeout(()=>focusRequestedMail(id),300);}
 }
 window.openEventDestination=openEventDestination;
 function handleDeepLink(){
@@ -444,7 +445,7 @@ function renderNotifs(tab) {
 
   el.innerHTML = items.map(n => {
     const isUnread = tab === 'inbox' && !n.read;
-    let icon = '🔔'; if(n.type === 'mail') icon = '💌'; if(n.type === 'surprise') icon = '🎁'; if(n.type === 'memory') icon = '📸'; if(n.type === 'ping') icon = '💗'; if(n.type === 'mood') icon = '🌙'; if(n.type === 'answer') icon = '📝';
+    let icon = '🔔'; if(n.type === 'mail') icon = '💌'; if(n.type === 'surprise') icon = '🎁'; if(n.type === 'memory') icon = '📸'; if(n.type === 'ping') icon = '💗'; if(n.type === 'mood') icon = '🌙'; if(n.type === 'answer') icon = '📝'; if(n.type==='quiz')icon='🧠'; if(n.type==='random')icon='🎲';
     return `<div class="notif-item ${isUnread ? 'unread' : ''}" onclick="window.openEventDestination('${n.type}','${n.itemId||''}')" role="button" tabindex="0"><div class="notif-icon">${icon}</div><div class="notif-body"><h4>${escapeHtml(n.title)} ${tab === 'sent' ? '(أرسلت)' : ''}</h4><p>${escapeHtml(n.body)}</p><div class="notif-time">${fmtDateTime(n.at)}</div></div></div>`;
   }).join('');
 }
@@ -558,6 +559,7 @@ function startSync(){
   onValue(ref(db, 'app/meetupDate'), s => { state.meetupDate = s.val() || ''; updateCountdown(); });
   onValue(ref(db, 'app/settings'), s => { if(s.val()) state.settings = s.val(); updateGreet(); });
   onValue(ref(db, 'app/answers'), s => { state.answers = s.val() || {}; renderDaily(); });
+  onValue(ref(db,'app/v10Activities'),s=>{v10Activities=s.val()||{};});
   onValue(ref(db,'app/dailyResponses'),s=>{v9Daily=s.val()||{};renderDaily();renderV9Dashboard();});
   onValue(ref(db,'app/dailyPrompts'),s=>{v9Prompts=s.val()||{};renderDaily();});
   onValue(ref(db,'app/v9Moods'),s=>{v9Moods=s.val()||{};renderV9Moods();renderV9Dashboard();});
@@ -574,9 +576,9 @@ function startSync(){
 
 function switchView(name){updateOwnChatPresence(); document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById('view-'+name).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view === name)); window.scrollTo({top:0, behavior:'smooth'}); if(name === 'mail'){setTimeout(()=>{updateOwnChatPresence();markChatMessages();},100);const partner=document.getElementById('chatPartnerName');if(partner)partner.textContent=MY_ROLE==='me'?state.settings.wifeName:state.settings.myName;setTimeout(()=>{const el=document.getElementById('mailList');if(el)el.scrollTop=el.scrollHeight;},80);} if(name === 'notifications') { renderNotifs('inbox'); markNotifsRead(); } }
 window.switchView = switchView;
-function openModal(html){document.getElementById('modalContent').innerHTML = html;document.getElementById('modalBg').classList.add('show');}
+function openModal(html){document.getElementById('modalContent').innerHTML = '<button type="button" class="v10-close" aria-label="إغلاق" onclick="window.forceCloseModal()">✕</button>'+html;document.getElementById('modalBg').classList.add('show');}
 function closeModal(){if(modalLocked)return;document.getElementById('modalBg').classList.remove('show');}
-window.openModal = openModal; window.closeModal = closeModal;
+window.openModal = openModal; window.closeModal = closeModal; window.forceCloseModal=()=>{modalLocked=false;document.getElementById('modalBg').classList.remove('show');};
 
 function updateGreet(){ const h = new Date().getHours(); const name = state.settings.wifeName || 'عيوشة'; let title, sub; if(h>=5 && h<12){title = `صباح الخير يا ${name} ☀️`; sub = 'أول شيء فكرت فيه اليوم… أنتِ.';} else if(h>=12 && h<17){title = `نهارك سعيد يا ${name} 🌸`; sub = 'أتمنى تكوني أكلتِ شي حلو اليوم.';} else if(h>=17 && h<22){title = `مساء الحب يا ${name} 🌙`; sub = 'الليل يحلى بسوالفك.';} else{title = `سهران معك يا ${name} ✨`; sub = 'لو ما نمتِ، أنا صاحي في قلبي.';} document.getElementById('greetTitle').textContent = title; document.getElementById('greetSub').textContent = sub; }
 function updateCountdown(){ const el = document.getElementById('countdown'); if(!state.meetupDate){ el.innerHTML = '<div style="grid-column:1/-1;text-align:center;opacity:.8;font-size:.85rem">اضغطي ⚙️ لتحديد يوم اللقاء</div>'; return; } const diff = new Date(state.meetupDate) - new Date(); if(diff <= 0){ el.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:1rem;font-weight:700">🎉 وصلنا! اليوم نلتقي</div>'; return; } const d = Math.floor(diff/86400000); const hh = Math.floor((diff%86400000)/3600000); const mm = Math.floor((diff%3600000)/60000); const ss = Math.floor((diff%60000)/1000); el.innerHTML = `<div class="cd-cell"><b>${d}</b><small>يوم</small></div><div class="cd-cell"><b>${pad(hh)}</b><small>ساعة</small></div><div class="cd-cell"><b>${pad(mm)}</b><small>دقيقة</small></div><div class="cd-cell"><b>${pad(ss)}</b><small>ثانية</small></div>`; }
@@ -585,7 +587,8 @@ const DEFAULT_QUESTIONS = ["لو عندك يوم كامل فاضي، شو أول
 function getDailyQuestion(){const key = getTodayKey(); if(v9Prompts[key])return v9Prompts[key];if(v9Daily[key]?.me?.q)return v9Daily[key].me.q;if(v9Daily[key]?.her?.q)return v9Daily[key].her.q; const idx = Math.floor(new Date().setHours(0,0,0,0) / 86400000); return DEFAULT_QUESTIONS[idx % DEFAULT_QUESTIONS.length];}
 function renderDaily(){ const key = getTodayKey(); const q = getDailyQuestion(); document.getElementById('dailyQ').textContent = q; const ta = document.getElementById('dailyAnswer'); const a = v9Daily[key]?.[MY_ROLE] || (state.answers[key]?.by===MY_ROLE?state.answers[key]:null); if(document.activeElement !== ta)ta.value = a?.a || '';  const saved = document.getElementById('answerSaved'); if(a?.a)saved.innerHTML = `<div class="answer-saved">💚 محفوظ — ${fmtDateTime(a.t)}${a.by ? ' — ' + senderName(a.by) : ''}</div>`; else saved.innerHTML = ''; renderV9Daily(); }
 let dailyTimer = null;
-document.addEventListener('input', e => { if(e.target.id === 'dailyAnswer'){ clearTimeout(dailyTimer); dailyTimer = setTimeout(async () => { const key = getTodayKey(); const payload = { q: getDailyQuestion(), a: e.target.value, t: new Date().toISOString(), by: MY_ROLE }; state.answers[key] = payload; if(firebaseReady && db){ try{await set(ref(db, 'app/dailyResponses/'+key+'/'+MY_ROLE), payload);}catch(err){console.warn('Daily save',err);} } renderV9Daily(); if(e.target.value.trim()) v9NotifyOnce('answer',key,'💭 إجابة سؤال اليوم','افتح سؤال اليوم لترى إجابتكما');playEventSound('answer',true); document.getElementById('answerSaved').innerHTML = e.target.value.trim() ? '<div class="answer-saved">💚 ينحفظ تلقائياً</div>' : ''; }, 1000); } });
+document.addEventListener('input', e=>{if(e.target.id==='dailyAnswer'){const el=document.getElementById('answerSaved');if(el)el.textContent='✍️ لم تُحفظ التغييرات بعد';}});
+window.saveDailyAnswer=async()=>{const ta=document.getElementById('dailyAnswer'),a=ta?.value.trim();if(!a)return toast('اكتب الإجابة أولًا');if(!firebaseReady||!db)return toast('لا يوجد اتصال بقاعدة البيانات');const key=getTodayKey(),payload={q:getDailyQuestion(),a,t:new Date().toISOString(),by:MY_ROLE};const btn=document.getElementById('saveDailyBtn');if(btn)btn.disabled=true;try{await set(ref(db,'app/dailyResponses/'+key+'/'+MY_ROLE),payload);v9Daily[key]||={};v9Daily[key][MY_ROLE]=payload;renderDaily();await addNotification('💭 إجابة سؤال اليوم','أجاب الطرف الآخر عن سؤال اليوم','answer');playEventSound('answer',true);toast('💗 حُفظت الإجابة بنجاح');}catch(e){console.error(e);toast('تعذر حفظ الإجابة، حاول مرة أخرى');}finally{if(btn)btn.disabled=false;}};
 
 async function sendPing(){ const ping = { at: new Date().toISOString(), by: MY_ROLE }; state.pings.unshift({id:uid(), ...ping}); renderPings(); if(firebaseReady && db){ try{await push(ref(db, 'app/pings'), ping);}catch(e){} } addNotification('أنا أفكر فيك', 'اضغطي لتعرفي المزيد 💗', 'ping');playEventSound('ping',true); toast('💗 وصل حبك'); burstHearts(); }
 window.sendPing = sendPing;
@@ -907,9 +910,13 @@ const v9Date=()=>getTodayKey();
 const v9Time=x=>{try{return new Date(x).toLocaleDateString('ar',{year:'numeric',month:'short',day:'numeric'});}catch(e){return ''}};
 function v9NotifyOnce(type,key,title,body){const k='v9_notice_'+type+'_'+key+'_'+MY_ROLE;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');addNotification(title,body,type).catch(console.warn);}
 function renderV9Daily(){const el=document.getElementById('dailyTogether');if(!el)return;const a=v9Daily[v9Date()]||{},mine=a[MY_ROLE],other=a[v9Other()];let html='<b>💞 إجابتكما اليوم</b>';if(mine?.a?.trim()&&other?.a?.trim())html+=`<div class="v9-entry v9-reveal"><b>💗 ${v9Esc(senderName(MY_ROLE))}</b><p>${v9Esc(mine.a)}</p></div><div class="v9-entry v9-reveal"><b>💜 ${v9Esc(senderName(v9Other()))}</b><p>${v9Esc(other.a)}</p></div><button class="btn btn-soft" onclick="v9SaveAnswers()">💌 احفظ الإجابتين في الذكريات</button>`;else html+=`<p>🔒 تظهر الإجابتان عندما تجيبان معًا. ${mine?.a?.trim()?'أجبتَ، بانتظار الطرف الآخر.':'اكتب إجابتك لتبدأ.'}</p>`;el.innerHTML=html;}
-window.v9RandomQuestion=async()=>{if(!db)return toast('تحقق من الاتصال');const key=v9Date();if(v9Daily[key]?.me?.a||v9Daily[key]?.her?.a)return toast('لا يمكن تغيير السؤال بعد بدء الإجابات');const q=v9Questions[Math.floor(Math.random()*v9Questions.length)];try{await set(ref(db,'app/dailyPrompts/'+key),q);toast('🎲 سؤال جديد لكما');}catch(e){toast('تعذر تحديث السؤال');}};
-window.v9Quiz=()=>{const q=['ما اللون الذي يفضله الطرف الآخر؟','ما الطعام المفضل لديه؟','ما المكان الذي يتمنى زيارته؟','ما أكثر شيء يجعله يضحك؟'][Math.floor(Math.random()*4)];openModal(`<h3>🧠 كم تعرفني؟</h3><p>${v9Esc(q)}</p><textarea id="v9QuizAnswer" placeholder="اكتب تخمينك"></textarea><button class="btn btn-primary btn-full" onclick="v9SubmitQuiz()">💗 أرسل التخمين</button>`);};
-window.v9SubmitQuiz=async()=>{const a=document.getElementById('v9QuizAnswer')?.value.trim();if(!a)return toast('اكتب تخمينك');try{await push(ref(db,'app/memories'),{type:'text',title:'🧠 كم تعرفني؟',text:a,at:new Date().toISOString(),by:MY_ROLE});closeModal();toast('تم حفظ تخمينك؛ قارن إجابتكما معًا');}catch(e){toast('تعذر الحفظ');}};
+let v10Activities={};
+const v10QuizQuestions=['ما اللون الذي يفضله الطرف الآخر؟','ما الطعام المفضل لديه؟','ما المكان الذي يتمنى زيارته؟','ما أكثر شيء يجعله يضحك؟'];
+function v10ActivityKey(kind){return v9Date()+'_'+kind;}
+function v10ActivityModal(kind){const key=v10ActivityKey(kind),obj=v10Activities[key]||{},title=kind==='random'?'🎲 سؤال عشوائي':'🧠 كم تعرفني؟',q=obj.q;const mine=obj.answers?.[MY_ROLE],other=obj.answers?.[v9Other()];let html=`<h3>${title}</h3>`;if(!q){html+=`<p>اضغط لإنشاء سؤال مشترك لكما اليوم.</p><button class="btn btn-primary btn-full" onclick="v10StartActivity('${kind}')">✨ إنشاء سؤال مشترك</button>`;}else{html+=`<div class="v9-panel">${v9Esc(q)}</div>`;if(mine?.a&&other?.a){html+=`<div class="v9-entry"><b>💗 ${v9Esc(senderName(MY_ROLE))}</b><p>${v9Esc(mine.a)}</p></div><div class="v9-entry"><b>💜 ${v9Esc(senderName(v9Other()))}</b><p>${v9Esc(other.a)}</p></div>`;}else if(mine?.a){html+='<div class="v9-panel">🔒 حُفظت إجابتك. ستظهر الإجابتان بعد إجابة الطرف الآخر.</div>';}else{html+=`<textarea id="v10ActivityAnswer" placeholder="اكتب إجابتك هنا"></textarea><button class="btn btn-primary btn-full" onclick="v10SaveActivity('${kind}')">💾 حفظ الإجابة</button><p class="v9-soft">🔒 لن تظهر الإجابات حتى يجيب الطرفان.</p>`;}}openModal(html);}
+window.v9RandomQuestion=()=>v10ActivityModal('random');window.v9Quiz=()=>v10ActivityModal('quiz');
+window.v10StartActivity=async kind=>{if(!db)return toast('تحقق من الاتصال');const key=v10ActivityKey(kind),old=v10Activities[key];if(old?.q)return v10ActivityModal(kind);const list=kind==='random'?v9Questions:v10QuizQuestions;const q=list[Math.floor(Math.random()*list.length)];try{await set(ref(db,'app/v10Activities/'+key+'/q'),q);await addNotification(kind==='random'?'🎲 سؤال عشوائي جديد':'🧠 سؤال كم تعرفني؟','افتح سؤال اليوم للمشاركة','answer');v10ActivityModal(kind);}catch(e){toast('تعذر إنشاء السؤال');}};
+window.v10SaveActivity=async kind=>{const a=document.getElementById('v10ActivityAnswer')?.value.trim();if(!a)return toast('اكتب إجابتك أولًا');if(!db)return toast('لا يوجد اتصال');const key=v10ActivityKey(kind);try{await set(ref(db,'app/v10Activities/'+key+'/answers/'+MY_ROLE),{a,t:new Date().toISOString()});await addNotification(kind==='random'?'🎲 إجابة السؤال العشوائي':'🧠 إجابة كم تعرفني؟','تمت الإجابة، افتح سؤال اليوم','answer');playEventSound('answer',true);toast('💗 حُفظت الإجابة');v10ActivityModal(kind);}catch(e){toast('تعذر حفظ الإجابة');}};
 window.v9QuestionHistory=()=>{const days=Object.entries(v9Daily).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,35);openModal('<h3>📅 أرشيف الأسئلة</h3>'+(days.map(([k,v])=>`<div class="v9-entry"><b>${v9Esc(k)}</b><p>${v9Esc(v.me?.q||v.her?.q||'سؤال اليوم')}</p><small>${v.me?.a&&v.her?.a?'💞 أجبتما معًا':'⏳ لم تكتمل الإجابات'}</small></div>`).join('')||'<p>لا توجد إجابات بعد</p>'));};
 window.v9SaveAnswers=async()=>{const a=v9Daily[v9Date()];if(!a?.me?.a||!a?.her?.a)return;try{await push(ref(db,'app/memories'),{type:'text',title:'💭 إجابتانا في '+v9Date(),text:`${a.me.q||a.her.q}\n${senderName('me')}: ${a.me.a}\n${senderName('her')}: ${a.her.a}`,at:new Date().toISOString(),by:MY_ROLE});toast('حُفظت إجابتكما 💗');}catch(e){toast('تعذر الحفظ');}};
 function renderV9Moods(){const el=document.getElementById('v9BothMoods');if(!el)return;const x=v9Moods[v9Date()]||{},names={happy:'😊 سعيد',tired:'😴 متعب',sad:'🥺 حزين',missing:'💭 مشتاق',angry:'😤 متضايق',calm:'😌 هادئ',excited:'🤩 متحمس',sick:'🤒 مريض'};el.innerHTML=`<b>💞 مزاجنا اليوم</b><div class="v9-entry">💗 ${v9Esc(senderName('me'))}: ${names[x.me?.mood]||'لم يحدد بعد'}</div><div class="v9-entry">💜 ${v9Esc(senderName('her'))}: ${names[x.her?.mood]||'لم تحدد بعد'}</div><p class="v9-soft">مشاركة المشاعر اختيارية، ويمكن تغيير المزاج في أي وقت.</p>`;}
