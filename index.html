@@ -132,6 +132,7 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
   padding: 20px;
 }
 
+/* Ayousha V7 - Instant Chat, no timed mail locks */
 /* محادثة فورية بتصميم فقاعات واضح */
 #view-mail{padding:0 8px 12px}#view-mail .messenger-shell{display:flex;flex-direction:column;height:calc(100dvh - 185px);min-height:380px;background:#f9f1f5;border:1px solid #f1dce6;border-radius:22px;overflow:hidden;box-shadow:0 9px 30px #5e31451c}
 .messenger-header{display:flex;align-items:center;gap:11px;padding:12px 14px;background:#fff;border-bottom:1px solid #f0e2e9;flex-shrink:0}.messenger-avatar{width:43px;height:43px;border-radius:50%;background:#ffe1ed;display:grid;place-items:center;font-size:22px}.messenger-title{flex:1;display:flex;flex-direction:column;gap:2px}.messenger-title strong{font-size:1rem}.messenger-title small{font-size:.73rem;color:#8b7080}.messenger-lock{font-size:25px;color:#d83275}
@@ -153,6 +154,17 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
 #mailList .chat-row.highlight .chat-bubble{outline:3px solid #e887af;animation:mailGlow 1.4s ease}
 @keyframes mailGlow{0%,100%{transform:scale(1)}45%{transform:scale(1.025)}}
 .notif-item{cursor:pointer;transition:transform .18s,background .18s}.notif-item:active{transform:scale(.98)}
+</style>
+<style>
+/* V7: messenger-style compact chat, no scheduled-message visuals */
+#view-mail .messenger-shell{height:calc(100dvh - 175px);min-height:350px}
+#mailList .chat-row.mine{justify-content:flex-start}
+#mailList .chat-row.theirs{justify-content:flex-end}
+#mailList .chat-bubble{min-width:0;max-width:84%;padding:9px 12px;border-radius:15px}
+#mailList .mine .chat-bubble{background:#dcf8e7;border:1px solid #b7e6c9}
+#mailList .theirs .chat-bubble{background:#fff;border:1px solid #eadce4}
+#mailList .chat-text{margin:5px 0;line-height:1.6}
+#mailList .chat-foot{font-size:.68rem;gap:6px}
 </style>
 </head>
 <body>
@@ -209,7 +221,7 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
 
   <section id="view-mail" class="view">
     <div class="messenger-shell">
-      <header class="messenger-header"><div class="messenger-avatar">💗</div><div class="messenger-title"><strong id="chatPartnerName">عيوشة</strong><small>💌 محادثتنا الخاصة</small></div><span class="messenger-lock" title="محادثة خاصة">♡</span></header>
+      <header class="messenger-header"><div class="messenger-avatar">💗</div><div class="messenger-title"><strong id="chatPartnerName">عيوشة</strong><small>🟢 محادثة فورية • تصل الرسائل مباشرة</small></div><span class="messenger-lock" title="محادثة خاصة">♡</span></header>
       <div id="mailList" class="messenger-messages" role="log" aria-live="polite" aria-label="المحادثة"></div>
       <form id="instantMailForm" class="messenger-composer" onsubmit="window.sendInstantMail(event)"><textarea id="instantMailText" rows="1" maxlength="5000" placeholder="اكتب رسالة..." aria-label="نص الرسالة" oninput="window.resizeChatInput(this)"></textarea><button id="instantMailSend" type="submit" aria-label="إرسال الرسالة">➤</button></form>
       <div id="instantMailStatus" class="messenger-status" role="status" aria-live="polite"></div>
@@ -577,7 +589,7 @@ window.sendInstantMail=async function(event){
  if(!firebaseReady||!db){status.textContent='تعذر الاتصال بقاعدة البيانات. تحقق من الإنترنت.';return;}
  button.disabled=true;status.textContent='جارٍ الإرسال...';
  try{
-  const item={text:message,at:new Date().toISOString(),createdAt:new Date().toISOString(),read:false,by:MY_ROLE,to:MY_ROLE==='me'?'her':'me'};
+  const item={text:message,at:new Date().toISOString(),createdAt:new Date().toISOString(),instant:true,read:false,by:MY_ROLE,to:MY_ROLE==='me'?'her':'me'};
   const record=await push(ref(db,'app/mails'),item);
   field.value='';window.resizeChatInput(field);status.textContent='';playEventSound('mail',true);
   requestAnimationFrame(()=>{const list=document.getElementById('mailList');if(list)list.scrollTop=list.scrollHeight;});
@@ -587,7 +599,8 @@ window.sendInstantMail=async function(event){
 };
 function renderMails(){
  const el=document.getElementById('mailList');if(!el)return;
- const items=[...state.mails].filter(m=>m.by===MY_ROLE||m.to===MY_ROLE||!m.to).sort((a,b)=>new Date(a.createdAt||a.at)-new Date(b.createdAt||b.at));
+ // الرسائل القديمة المجدولة تظهر الآن فوراً، بغض النظر عن حقل at القديم.
+ const items=[...state.mails].filter(m=>m.by===MY_ROLE||m.to===MY_ROLE||!m.to).sort((a,b)=>new Date(a.createdAt||a.at||0)-new Date(b.createdAt||b.at||0));
  if(!items.length){el.innerHTML='<div class="empty"><div class="e-icon">💌</div><p>ابدآ المحادثة برسالة جميلة 💗</p></div>';return;}
  const wasNearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<130;const previousCount=el.querySelectorAll('[data-mail-id]').length;
  el.innerHTML=items.map(m=>{const mine=m.by===MY_ROLE,ready=true,visible=true;
