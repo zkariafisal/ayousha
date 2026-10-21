@@ -10,6 +10,8 @@ firebase.initializeApp({
   appId:'1:68680035248:web:212c41987a40628969c475'
 });
 const messaging=firebase.messaging();
+// Push notifications are handled by the service worker even when no app tab is open.
+// The OS, not JavaScript audio, supplies the background notification sound.
 const symbols={mail:'💌',surprise:'🎁',memory:'📸',ping:'💗',mood:'🌙',answer:'📝',quiz:'🧠',random:'🎲'};
 messaging.onBackgroundMessage(payload=>{
  const d=payload.data||{};

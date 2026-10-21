@@ -426,7 +426,7 @@ async function sendFCM(toRole, title, body, type='notification', itemId='') {
       body: JSON.stringify({ token: targetToken, title, body, type, itemId, role:toRole })
     });
     const resData = await response.json();
-    if(resData.success) console.log('✅ FCM Sent Successfully');
+    if(resData.success) console.log('✅ FCM accepted by Firebase (device delivery not guaranteed)');
     else console.warn('FCM error from server:', resData.error);
   } catch(e) { console.warn('FCM fetch error:', e); }
 }
@@ -900,7 +900,7 @@ async function boot(){
   navigator.serviceWorker?.addEventListener('message', event => { if(event.data?.type==='OPEN_AYOUSHA'){location.assign(event.data.url);} });
   // Re-register the push token when returning to the app (e.g. after browser updates).
   let lastFcmRefresh=0;
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden && Date.now()-lastFcmRefresh>3600000){lastFcmRefresh=Date.now();if(firebaseReady)initFCM();}});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden && Date.now()-lastFcmRefresh>900000){lastFcmRefresh=Date.now();if(firebaseReady)initFCM();}});
 }
 document.addEventListener('click', () => { initAudio(); }, { once: true });
 document.addEventListener('touchstart', () => { initAudio(); }, { once: true });
