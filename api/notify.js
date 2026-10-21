@@ -15,13 +15,15 @@ if (!admin.apps.length) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
   
-  const { token, title, body } = req.body;
+  const { token, title, body, type = 'notification', itemId = '', role = '' } = req.body;
   if (!token || !title) return res.status(400).json({ error: 'Missing token or title' });
+  if (!admin.apps.length) return res.status(503).json({error:'FIREBASE_SERVICE_ACCOUNT is not configured'});
 
   try {
     const response = await admin.messaging().send({
       token: token,
-      notification: { title, body },
+      data: { title: String(title), body: String(body || ''), type: String(type), itemId: String(itemId), role: String(role) },
+      webpush: { headers: { Urgency: 'high' } },
       android: { priority: 'high', notification: { sound: 'default' } },
       apns: { payload: { aps: { sound: 'default' } } }
     });
