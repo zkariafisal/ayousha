@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#d81b60">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="عيون عيوشة">
+<title>عيون عيوشة 🌸</title>
+
+<!-- 🌟 الأيقونة الجديدة (Aa.png) والـ Manifest -->
+<link rel="manifest" href='data:application/manifest+json,{"name":"عيون عيوشة","short_name":"عيوشة","start_url":"./","display":"standalone","background_color":"%23fdf6f9","theme_color":"%23d81b60","orientation":"portrait","icons":[{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"512x512","type":"image/png","purpose":"any"}]}'>
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* ======== التصميم (CSS) ======== */
+:root{--bg:#fdf6f9;--card:#fff;--primary:#d81b60;--primary-2:#ad1457;--gold:#ffb300;--text:#2d1b26;--muted:#7a5a68;--border:#f8bbd0;--shadow:0 4px 20px rgba(216,27,96,.08);--shadow-lg:0 16px 48px rgba(216,27,96,.18);--radius:22px;--radius-sm:14px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:110px;line-height:1.7;background-image:radial-gradient(circle at 8% 8%,rgba(255,182,193,.35),transparent 42%),radial-gradient(circle at 92% 25%,rgba(255,213,79,.22),transparent 42%);background-attachment:fixed}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-size:1rem;color:inherit}
+header{padding:22px 20px 10px;display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--gold));display:grid;place-items:center;font-size:1.4rem;box-shadow:0 6px 18px rgba(216,27,96,.3)}
+.brand h1{font-size:1.15rem;font-weight:800;color:var(--primary-2)}
+.brand small{display:block;font-size:.72rem;color:var(--muted);font-weight:400}
+.settings-btn{width:40px;height:40px;border-radius:50%;background:var(--card);display:grid;place-items:center;box-shadow:var(--shadow);font-size:1.1rem;position:relative}
+.settings-btn .badge-dot{position:absolute;top:4px;right:4px;width:10px;height:10px;border-radius:50%;background:#f44336;display:none}
+.settings-btn.has-badge .badge-dot{display:block}
+.sync-status{max-width:900px;margin:0 auto 8px;padding:0 20px;font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#4caf50;animation:pulseDot 2s infinite}
+.sync-dot.offline{background:#ff9800;animation:none}
+.sync-dot.local{background:#9e9e9e;animation:none}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.4}}
+main{max-width:900px;margin:0 auto;padding:0 16px}
+.view{display:none;animation:fadeIn .35s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px;border:1px solid rgba(248,187,208,.4)}
+.card-title{font-size:.85rem;font-weight:800;color:var(--primary-2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card-title span{font-size:1.1rem}
+.muted{color:var(--muted);font-size:.88rem}
+.greet{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-2) 60%,#880e4f 100%);color:#fff;padding:26px 22px;border-radius:var(--radius);box-shadow:var(--shadow-lg);margin-bottom:16px;position:relative;overflow:hidden}
+.greet::after{content:'';position:absolute;top:-50%;left:-20%;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.1)}
+.greet h2{font-size:1.4rem;margin-bottom:6px;position:relative}
+.greet p{font-size:.9rem;opacity:.9;position:relative}
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.cd-cell{background:rgba(255,255,255,.18);border-radius:12px;padding:10px 4px;text-align:center;backdrop-filter:blur(6px)}
+.cd-cell b{font-size:1.4rem;display:block;line-height:1}
+.cd-cell small{font-size:.7rem;opacity:.85}
+.question-box{background:linear-gradient(135deg,#fff8e1,#ffe0b2);border:1px dashed var(--gold)}
+.question-box .q-text{font-size:1.05rem;font-weight:600;margin:8px 0 14px;color:#5d4037}
+.answer-input{width:100%;padding:12px 14px;border-radius:14px;border:1px solid #ffe0b2;background:#fff;resize:vertical;min-height:60px;font-size:.95rem}
+.answer-input:focus{outline:2px solid var(--gold);border-color:transparent}
+.answer-saved{margin-top:10px;padding:10px 14px;border-radius:12px;background:rgba(255,179,0,.15);color:#5d4037;font-size:.9rem}
+.btn{padding:12px 20px;border-radius:14px;font-weight:700;font-size:.95rem;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s ease}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;box-shadow:0 6px 18px rgba(216,27,96,.3)}
+.btn-soft{background:#fce4ec;color:var(--primary-2)}
+.btn-gold{background:linear-gradient(135deg,#ffb300,#ff8f00);color:#fff;box-shadow:0 6px 18px rgba(255,143,0,.3)}
+.btn-full{width:100%}
+.btn-danger{background:#ffebee;color:#c62828}
+.think-wrap{text-align:center;padding:10px 0}
+.think-btn{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff6090,var(--primary),var(--primary-2));color:#fff;font-weight:800;font-size:1rem;box-shadow:0 12px 40px rgba(216,27,96,.4),inset 0 -6px 20px rgba(0,0,0,.15);display:grid;place-items:center;gap:4px;transition:transform .2s;animation:pulse 2.5s infinite;margin:0 auto}
+.think-btn:active{transform:scale(.92)}
+.think-btn small{font-size:.75rem;font-weight:400;opacity:.9}
+@keyframes pulse{0%,100%{box-shadow:0 12px 40px rgba(216,27,96,.4),inset 0 -6px 20px rgba(0,0,0,.15)}50%{box-shadow:0 12px 60px rgba(216,27,96,.7),inset 0 -6px 20px rgba(0,0,0,.15)}}
+.ping-log{margin-top:14px;font-size:.82rem;color:var(--muted);text-align:center}
+.surprise-item{background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;border:1px solid var(--border);display:flex;gap:12px;align-items:flex-start}
+.surprise-item.locked{opacity:.75}
+.surprise-icon{width:44px;height:44px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,#fff3e0,#ffe0b2);display:grid;place-items:center;font-size:1.3rem}
+.surprise-item.unlocked .surprise-icon{background:linear-gradient(135deg,#e8f5e9,#c8e6c9)}
+.surprise-body{flex:1;min-width:0}
+.surprise-body p{font-size:.95rem;margin-bottom:6px;word-break:break-word}
+.surprise-time{font-size:.75rem;color:var(--muted)}
+.surprise-sender{font-size:.7rem;color:var(--primary);font-weight:700;margin-top:4px}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.7rem;font-weight:700;margin-top:4px}
+.badge-locked{background:#fff3e0;color:#e65100}
+.badge-ready{background:#e8f5e9;color:#2e7d32}
+.mail-item{background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;border-right:4px solid var(--primary);box-shadow:var(--shadow)}
+.mail-item.delivered{border-right-color:#43a047}
+.mail-item.pending{border-right-color:#ffb300}
+.mail-item h4{font-size:.95rem;margin-bottom:6px}
+.mail-item p{font-size:.88rem;color:var(--muted);margin-bottom:8px;word-break:break-word}
+.mail-meta{font-size:.75rem;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.mem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.mem-card{background:var(--card);border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow);position:relative}
+.mem-card img{width:100%;height:120px;object-fit:cover;display:block}
+.mem-card .mem-text{padding:10px;font-size:.85rem;word-break:break-word}
+.mem-card .mem-date{padding:0 10px 10px;font-size:.7rem;color:var(--muted)}
+.mem-card .mem-sender{padding:0 10px 10px;font-size:.7rem;color:var(--primary);font-weight:700}
+.mem-card .mem-del{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.5);color:#fff;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:.9rem;opacity:0;transition:opacity .2s}
+.mem-card:hover .mem-del{opacity:1}
+.mood-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.mood-btn{padding:16px 6px;border-radius:16px;background:var(--card);border:2px solid transparent;text-align:center;box-shadow:var(--shadow);transition:all .2s;font-size:.75rem;font-weight:600}
+.mood-btn .emoji{font-size:1.8rem;display:block;margin-bottom:4px}
+.mood-btn.selected{border-color:var(--primary);background:#fff0f5;transform:translateY(-2px)}
+.mood-response{margin-top:16px;padding:16px;border-radius:16px;background:linear-gradient(135deg,#fff8e1,#ffe0b2);font-size:.95rem;color:#5d4037}
+nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-top:1px solid var(--border);padding:8px 6px calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;align-items:center;z-index:50;max-width:900px;margin:0 auto;border-radius:24px 24px 0 0}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:14px;color:var(--muted);font-size:.7rem;font-weight:600;transition:all .2s;position:relative}
+.nav-btn .ic{font-size:1.3rem;line-height:1}
+.nav-btn.active{color:var(--primary);background:#fff0f5}
+.nav-dot{position:absolute;top:2px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#f44336;display:none}
+.nav-btn.has-badge .nav-dot{display:block}
+.modal-bg{position:fixed;inset:0;background:rgba(45,27,38,.6);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;backdrop-filter:blur(4px)}
+.modal-bg.show{display:flex;animation:fadeIn .25s}
+.modal{background:var(--card);border-radius:var(--radius);padding:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:popIn .3s}
+@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modal h3{font-size:1.1rem;color:var(--primary-2);margin-bottom:16px}
+.modal h4{font-size:.9rem;color:var(--primary-2);margin:16px 0 8px;padding-top:8px;border-top:1px solid var(--border)}
+.modal label{display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px}
+.modal input,.modal textarea,.modal select{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);font-size:.95rem}
+.modal input:focus,.modal textarea:focus,.modal select:focus{outline:2px solid var(--primary);border-color:transparent}
+.modal textarea{resize:vertical;min-height:80px}
+.modal-actions{display:flex;gap:8px;margin-top:20px}
+.modal-actions .btn{flex:1}
+.modal small.help{display:block;color:var(--muted);font-size:.72rem;margin-top:4px;line-height:1.6}
+.modal .info-box{background:#fff8e1;border:1px solid var(--gold);border-radius:12px;padding:12px;margin:12px 0;font-size:.82rem;color:#5d4037;line-height:1.6}
+.modal .info-box b{color:var(--primary-2)}
+.modal .info-box.ok{background:#e8f5e9;border-color:#4caf50;color:#1b5e20}
+.modal .info-box.warn{background:#fff3e0;border-color:#ff9800;color:#e65100}
+.modal .link-box{background:#f5f5f5;border:1px solid #ddd;border-radius:12px;padding:12px;margin:8px 0;font-family:monospace;font-size:.72rem;word-break:break-all;color:#333}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:12px 20px;border-radius:14px;font-size:.9rem;font-weight:600;opacity:0;transition:all .3s;z-index:200;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .e-icon{font-size:3rem;margin-bottom:10px;opacity:.5}
+.empty p{font-size:.9rem}
+.full-screen-msg{position:fixed;inset:0;background:var(--bg);z-index:150;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+.full-screen-msg .box{max-width:400px;background:var(--card);border-radius:var(--radius);padding:32px 24px;box-shadow:var(--shadow-lg)}
+.full-screen-msg h2{color:var(--primary-2);margin-bottom:12px;font-size:1.2rem}
+.full-screen-msg p{color:var(--muted);font-size:.9rem;margin-bottom:16px}
+.full-screen-msg .spinner{width:40px;height:40px;border:3px solid #f8bbd0;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+input[type=file]{display:none}
+@media(max-width:420px){.cd-cell b{font-size:1.2rem}.think-btn{width:130px;height:130px;font-size:.9rem}}
+
+/* ======== شاشة الترحيب (Splash Screen) ======== */
+#splashScreen {
+  position: fixed; inset: 0; background: #fdf6f9; z-index: 9999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.6s ease;
+}
+#splashScreen img {
+  max-width: 85%; max-height: 70vh; object-fit: contain;
+  border-radius: 20px; box-shadow: 0 10px 30px rgba(216,27,96,0.15);
+  margin-bottom: 20px;
+}
+</style>
+</head>
+<body>
+
+<!-- شاشة الترحيب تظهر فوراً -->
+<div id="splashScreen">
+  <img src="https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Za.png" alt="عيون عيوشة">
+  <div class="spinner" style="width:30px;height:30px;border:3px solid #f8bbd0;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;"></div>
+</div>
+
+<header>
+  <div class="brand"><div class="brand-logo">🌸</div><div><h1>عيون عيوشة</h1><small>إشعارات فورية بين قلبينا</small></div></div>
+  <button class="settings-btn" onclick="openSettings()" title="الإعدادات">⚙️<span class="badge-dot"></span></button>
+</header>
+
+<div class="sync-status"><span class="sync-dot local" id="syncDot"></span><span id="syncText">جاري التحميل...</span></div>
+
+<main>
+  <section id="view-home" class="view active">
+    <div class="greet">
+      <h2 id="greetTitle">صباح الخير يا عيوشة 💕</h2>
+      <p id="greetSub">كل يوم يقرّبنا أكثر</p>
+      <div class="countdown" id="countdown">
+        <div class="cd-cell"><b>--</b><small>يوم</small></div><div class="cd-cell"><b>--</b><small>ساعة</small></div>
+        <div class="cd-cell"><b>--</b><small>دقيقة</small></div><div class="cd-cell"><b>--</b><small>ثانية</small></div>
+      </div>
+    </div>
+    <div class="card question-box">
+      <div class="card-title"><span>☀️</span> سؤال اليوم</div>
+      <div class="q-text" id="dailyQ">جاري التحميل...</div>
+      <textarea class="answer-input" id="dailyAnswer" placeholder="اكتبي ردك هنا... (ينحفظ تلقائياً)"></textarea>
+      <div id="answerSaved"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>💭</span> أنا أفكر فيكِ الآن</div>
+      <div class="think-wrap">
+        <button class="think-btn" onclick="sendPing()"><div><div style="font-size:2rem">💗</div><div>اضغطي هنا</div><small>ليوصل قلبي</small></div></button>
+      </div>
+      <div class="ping-log" id="pingLog"></div>
+    </div>
+  </section>
+
+  <section id="view-surprise" class="view">
+    <div class="card">
+      <div class="card-title"><span>🎁</span> صندوق المفاجآت</div>
+      <p class="muted" style="margin-bottom:14px">كل مفاجأة تنفتح في وقتها — ويصل إشعار فوري للطرف الآخر.</p>
+      <button class="btn btn-gold btn-full" onclick="openAddSurprise()">➕ أضيفي مفاجأة</button>
+    </div>
+    <div id="surpriseList"></div>
+  </section>
+
+  <section id="view-mail" class="view">
+    <div class="card">
+      <div class="card-title"><span>💌</span> بريد الحنين</div>
+      <p class="muted" style="margin-bottom:14px">اكتبي رسالة اليوم، تصل في التاريخ الذي تختارينه.</p>
+      <button class="btn btn-primary btn-full" onclick="openComposeMail()">✍️ رسالة جديدة</button>
+    </div>
+    <div id="mailList"></div>
+  </section>
+
+  <section id="view-memories" class="view">
+    <div class="card">
+      <div class="card-title"><span>📸</span> أرشيفنا</div>
+      <p class="muted" style="margin-bottom:14px">ذكرياتنا، صورنا، وكلماتنا — تتزامن بين الجهازين.</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-soft" style="flex:1" onclick="addMemory('text')">📝 نص</button>
+        <button class="btn btn-soft" style="flex:1" onclick="addMemory('photo')">📷 صورة</button>
+      </div>
+    </div>
+    <div class="mem-grid" id="memGrid"></div>
+  </section>
+
+  <section id="view-mood" class="view">
+    <div class="card">
+      <div class="card-title"><span>🌙</span> كيف حالكِ اليوم؟</div>
+      <p class="muted" style="margin-bottom:16px">اختاري مزاجك، ويصل إشعار للطرف الآخر فوراً.</p>
+      <div class="mood-grid" id="moodGrid">
+        <button class="mood-btn" data-mood="happy"><span class="emoji">😊</span>سعيدة</button>
+        <button class="mood-btn" data-mood="tired"><span class="emoji">😴</span>متعبة</button>
+        <button class="mood-btn" data-mood="sad"><span class="emoji">🥺</span>حزينة</button>
+        <button class="mood-btn" data-mood="missing"><span class="emoji">💭</span>مشتاقة</button>
+        <button class="mood-btn" data-mood="angry"><span class="emoji">😤</span>زعلانة</button>
+        <button class="mood-btn" data-mood="calm"><span class="emoji">😌</span>هادية</button>
+        <button class="mood-btn" data-mood="excited"><span class="emoji">🤩</span>متحمسة</button>
+        <button class="mood-btn" data-mood="sick"><span class="emoji">🤒</span>مريضة</button>
+      </div>
+      <div id="moodResponse"></div>
+    </div>
+  </section>
+</main>
+
+<nav class="bottom">
+  <button class="nav-btn active" data-view="home" onclick="switchView('home')"><span class="ic">🏠</span>الرئيسية</button>
+  <button class="nav-btn" data-view="surprise" onclick="switchView('surprise')"><span class="ic">🎁</span>المفاجآت<span class="nav-dot"></span></button>
+  <button class="nav-btn" data-view="mail" onclick="switchView('mail')"><span class="ic">💌</span>البريد</button>
+  <button class="nav-btn" data-view="memories" onclick="switchView('memories')"><span class="ic">📸</span>الذكريات</button>
+  <button class="nav-btn" data-view="mood" onclick="switchView('mood')"><span class="ic">💭</span>المزاج</button>
+</nav>
+
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this && !modalLocked) closeModal()"><div class="modal" id="modalContent"></div></div>
+<div class="toast" id="toast"></div>
+<div id="fullScreen"></div>
+
+<script type="module">
+import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, onChildAdded, push, set, remove, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+/* ============================================================
+   🛠️ تسجيل Service Worker (تم تحسينه ليعمل على Vercel)
+   ============================================================ */
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    self.addEventListener('install', function(e) { self.skipWaiting(); });
+    self.addEventListener('activate', function(e) { e.waitUntil(self.clients.claim()); });
+    self.addEventListener('notificationclick', function(event) {
+      event.notification.close();
+      event.waitUntil(
+        clients.matchAll({ type: 'window' }).then(function(clientList) {
+          for (var i = 0; i < clientList.length; i++) {
+            var client = clientList[i];
+            if (client.url === '/' && 'focus' in client) return client.focus();
+          }
+          if (clients.openWindow) return clients.openWindow('/');
+        })
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch((err) => console.log('SW failed:', err));
+}
+
+/* ============================================================
+   ⚙️ الثوابت المضمّنة
+   ============================================================ */
+const FIREBASE_URL = 'https://ayousha-default-rtdb.firebaseio.com/';
+const ICON_URL = 'https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png'; 
+const APP_START = Date.now();
+const NOTIF_GRACE_MS = 3 * 60 * 1000;
+const LS = 'ayousha_v6_';
+
+const MOOD_LABELS = {
+  happy: 'سعيدة 😊', tired: 'متعبة 😴', sad: 'حزينة 🥺', missing: 'مشتاقة 💭',
+  angry: 'زعلانة 😤', calm: 'هادية 😌', excited: 'متحمسة 🤩', sick: 'مريضة 🤒'
+};
+
+/* ============================================================
+   الحالة العامة
+   ============================================================ */
+let MY_ROLE = null;
+let db = null;
+let firebaseApp = null;
+let firebaseReady = false;
+let modalLocked = false;
+let audioCtx = null;
+let unreadBadge = 0;
+
+let config = {
+  setupComplete: false,
+  me: { name: 'حبيبي' },
+  her: { name: 'عيوشة' }
+};
+
+let state = {
+  meetupDate: '', answers: {}, surprises: [], mails: [],
+  memories: [], moods: {}, pings: [],
+  settings: { wifeName: 'عيوشة', myName: 'حبيبك' }
+};
+
+/* ============================================================
+   أدوات مساعدة
+   ============================================================ */
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('show'),3000);}
+function pad(n){return String(n).padStart(2,'0');}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function fmtDate(d){if(!d)return '';return new Date(d).toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'});}
+function fmtDateTime(d){if(!d)return '';const dt=new Date(d);return dt.toLocaleDateString('ar-EG',{day:'numeric',month:'short'})+' - '+pad(dt.getHours())+':'+pad(dt.getMinutes());}
+function timeUntil(d){const ms=new Date(d)-new Date();if(ms<=0)return 'جاهزة';const s=Math.floor(ms/1000);const days=Math.floor(s/86400);const hrs=Math.floor((s%86400)/3600);const mins=Math.floor((s%3600)/60);if(days>0)return `بعد ${days} يوم و${hrs} ساعة`;if(hrs>0)return `بعد ${hrs} ساعة و${mins} دقيقة`;return `بعد ${mins} دقيقة`;}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function getTodayKey(){return new Date().toISOString().slice(0,10);}
+function toLocalISO(date){const d=new Date(date);const off=d.getTimezoneOffset();return new Date(d.getTime()-off*60000).toISOString().slice(0,16);}
+function setSyncStatus(mode,text){const dot=document.getElementById('syncDot');const txt=document.getElementById('syncText');if(!dot||!txt)return;dot.className='sync-dot';if(mode==='offline')dot.classList.add('offline');if(mode==='local')dot.classList.add('local');txt.textContent=text;}
+function lsGet(k,d){try{const v=localStorage.getItem(LS+k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function lsSet(k,v){try{localStorage.setItem(LS+k,JSON.stringify(v));}catch(e){}}
+
+function senderName(by){if(!by)return '';return config[by]?.name||(by==='me'?'حبيبي':'عيوشة');}
+
+function itemTime(item){
+  if(!item)return 0;
+  const t = item.at || item.t;
+  return t ? new Date(t).getTime() : 0;
+}
+
+function shouldNotify(item){
+  if(!item)return false;
+  if(item.by === MY_ROLE)return false;
+  const t = itemTime(item);
+  if(!t)return false;
+  return t >= APP_START - NOTIF_GRACE_MS;
+}
+
+/* ============================================================
+   🔔 الإشعارات
+   ============================================================ */
+function initAudio(){
+  if(!audioCtx){ try{audioCtx = new (window.AudioContext || window.webkitAudioContext)();}catch(e){} }
+  if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume().catch(()=>{}); }
+}
+document.addEventListener('click', initAudio, {once:false});
+document.addEventListener('touchstart', initAudio, {once:false});
+
+function playBeep(){
+  try{
+    initAudio(); if(!audioCtx)return;
+    const now = audioCtx.currentTime;
+    [880, 1100].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+      osc.type = 'sine'; osc.frequency.value = freq;
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      gain.gain.setValueAtTime(0.0001, now + i * 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.25, now + i * 0.15 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.15 + 0.3);
+      osc.start(now + i * 0.15); osc.stop(now + i * 0.15 + 0.32);
+    });
+  }catch(e){}
+}
+
+async function requestNotifPermission(){
+  if(!('Notification' in window))return false;
+  if(Notification.permission === 'granted')return true;
+  if(Notification.permission === 'denied')return false;
+  try{ const p = await Notification.requestPermission(); return p === 'granted'; }catch(e){return false;}
+}
+
+function updateBadge(delta){
+  unreadBadge = Math.max(0, unreadBadge + delta);
+  if(navigator.setAppBadge){
+    if(unreadBadge > 0) navigator.setAppBadge(unreadBadge).catch(()=>{});
+    else if(navigator.clearAppBadge) navigator.clearAppBadge().catch(()=>{});
+  }
+  const sBtn = document.querySelector('.settings-btn');
+  if(sBtn) sBtn.classList.toggle('has-badge', unreadBadge > 0);
+}
+
+function showAppNotification(title, body, type){
+  playBeep();
+  if(navigator.vibrate)navigator.vibrate([200, 100, 200]);
+  updateBadge(1);
+  toast('🔔 ' + title);
+  
+  if(Notification.permission === 'granted'){
+    try{
+      const n = new Notification(title, {
+        body: body || '', icon: ICON_URL, badge: ICON_URL,
+        tag: 'ayousha-' + (type || 'general') + '-' + Date.now(),
+        silent: true
+      });
+      n.onclick = () => { try{window.focus();}catch(e){} n.close(); updateBadge(-unreadBadge); };
+      setTimeout(() => { try{n.close();}catch(e){} }, 10000);
+    }catch(e){ console.warn('Notification failed', e); }
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if(!document.hidden) updateBadge(-unreadBadge);
+});
+
+/* ============================================================
+   Firebase Init
+   ============================================================ */
+function initFirebase(url){
+  try{
+    if(firebaseApp){try{deleteApp(firebaseApp);}catch(e){}firebaseApp=null;db=null;}
+    if(!url)throw new Error('URL مفقود');
+    firebaseApp = initializeApp({databaseURL:url});
+    db = getDatabase(firebaseApp);
+    firebaseReady = true; return true;
+  }catch(e){ console.error('Firebase init', e); firebaseReady = false; db = null; return false; }
+}
+
+/* ============================================================
+   شاشات ملء الشاشة
+   ============================================================ */
+function showFullScreen(html){document.getElementById('fullScreen').innerHTML=`<div class="full-screen-msg">${html}</div>`;}
+function hideFullScreen(){document.getElementById('fullScreen').innerHTML='';}
+
+function showWaitingScreen(){
+  showFullScreen(`<div class="box"><div style="font-size:3rem;margin-bottom:12px">⏳</div><h2>جاري تجهيز التطبيق</h2><p>زوجكِ لم يكمل إعداد التطبيق بعد. سيُفتح تلقائياً بمجرد أن ينهي.</p><div class="spinner"></div><button class="btn btn-soft btn-full" onclick="location.reload()">🔄 إعادة المحاولة</button></div>`);
+}
+
+/* ============================================================
+   معالج الإعداد (للمالك فقط)
+   ============================================================ */
+function showSetupWizard(){
+  modalLocked = true;
+  openModal(`
+    <h3>⚙️ إعداد التطبيق (مرة واحدة)</h3>
+    <div class="info-box"><b>👋 أهلاً!</b> هذا الإعداد يتم مرة واحدة فقط من هاتفك. عيوشة لن تحتاج لأي إعداد — فقط تفتح رابطها.</div>
+    <label>اسمك</label>
+    <input id="wizMe" value="${escapeHtml(config.me.name || 'حبيبي')}">
+    <label>اسمها</label>
+    <input id="wizHer" value="${escapeHtml(config.her.name || 'عيوشة')}">
+    <label>يوم اللقاء (اختياري)</label>
+    <input type="datetime-local" id="wizMeet" value="${state.meetupDate ? toLocalISO(new Date(state.meetupDate)) : ''}">
+    <div class="info-box">🔔 سيُطلب منك تفعيل الإشعارات بعد الحفظ — ضروري لعمل التطبيق بكامل قوته.</div>
+    <div class="modal-actions"><button class="btn btn-primary btn-full" onclick="saveWizard()">💾 حفظ ومتابعة</button></div>
+  `);
+}
+
+window.saveWizard = async function(){
+  const meName = document.getElementById('wizMe').value.trim() || 'حبيبي';
+  const herName = document.getElementById('wizHer').value.trim() || 'عيوشة';
+  const meet = document.getElementById('wizMeet').value;
+  if(!firebaseReady){toast('⚠️ لا يوجد اتصال بقاعدة البيانات');return;}
+  config.me = { name: meName };
+  config.her = { name: herName };
+  config.setupComplete = true;
+  state.settings = { wifeName: herName, myName: meName };
+  state.meetupDate = meet ? new Date(meet).toISOString() : '';
+  lsSet('config', { me: config.me, her: config.her });
+  lsSet('settings', state.settings);
+  lsSet('meetupDate', state.meetupDate);
+  localStorage.setItem('ayousha_role', 'me');
+  MY_ROLE = 'me';
+  try{
+    await set(ref(db, 'config/me'), config.me);
+    await set(ref(db, 'config/her'), config.her);
+    await set(ref(db, 'config/setupComplete'), true);
+    await set(ref(db, 'app/settings'), state.settings);
+    await set(ref(db, 'app/meetupDate'), state.meetupDate);
+  }catch(e){
+    console.error(e); toast('⚠️ فشل الحفظ — تحقق من قواعد Firebase'); return;
+  }
+  await requestNotifPermission();
+  closeModal(); modalLocked = false;
+  showSuccessScreen();
+};
+
+function showSuccessScreen(){
+  const baseUrl = location.origin + location.pathname;
+  const herLink = `${baseUrl}?for=her`;
+  const myLink = baseUrl;
+  modalLocked = true;
+  openModal(`
+    <h3>🎉 تم الإعداد بنجاح!</h3>
+    <div class="info-box ok">✅ الإعدادات محفوظة.<br>✅ الإشعارات ${Notification.permission === 'granted' ? 'مفعّلة' : 'غير مفعّلة — فعّلها من ⚙️ لاحقاً'}.</div>
+    <h4>📱 رابط عيوشة (أرسله لها)</h4>
+    <div class="link-box" id="herLinkBox">${escapeHtml(herLink)}</div>
+    <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="copyLink('herLinkBox')">📋 نسخ الرابط</button></div>
+    <h4>💾 رابطك أيضاً</h4>
+    <div class="link-box" id="myLinkBox">${escapeHtml(myLink)}</div>
+    <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="copyLink('myLinkBox')">📋 نسخ</button></div>
+    <small class="help">💡 قم بتثبيت التطبيق على الشاشة الرئيسية من قائمة المتصفح.</small>
+    <div class="modal-actions" style="margin-top:20px"><button class="btn btn-primary btn-full" onclick="finishSetup()">✅ بدء الاستخدام</button></div>
+  `);
+}
+
+window.copyLink = function(id){
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(()=>toast('📋 تم النسخ')).catch(()=>toast('⚠️ فشل النسخ'));
+};
+window.finishSetup = function(){ closeModal(); modalLocked = false; hideFullScreen(); boot(); };
+
+/* ============================================================
+   تحميل الإعدادات من Firebase
+   ============================================================ */
+async function loadConfigFromFirebase(){
+  try{
+    const [meSnap, herSnap, setupSnap] = await Promise.all([
+      get(ref(db, 'config/me')), get(ref(db, 'config/her')), get(ref(db, 'config/setupComplete'))
+    ]);
+    if(meSnap.val()) config.me = meSnap.val();
+    if(herSnap.val()) config.her = herSnap.val();
+    config.setupComplete = !!setupSnap.val();
+    lsSet('config', { me: config.me, her: config.her });
+    return config.setupComplete;
+  }catch(e){console.warn('Config load', e);return false;}
+}
+
+async function isSetupComplete(){
+  try{ const snap = await get(ref(db, 'config/setupComplete')); return !!snap.val(); }catch(e){return false;}
+}
+
+/* ============================================================
+   🔄 مزامنة Firebase + الإشعارات
+   ============================================================ */
+function startSync(){
+  if(!firebaseReady || !db)return;
+
+  onValue(ref(db, 'app/meetupDate'), s => { state.meetupDate = s.val() || ''; updateCountdown(); });
+  onValue(ref(db, 'app/settings'), s => { if(s.val()) state.settings = s.val(); updateGreet(); });
+  onValue(ref(db, 'app/answers'), s => { state.answers = s.val() || {}; renderDaily(); });
+  onValue(ref(db, 'app/surprises'), s => {
+    const v = s.val(); state.surprises = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : [];
+    renderSurprises(); checkReadyItems();
+  });
+  onValue(ref(db, 'app/mails'), s => {
+    const v = s.val(); state.mails = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : [];
+    renderMails();
+  });
+  onValue(ref(db, 'app/memories'), s => {
+    const v = s.val(); state.memories = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : [];
+    renderMemories();
+  });
+  onValue(ref(db, 'app/moods'), s => { state.moods = s.val() || {}; renderMood(); });
+  onValue(ref(db, 'app/pings'), s => {
+    const v = s.val(); state.pings = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : [];
+    renderPings();
+  });
+
+  onChildAdded(ref(db, 'app/mails'), s => {
+    const m = s.val(); if(!shouldNotify(m))return;
+    showAppNotification('💌 رسالة جديدة من ' + senderName(m.by), m.text.slice(0, 120), 'mail');
+  });
+  onChildAdded(ref(db, 'app/surprises'), s => {
+    const sp = s.val(); if(!shouldNotify(sp))return;
+    showAppNotification('🎁 مفاجأة جديدة من ' + senderName(sp.by), sp.text.slice(0, 120), 'surprise');
+  });
+  onChildAdded(ref(db, 'app/memories'), s => {
+    const m = s.val(); if(!shouldNotify(m))return;
+    showAppNotification('📸 ذكرى جديدة من ' + senderName(m.by), m.text ? m.text.slice(0, 120) : 'صورة جديدة', 'memory');
+  });
+  onChildAdded(ref(db, 'app/pings'), s => {
+    const p = s.val(); if(!shouldNotify(p))return;
+    showAppNotification('💗 ' + senderName(p.by) + ' يفكر فيك الآن', 'افتح التطبيق وشاركيه الحب', 'ping');
+  });
+  onChildAdded(ref(db, 'app/moods'), s => {
+    const m = s.val(); if(!m || !m.at)return;
+    if(m.by === MY_ROLE)return;
+    if(new Date(m.at).getTime() < APP_START - NOTIF_GRACE_MS)return;
+    const label = MOOD_LABELS[m.mood] || m.mood || 'مزاج جديد';
+    showAppNotification('🌙 مزاج جديد', senderName(m.by) + ': ' + label, 'mood');
+  });
+  onChildAdded(ref(db, 'app/answers'), s => {
+    const a = s.val(); if(!a || !a.by)return;
+    if(a.by === MY_ROLE)return;
+    const t = a.t ? new Date(a.t).getTime() : 0;
+    if(!t || t < APP_START - NOTIF_GRACE_MS)return;
+    showAppNotification('📝 سؤال اليوم', senderName(a.by) + ' أجاب: ' + (a.a || '').slice(0, 80), 'answer');
+  });
+
+  setSyncStatus('online', 'متصل — الإشعارات تعمل');
+}
+
+/* ============================================================
+   الواجهة
+   ============================================================ */
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view === name));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+window.switchView = switchView;
+
+function openModal(html){document.getElementById('modalContent').innerHTML = html;document.getElementById('modalBg').classList.add('show');}
+function closeModal(){if(modalLocked)return;document.getElementById('modalBg').classList.remove('show');}
+window.openModal = openModal;
+window.closeModal = closeModal;
+
+function updateGreet(){
+  const h = new Date().getHours(); const name = state.settings.wifeName || 'عيوشة'; let title, sub;
+  if(h>=5 && h<12){title = `صباح الخير يا ${name} ☀️`; sub = 'أول شيء فكرت فيه اليوم… أنتِ.';}
+  else if(h>=12 && h<17){title = `نهارك سعيد يا ${name} 🌸`; sub = 'أتمنى تكوني أكلتِ شي حلو اليوم.';}
+  else if(h>=17 && h<22){title = `مساء الحب يا ${name} 🌙`; sub = 'الليل يحلى بسوالفك.';}
+  else{title = `سهران معك يا ${name} ✨`; sub = 'لو ما نمتِ، أنا صاحي في قلبي.';}
+  document.getElementById('greetTitle').textContent = title;
+  document.getElementById('greetSub').textContent = sub;
+}
+
+function updateCountdown(){
+  const el = document.getElementById('countdown');
+  if(!state.meetupDate){
+    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;opacity:.8;font-size:.85rem">اضغطي ⚙️ لتحديد يوم اللقاء</div>'; return;
+  }
+  const diff = new Date(state.meetupDate) - new Date();
+  if(diff <= 0){
+    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:1rem;font-weight:700">🎉 وصلنا! اليوم نلتقي</div>'; return;
+  }
+  const d = Math.floor(diff/86400000); const hh = Math.floor((diff%86400000)/3600000);
+  const mm = Math.floor((diff%3600000)/60000); const ss = Math.floor((diff%60000)/1000);
+  el.innerHTML = `
+    <div class="cd-cell"><b>${d}</b><small>يوم</small></div>
+    <div class="cd-cell"><b>${pad(hh)}</b><small>ساعة</small></div>
+    <div class="cd-cell"><b>${pad(mm)}</b><small>دقيقة</small></div>
+    <div class="cd-cell"><b>${pad(ss)}</b><small>ثانية</small></div>`;
+}
+
+/* ============================================================
+   سؤال اليوم
+   ============================================================ */
+const DEFAULT_QUESTIONS = ["لو عندك يوم كامل فاضي، شو أول شي تعمليه؟","شو أحلى شي صار معك هذا الأسبوع؟","إيش الشي اللي لو سمعتيه مني اليوم يفرحك؟","لو نسافر بكرة، وين نروح؟","شو أكثر شي يضحكك لما تتذكريه؟","لو كان عندك قوة خارقة وحدة، شو تختاري؟","شو أكلة نفسك فيها اليوم؟","إيش الشي اللي تحبي فينا كأزواج؟","شو أغنية تعبر عن حالتك اليوم؟","أحلى هدية تلقيتيها مني؟","شو نفسك نعمل أول ما نشوف بعض؟","شو أكثر لحظة حسيتي فيها إني أحبك؟","شو حلمك الصغير لهذا الشهر؟","شو أكثر شي يريحك لما تسمعيه مني؟","لو تختاري مكان نعيش فيه، وين يكون؟","شو الشي اللي دايمًا يخليك تبتسمي؟"];
+function getDailyQuestion(){const key = getTodayKey(); if(state.answers[key]?.q)return state.answers[key].q; const idx = Math.floor(new Date().setHours(0,0,0,0) / 86400000); return DEFAULT_QUESTIONS[idx % DEFAULT_QUESTIONS.length];}
+function renderDaily(){
+  const key = getTodayKey(); const q = getDailyQuestion(); document.getElementById('dailyQ').textContent = q;
+  const ta = document.getElementById('dailyAnswer'); const a = state.answers[key];
+  if(document.activeElement !== ta)ta.value = a?.a || '';
+  const saved = document.getElementById('answerSaved');
+  if(a?.a)saved.innerHTML = `<div class="answer-saved">💚 محفوظ — ${fmtDateTime(a.t)}${a.by ? ' — ' + senderName(a.by) : ''}</div>`;
+  else saved.innerHTML = '';
+}
+let dailyTimer = null;
+document.addEventListener('input', e => {
+  if(e.target.id === 'dailyAnswer'){
+    clearTimeout(dailyTimer);
+    dailyTimer = setTimeout(async () => {
+      const key = getTodayKey(); const payload = { q: getDailyQuestion(), a: e.target.value, t: new Date().toISOString(), by: MY_ROLE };
+      state.answers[key] = payload;
+      if(firebaseReady && db){ try{await set(ref(db, 'app/answers/'+key), payload);}catch(err){} }
+      document.getElementById('answerSaved').innerHTML = e.target.value.trim() ? '<div class="answer-saved">💚 ينحفظ تلقائياً</div>' : '';
+    }, 800);
+  }
+});
+
+/* ============================================================
+   Ping
+   ============================================================ */
+async function sendPing(){
+  const ping = { at: new Date().toISOString(), by: MY_ROLE };
+  state.pings.unshift({id:uid(), ...ping}); renderPings();
+  if(firebaseReady && db){ try{await push(ref(db, 'app/pings'), ping);}catch(e){} }
+  toast('💗 وصل حبك'); burstHearts();
+}
+window.sendPing = sendPing;
+function renderPings(){
+  const el = document.getElementById('pingLog');
+  if(!state.pings.length){el.textContent = 'لسا ما أرسلتِ ولا مرة 💭'; return;}
+  const sorted = [...state.pings].sort((a,b)=>new Date(b.at)-new Date(a.at));
+  const last = sorted[0]; const byName = last.by ? ` (${senderName(last.by)})` : '';
+  el.innerHTML = `💗 آخر مرة: ${fmtDateTime(last.at)}${byName} — المجموع: <b>${state.pings.length}</b> مرة`;
+}
+function burstHearts(){
+  for(let i=0;i<12;i++){
+    const h = document.createElement('div'); h.textContent = ['💗','💖','🌸','✨','💕'][i%5];
+    h.style.cssText = `position:fixed;left:${50+(Math.random()-0.5)*40}%;bottom:200px;font-size:${1+Math.random()*1.5}rem;pointer-events:none;z-index:999;transition:all 1.5s ease;opacity:1;`;
+    document.body.appendChild(h);
+    requestAnimationFrame(()=>{ h.style.transform = `translate(${(Math.random()-0.5)*200}px, -${200+Math.random()*200}px) rotate(${(Math.random()-0.5)*60}deg)`; h.style.opacity = '0'; });
+    setTimeout(()=>h.remove(), 1600);
+  }
+}
+
+/* ============================================================
+   المفاجآت
+   ============================================================ */
+function openAddSurprise(){
+  openModal(`<h3>🎁 مفاجأة جديدة</h3><label>نص المفاجأة</label><textarea id="spText" placeholder="اكتبي رسالة، ذكرى، وعد..."></textarea><label>تفتح في</label><input type="datetime-local" id="spTime"><small class="help">🔔 سيصل إشعار فوري للطرف الآخر في التطبيق.</small><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveSurprise()">حفظ</button></div>`);
+  const dt = new Date(Date.now()+3600000); dt.setMinutes(0,0,0); document.getElementById('spTime').value = toLocalISO(dt);
+}
+window.openAddSurprise = openAddSurprise;
+async function saveSurprise(){
+  const text = document.getElementById('spText').value.trim(); const time = document.getElementById('spTime').value;
+  if(!text || !time){toast('املئي الحقول'); return;}
+  const item = { text, at: new Date(time).toISOString(), opened: false, by: MY_ROLE };
+  if(firebaseReady && db){ try{await push(ref(db, 'app/surprises'), item);}catch(e){} } else { state.surprises.push({id:uid(), ...item}); }
+  renderSurprises(); closeModal(); toast('🎁 مفاجأة محفوظة');
+}
+window.saveSurprise = saveSurprise;
+function renderSurprises(){
+  const el = document.getElementById('surpriseList'); const items = [...state.surprises].sort((a,b)=>new Date(a.at)-new Date(b.at));
+  if(!items.length){el.innerHTML = `<div class="empty"><div class="e-icon">🎁</div><p>ما في مفاجآت بعد</p></div>`; return;}
+  el.innerHTML = items.map(s => {
+    const ready = new Date(s.at) <= new Date(); const byLabel = s.by ? `<div class="surprise-sender">من: ${senderName(s.by)}</div>` : '';
+    return `<div class="surprise-item ${ready?'unlocked':'locked'}"><div class="surprise-icon">${ready?'✅':'🔒'}</div><div class="surprise-body"><p>${ready ? escapeHtml(s.text) : '🔒 مفاجأة مقفلة — '+timeUntil(s.at)}</p><div class="surprise-time">⏰ ${fmtDateTime(s.at)}</div>${byLabel}<span class="badge ${ready?'badge-ready':'badge-locked'}">${ready?'جاهزة':'مقفلة'}</span></div><button onclick="deleteSurprise('${s.id}')" style="color:#c62828;font-size:1.2rem;padding:4px">✕</button></div>`;
+  }).join('');
+}
+async function deleteSurprise(id){
+  if(!confirm('حذف المفاجأة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/surprises/'+id));}catch(e){} }
+  state.surprises = state.surprises.filter(s => s.id !== id); renderSurprises();
+}
+window.deleteSurprise = deleteSurprise;
+
+/* ============================================================
+   البريد
+   ============================================================ */
+function openComposeMail(){
+  openModal(`<h3>💌 رسالة حنين</h3><label>إلى</label><input value="${escapeHtml(MY_ROLE==='me' ? state.settings.wifeName : state.settings.myName)}" readonly><label>نص الرسالة</label><textarea id="mailText" placeholder="اكتبي من قلبك..." style="min-height:120px"></textarea><label>توصل في</label><input type="datetime-local" id="mailTime"><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMail()">إرسال</button></div>`);
+  document.getElementById('mailTime').value = toLocalISO(new Date(Date.now()+86400000));
+}
+window.openComposeMail = openComposeMail;
+async function saveMail(){
+  const text = document.getElementById('mailText').value.trim(); const time = document.getElementById('mailTime').value;
+  if(!text || !time){toast('املئي الحقول'); return;}
+  const item = { text, at: new Date(time).toISOString(), read: false, by: MY_ROLE };
+  if(firebaseReady && db){ try{await push(ref(db, 'app/mails'), item);}catch(e){} } else { state.mails.push({id:uid(), ...item}); }
+  renderMails(); closeModal(); toast('💌 رسالتك في الطريق');
+}
+window.saveMail = saveMail;
+function renderMails(){
+  const el = document.getElementById('mailList'); const items = [...state.mails].sort((a,b)=>new Date(b.at)-new Date(a.at));
+  if(!items.length){el.innerHTML = `<div class="empty"><div class="e-icon">💌</div><p>ما في رسائل بعد</p></div>`; return;}
+  el.innerHTML = items.map(m => {
+    const delivered = new Date(m.at) <= new Date();
+    return `<div class="mail-item ${delivered?'delivered':'pending'}"><h4>${delivered?'📬 وصلت':'⏳ في الطريق'}${m.by?' — من '+senderName(m.by):''}</h4><p>${delivered ? escapeHtml(m.text) : 'رسالة ستصل '+timeUntil(m.at)}</p><div class="mail-meta"><span>⏰ ${fmtDateTime(m.at)}</span><button onclick="deleteMail('${m.id}')" style="color:#c62828;font-size:.8rem">حذف</button></div></div>`;
+  }).join('');
+}
+async function deleteMail(id){
+  if(!confirm('حذف الرسالة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/mails/'+id));}catch(e){} }
+  state.mails = state.mails.filter(m => m.id !== id); renderMails();
+}
+window.deleteMail = deleteMail;
+
+/* ============================================================
+   الذكريات
+   ============================================================ */
+let tempPhoto = null;
+function addMemory(type){
+  if(type === 'text'){
+    openModal(`<h3>📝 ذكرى نصية</h3><label>العنوان</label><input id="memTitle"><label>الذكرى</label><textarea id="memText"></textarea><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('text')">حفظ</button></div>`);
+  } else {
+    tempPhoto = null;
+    openModal(`<h3>📷 ذكرى صورة</h3><label>العنوان</label><input id="memTitle"><label>اختاري صورة</label><input type="file" id="memFile" accept="image/*" onchange="previewPhoto(event)"><div id="photoPreview" style="margin-top:10px"></div><small class="help">⚠️ اختر صورة أقل من 500KB.</small><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('photo')">حفظ</button></div>`);
+  }
+}
+window.addMemory = addMemory;
+function previewPhoto(e){
+  const f = e.target.files[0]; if(!f)return;
+  if(f.size > 800000){toast('الصورة كبيرة — اختر أصغر من 800KB'); return;}
+  const r = new FileReader();
+  r.onload = ev => { tempPhoto = ev.target.result; document.getElementById('photoPreview').innerHTML = `<img src="${tempPhoto}" style="width:100%;border-radius:12px;max-height:240px;object-fit:cover">`; };
+  r.readAsDataURL(f);
+}
+window.previewPhoto = previewPhoto;
+async function saveMemory(type){
+  const title = document.getElementById('memTitle')?.value.trim() || '';
+  const item = { type, title, at: new Date().toISOString(), by: MY_ROLE };
+  if(type === 'text'){
+    const text = document.getElementById('memText').value.trim(); if(!text){toast('اكتبي الذكرى'); return;} item.text = text;
+  } else {
+    if(!tempPhoto){toast('اختاري صورة'); return;} item.src = tempPhoto; tempPhoto = null;
+  }
+  if(firebaseReady && db){ try{await push(ref(db, 'app/memories'), item);}catch(e){} } else { state.memories.unshift({id:uid(), ...item}); }
+  renderMemories(); closeModal(); toast('📸 الذكرى محفوظة');
+}
+window.saveMemory = saveMemory;
+function renderMemories(){
+  const el = document.getElementById('memGrid');
+  if(!state.memories.length){el.innerHTML = `<div class="empty"><div class="e-icon">📸</div><p>أرشيفنا فاضي</p></div>`; return;}
+  el.innerHTML = state.memories.map(m => {
+    let body = ''; if(m.type === 'photo' && m.src)body = `<img src="${m.src}">`; else if(m.text)body = `<div class="mem-text">${escapeHtml(m.text)}</div>`;
+    return `<div class="mem-card">${body}${m.title?`<div style="padding:0 10px;font-weight:700;font-size:.85rem">${escapeHtml(m.title)}</div>`:''}<div class="mem-date">${fmtDate(m.at)}</div>${m.by?`<div class="mem-sender">من: ${senderName(m.by)}</div>`:''}<button class="mem-del" onclick="deleteMemory('${m.id}')">✕</button></div>`;
+  }).join('');
+}
+async function deleteMemory(id){
+  if(!confirm('حذف الذكرى؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/memories/'+id));}catch(e){} }
+  state.memories = state.memories.filter(m => m.id !== id); renderMemories();
+}
+window.deleteMemory = deleteMemory;
+
+/* ============================================================
+   المزاج
+   ============================================================ */
+const MOOD_RESPONSES = { happy: ["😊 فرحتك تفرحني."], tired: ["😴 ارتاحي حبيبتي."], sad: ["🥺 ما أحب أشوفك زعلانة."], missing: ["💭 وأنا مشتاق لك أكثر."], angry: ["😤 أنا معك."], calm: ["😌 هدوءك جميل."], excited: ["🤩 شاركيني الحماس!"], sick: ["🤒 سلامتك."] };
+function getMoodValue(m){ if(typeof m === 'string')return m; if(m && m.mood)return m.mood; return null; }
+function renderMood(){
+  const key = getTodayKey(); const current = getMoodValue(state.moods[key]);
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('selected', b.dataset.mood === current));
+  renderMoodResponse(current);
+}
+function renderMoodResponse(mood){
+  const el = document.getElementById('moodResponse');
+  if(!mood){el.innerHTML = ''; return;} el.innerHTML = `<div class="mood-response">${(MOOD_RESPONSES[mood]||['💗'])[0]}</div>`;
+}
+document.querySelectorAll('.mood-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const key = getTodayKey(); const mood = btn.dataset.mood;
+    const payload = { mood, by: MY_ROLE, at: new Date().toISOString() };
+    state.moods[key] = payload; renderMood();
+    if(firebaseReady && db){ try{await set(ref(db, 'app/moods/'+key), payload);}catch(e){} }
+    toast('سجلنا مزاجك 💭');
+  });
+});
+
+/* ============================================================
+   الإعدادات
+   ============================================================ */
+function openSettings(){
+  const notifStatus = !('Notification' in window) ? '<div class="info-box warn">⚠️ متصفحك لا يدعم الإشعارات</div>'
+    : Notification.permission === 'granted' ? '<div class="info-box ok">✅ الإشعارات مفعّلة</div>'
+    : Notification.permission === 'denied' ? '<div class="info-box warn">❌ الإشعارات مرفوضة — افتح إعدادات المتصفح واسمح بها</div>'
+    : '<div class="info-box">🔔 الإشعارات غير مفعّلة</div>';
+
+  const isOwner = MY_ROLE === 'me';
+  openModal(`
+    <h3>⚙️ الإعدادات</h3>
+    <label>اسمك</label><input id="setMe" value="${escapeHtml(state.settings.myName)}">
+    <label>اسمها</label><input id="setWife" value="${escapeHtml(state.settings.wifeName)}">
+    <label>يوم اللقاء</label><input type="datetime-local" id="setMeet" value="${state.meetupDate ? toLocalISO(new Date(state.meetupDate)) : ''}">
+    <div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveSettingsSimple()">حفظ</button></div>
+
+    <h4>🔔 الإشعارات</h4>
+    ${notifStatus}
+    <div class="modal-actions" style="flex-direction:column">
+      <button class="btn btn-soft btn-full" onclick="askNotifPermission()">🔔 تفعيل الإشعارات</button>
+      <button class="btn btn-soft btn-full" onclick="testNotification()">🧪 اختبار الإشعار</button>
+    </div>
+
+    ${isOwner ? `
+    <h4>إدارة</h4>
+    <div class="modal-actions" style="flex-direction:column">
+      <button class="btn btn-soft btn-full" onclick="resendHerLink()">🔗 عرض رابط عيوشة</button>
+      <button class="btn btn-danger btn-full" onclick="openSetupAgain()">🔧 إعادة الإعداد</button>
+    </div>
+    ` : ''}
+  `);
+}
+window.openSettings = openSettings;
+
+async function askNotifPermission(){
+  const ok = await requestNotifPermission();
+  if(ok){ toast('✅ الإشعارات مفعّلة'); showAppNotification('🎉 الإشعارات تعمل!', 'ستصلك إشعارات فورية هنا وهاتفك', 'test'); }
+  else { toast('❌ لم يتم تفعيل الإشعارات'); }
+  closeModal();
+}
+window.askNotifPermission = askNotifPermission;
+
+function testNotification(){
+  if(Notification.permission !== 'granted'){ toast('فعّل الإشعارات أولاً'); return; }
+  showAppNotification('🧪 إشعار تجريبي', 'إذا وصلتك هذه الرسالة، فكل شيء يعمل بشكل صحيح', 'test');
+}
+window.testNotification = testNotification;
+
+async function saveSettingsSimple(){
+  const wife = document.getElementById('setWife').value.trim() || 'عيوشة';
+  const me = document.getElementById('setMe').value.trim() || 'حبيبي';
+  const meet = document.getElementById('setMeet').value;
+  state.settings = { wifeName: wife, myName: me }; state.meetupDate = meet ? new Date(meet).toISOString() : '';
+  lsSet('settings', state.settings); lsSet('meetupDate', state.meetupDate);
+  if(firebaseReady && db){ try{ await set(ref(db, 'app/settings'), state.settings); await set(ref(db, 'app/meetupDate'), state.meetupDate); }catch(e){} }
+  closeModal(); updateGreet(); updateCountdown(); toast('✅ محفوظ');
+}
+window.saveSettingsSimple = saveSettingsSimple;
+
+function resendHerLink(){
+  const baseUrl = location.origin + location.pathname; const herLink = `${baseUrl}?for=her`;
+  openModal(`<h3>🔗 رابط عيوشة</h3><div class="link-box" id="herLinkBox">${escapeHtml(herLink)}</div><div class="modal-actions"><button class="btn btn-soft btn-full" onclick="copyLink('herLinkBox')">📋 نسخ الرابط</button></div><small class="help">أرسله لها. تفتحه وتثبّته على الشاشة الرئيسية.</small><div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>`);
+}
+window.resendHerLink = resendHerLink;
+
+function openSetupAgain(){ if(!confirm('إعادة الإعداد ستطلب البيانات من جديد. متأكد؟'))return; closeModal(); setTimeout(()=>showSetupWizard(), 300); }
+window.openSetupAgain = openSetupAgain;
+function checkReadyItems(){
+  const now = new Date(); const hasReady = state.surprises.some(s => !s.opened && new Date(s.at) <= now);
+  document.querySelector('.nav-btn[data-view="surprise"]')?.classList.toggle('has-badge', hasReady);
+}
+
+/* ============================================================
+   🚀 الإقلاع
+   ============================================================ */
+async function boot(){
+  setTimeout(() => {
+    const splash = document.getElementById('splashScreen');
+    if(splash){ splash.style.opacity = '0'; setTimeout(() => splash.remove(), 600); }
+  }, 2500); 
+
+  const urlParams = new URLSearchParams(location.search);
+  const urlRole = urlParams.get('for');
+  if(urlRole === 'her' || urlRole === 'me'){ MY_ROLE = urlRole; localStorage.setItem('ayousha_role', urlRole); }
+  else { MY_ROLE = localStorage.getItem('ayousha_role'); }
+
+  const savedCfg = lsGet('config', null);
+  if(savedCfg){ config.me = { ...config.me, ...savedCfg.me }; config.her = { ...config.her, ...savedCfg.her }; }
+  const savedSettings = lsGet('settings', null); if(savedSettings)state.settings = savedSettings;
+  const savedMeet = lsGet('meetupDate', ''); if(savedMeet)state.meetupDate = savedMeet;
+
+  updateGreet(); updateCountdown(); renderDaily(); renderPings(); renderSurprises(); renderMails(); renderMemories(); renderMood();
+
+  setSyncStatus('online', 'جاري الاتصال...');
+  if(!initFirebase(FIREBASE_URL)){
+    setSyncStatus('offline', 'فشل الاتصال');
+    showFullScreen(`<div class="box"><div style="font-size:3rem">⚠️</div><h2>خطأ في الاتصال</h2><p>تأكد من اتصال الإنترنت ثم أعد المحاولة.</p><button class="btn btn-primary btn-full" onclick="location.reload()">🔄 إعادة المحاولة</button></div>`);
+    return;
+  }
+
+  const setupDone = await isSetupComplete();
+  if(setupDone){
+    await loadConfigFromFirebase(); startSync();
+    if(!MY_ROLE){MY_ROLE = 'me'; localStorage.setItem('ayousha_role', 'me');}
+    setSyncStatus('online', 'متصل — الإشعارات تعمل'); toast('👋 أهلاً ' + senderName(MY_ROLE));
+  } else {
+    if(MY_ROLE === 'her'){
+      showWaitingScreen();
+      const t = setInterval(async () => {
+        if(await isSetupComplete()){
+          clearInterval(t); await loadConfigFromFirebase(); hideFullScreen(); startSync();
+          setSyncStatus('online', 'متصل — الإشعارات تعمل'); toast('🎉 التطبيق جاهز');
+        }
+      }, 3000);
+    } else {
+      MY_ROLE = 'me'; localStorage.setItem('ayousha_role', 'me'); showSetupWizard();
+    }
+  }
+
+  setInterval(updateCountdown, 1000);
+  setInterval(updateGreet, 60000);
+  setInterval(()=>{ checkReadyItems(); const active = document.querySelector('.view.active')?.id; if(active === 'view-surprise')renderSurprises(); if(active === 'view-mail')renderMails(); }, 20000);
+}
+
+document.addEventListener('click', () => { initAudio(); }, { once: true });
+document.addEventListener('touchstart', () => { initAudio(); }, { once: true });
+
+boot();
+</script>
+</body>
+  </html>
