@@ -9,6 +9,9 @@
 <meta name="apple-mobile-web-app-title" content="عيون عيوشة">
 <title>عيون عيوشة 🌸</title>
 
+<!-- ملف قاعدة بيانات أسئلة لعبة الترفيه والخداع المستقل -->
+<script src="./trivia-questions.js"></script>
+
 <link rel="manifest" href='data:application/manifest+json,{"name":"عيون عيوشة","short_name":"عيوشة","start_url":"./","display":"standalone","background_color":"%23fdf6f9","theme_color":"%23d81b60","orientation":"portrait","icons":[{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"512x512","type":"image/png","purpose":"any"}]}'>
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
@@ -197,7 +200,7 @@ nav.bottom{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:10
       </div>
     </div>
 
-    <!-- جميع الألعاب المتكاملة التناوبية مع شات 5 ثوانٍ -->
+    <!-- قائمة الألعاب -->
     <div class="card">
       <div class="card-title"><span>⭐</span> قائمة الألعاب الثنائية المشتركة</div>
       <div style="display:flex;flex-direction:column;gap:11px;margin-top:8px;">
@@ -578,47 +581,19 @@ window.sendGameInlineMsg = async function(gamePath){
 };
 
 /* =========================================================
-   1. 🧠 لعبة الترفيه والخداع (قاعدة بيانات ضخمة + نظام 4 خيارات)
+   1. 🧠 لعبة الترفيه والخداع (معالجة عدم ظهور الأسئلة + الخيارات الـ 4)
    ========================================================= */
-const TRIVIA_BANK = [
-  { id: 1, cat: "غرائب", q: "ما هو الحيوان الثديي الوحيد الذي لا يستطيع القفز نهائياً؟", real: "الفيل", decoy: "فرس النهر" },
-  { id: 2, cat: "تاريخ", q: "كم سنة استمرت حرب المئة عام الشهيرة بين إنجلترا وفرنسا؟", real: "116 سنة", decoy: "100 سنة" },
-  { id: 3, cat: "جغرافيا", q: "ما هي عاصمة أستراليا الرسمية وليست سيدني كما يظن الكثيرون؟", real: "كانبيرا", decoy: "ملبورن" },
-  { id: 4, cat: "علوم", q: "كم عدد القلوب لدى كائن الأخطبوط في أعماق البحار؟", real: "3 قلوب", decoy: "قلبان" },
-  { id: 5, cat: "غرائب", q: "ما هو الطائر الوحيد في العالم القادر على الطيران إلى الخلف؟", real: "طائر الطنان", decoy: "السنونو" },
-  { id: 6, cat: "علوم", q: "ما هو الغاز الأكثر وفرة في الغلاف الجوي لكوكب الأرض؟", real: "النيتروجين", decoy: "الأكسجين" },
-  { id: 7, cat: "تاريخ", q: "في أي عام مشى رائد الفضاء نيل أرمسترونغ لأول مرة على سطح القمر؟", real: "1969", decoy: "1972" },
-  { id: 8, cat: "جغرافيا", q: "ما هي أصغر دولة مستقلة في العالم من حيث المساحة وعدد السكان؟", real: "الفاتيكان", decoy: "موناكو" },
-  { id: 9, cat: "علوم", q: "ما هو الكوكب الأقرب إلى الشمس في نظامنا الشمسي؟", real: "عطارد", decoy: "الزهرة" },
-  { id: 10, cat: "تاريخ", q: "أي حضارة قديمة هي التي اخترعت الورق لأول مرة في التاريخ؟", real: "الحضارة الصينية", decoy: "الفراعنة" },
-  { id: 11, cat: "فنون", q: "في أي مدينة إيطالية شهيرة يقع برج بيزا المائل؟", real: "مدينة بيزا", decoy: "مدينة فلورنسا" },
-  { id: 12, cat: "غرائب", q: "ما هو لون حليب أنثى فرس النهر الطبيعي؟", real: "وردي", decoy: "أصفر خفيف" },
-  { id: 13, cat: "حيوانات", q: "كم عدد عيون نحلة العسل العادية؟", real: "5 عيون", decoy: "عينان مركبتان فقط" },
-  { id: 14, cat: "جغرافيا", q: "ما هو أطول نهر في قارة آسيا؟", real: "نهر اليانغتسي", decoy: "نهر الميكونغ" },
-  { id: 15, cat: "أكلات وثقافات", q: "في أي دولة تم ابتكار حلوى التيراميسو الشهيرة أول مرة؟", real: "إيطاليا", decoy: "فرنسا" },
-  { id: 16, cat: "رياضة", q: "كم عدد اللاعبين في فريق كرة السلة داخل الملعب أثناء المباراة؟", real: "5 لاعبين", decoy: "6 لاعبين" },
-  { id: 17, cat: "علوم", q: "ما هو العضو الوحيد في جسم الإنسان القادر على تجديد خلاياه وإعادة بناء نفسه؟", real: "الكبد", decoy: "الرئة" },
-  { id: 18, cat: "تاريخ", q: "من هو القائد التاريخي الذي اجتاز جبال الألب بصحبة الأفيال؟", real: "حنبعل", decoy: "يوليوس قيصر" },
-  { id: 19, cat: "غرائب", q: "ما هو المعدن الوحيد الذي يكون في حالة سائلة في درجة حرارة الغرفة العادية؟", real: "الزئبق", decoy: "الغاليوم" },
-  { id: 20, cat: "جغرافيا", q: "في أي محيط تقع أعمق نقطة على سطح الأرض (خندق ماريانا)؟", real: "المحيط الهادئ", decoy: "المحيط الأطلسي" },
-  { id: 21, cat: "حيوانات", q: "كم عدد أصابع أقدام حيوان الكسلان الشهير؟", real: "3 أصابع", decoy: "4 أصابع" },
-  { id: 22, cat: "فنون", q: "من هو الرسام العالمي صاحب لوحة 'ليلة النجوم' (Starry Night)؟", real: "فنسنت فان غوخ", decoy: "بابلو بيكاسو" },
-  { id: 23, cat: "أكلات وثقافات", q: "ما هي الفاكهة الآسيوية الشهيرة برائحتها النفاذة جداً والتي يُمنع إدخالها للفنادق؟", real: "الدوريان", decoy: "الجاك فروت" },
-  { id: 24, cat: "رياضة", q: "كم عدد الحلقات الملونة في الشعار الرسمي للألعاب الأولمبية؟", real: "5 حلقات", decoy: "6 حلقات" },
-  { id: 25, cat: "تاريخ", q: "ما هي أقدم عاصمة مأهولة بالسكان بشكل مستمر حتى اليوم في العالم؟", real: "دمشق", decoy: "أثينا" },
-  { id: 26, cat: "علوم", q: "ما هو الكائن الأطول عمراً على وجه الأرض وتعيش بعض أنواعه مئات السنين؟", real: "قرش غرينلاند", decoy: "سلحفاة غالاباغوس" },
-  { id: 27, cat: "غرائب", q: "ما هو الشيء الذي يزداد طوله في الصيف بحوالي 15 سم بسبب التمدد الحراري؟", real: "برج إيفل", decoy: "ساعة بيغ بن" },
-  { id: 28, cat: "جغرافيا", q: "ما هي أكبر جزيرة في البحر الأبيض المتوسط من حيث المساحة؟", real: "صقلية", decoy: "قبرص" }
-];
-
 window.openTriviaGame = function(){
   if(!db) return toast('جاري الاتصال...');
   const trivRef = ref(db, 'games/trivia');
   if(window._activeGameUnsub) window._activeGameUnsub();
 
   window.openModal(`
-    <h3>🧠 لعبة الترفيه والخداع</h3>
-    <div id="triviaContent">جاري تحميل الغرفة...</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <h3 style="margin:0;">🧠 لعبة الترفيه والخداع</h3>
+      <button class="btn btn-soft" style="padding:4px 8px;font-size:.75rem;" onclick="window.resetTriviaGame()">🔄 تصفير الغرفة</button>
+    </div>
+    <div id="triviaContent">جاري فحص الغرفة وتجهيز الأسئلة...</div>
     ${window.renderGameChatUI('games/trivia')}
     <div style="margin-top:10px;"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
   `);
@@ -630,7 +605,8 @@ window.openTriviaGame = function(){
     const cEl = document.getElementById('triviaContent');
     if(!cEl) return;
 
-    if(!t || t.status === 'setup'){
+    // إذا كانت الغرفة فارغة أو محتاجة تجهيز سؤال أو بيانات غير مكتملة
+    if(!t || t.status === 'setup' || !t.currentQ || !t.currentQ.q){
       cEl.innerHTML = `
         <p class="muted">قانون لعبة الترفيه والخداع: يُطرح سؤال عام ويكون له <b>4 خيارات</b>:<br>
         1. خيار منك ✍️ | 2. خيار من عيوشة ✍️ | 3. إجابة حقيقية من الجهاز 💻 | 4. تمويه ذكي من الجهاز 🤖<br><br>
@@ -737,10 +713,18 @@ window.openTriviaGame = function(){
   });
 };
 
+window.resetTriviaGame = async function(){
+  await set(ref(db, 'games/trivia'), { status: 'setup' });
+  toast('🔄 تم تصفير غرفة اللعبة بنجاح');
+};
+
 window.startTriviaRound = async function(){
+  const bank = (window.TRIVIA_BANK && window.TRIVIA_BANK.length) ? window.TRIVIA_BANK : [
+    { id: 1, cat: "غرائب", q: "ما هو الحيوان الثديي الوحيد الذي لا يستطيع القفز نهائياً؟", real: "الفيل", decoy: "فرس النهر" }
+  ];
   const cat = document.getElementById('trivCatSelect')?.value || 'الكل';
-  let filtered = cat === 'الكل' ? TRIVIA_BANK : TRIVIA_BANK.filter(q => q.cat === cat);
-  if(!filtered.length) filtered = TRIVIA_BANK;
+  let filtered = cat === 'الكل' ? bank : bank.filter(q => q.cat === cat);
+  if(!filtered.length) filtered = bank;
   const picked = filtered[Math.floor(Math.random() * filtered.length)];
 
   await set(ref(db, 'games/trivia'), {
@@ -766,8 +750,8 @@ window.submitFakeAnswer = async function(){
 
   const snap = await get(trivRef);
   const data = snap.val();
-  if(data.fakeAnswers?.me && data.fakeAnswers?.her){
-    // إنشاء الخيارات الأربعة: الحقيقية، تمويه اللاعب 1، تمويه اللاعب 2، تمويه الجهاز
+  if(data && data.fakeAnswers?.me && data.fakeAnswers?.her){
+    // إنشاء الخيارات الأربعة بدقة: الحقيقية، تمويه اللاعب 1، تمويه اللاعب 2، تمويه الجهاز
     const opts = [data.currentQ.real, data.currentQ.decoy, data.fakeAnswers.me, data.fakeAnswers.her].sort(() => Math.random() - 0.5);
     await update(trivRef, {
       status: 'guessing',
@@ -785,7 +769,7 @@ window.submitTriviaGuess = async function(chosenOpt){
 
   const snap = await get(trivRef);
   const data = snap.val();
-  if(data.guesses?.me && data.guesses?.her){
+  if(data && data.guesses?.me && data.guesses?.her){
     let scMe = data.scores?.me || 0;
     let scHer = data.scores?.her || 0;
 
@@ -806,9 +790,16 @@ window.submitTriviaGuess = async function(chosenOpt){
 };
 
 window.nextTriviaQuestion = async function(){
+  const bank = (window.TRIVIA_BANK && window.TRIVIA_BANK.length) ? window.TRIVIA_BANK : [];
   const snap = await get(ref(db, 'games/trivia'));
   const data = snap.val() || {};
-  const picked = TRIVIA_BANK[Math.floor(Math.random() * TRIVIA_BANK.length)];
+  const currentCat = data.currentQ?.cat;
+  let filtered = bank;
+  if(currentCat && bank.some(q => q.cat === currentCat)){
+    filtered = bank.filter(q => q.cat === currentCat);
+  }
+  const picked = filtered[Math.floor(Math.random() * filtered.length)] || bank[0];
+
   await update(ref(db, 'games/trivia'), {
     status: 'faking',
     currentQ: picked,
