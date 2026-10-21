@@ -9,10 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="عيون عيوشة">
 <title>عيون عيوشة 🌸</title>
 
-<!-- 🌟 الأيقونة الجديدة (Aa.png) والـ Manifest -->
 <link rel="manifest" href='data:application/manifest+json,{"name":"عيون عيوشة","short_name":"عيوشة","start_url":"./","display":"standalone","background_color":"%23fdf6f9","theme_color":"%23d81b60","orientation":"portrait","icons":[{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"512x512","type":"image/png","purpose":"any"}]}'>
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png">
-
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 /* ======== التصميم (CSS) ======== */
@@ -27,9 +25,10 @@ header{padding:22px 20px 10px;display:flex;align-items:center;justify-content:sp
 .brand-logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--gold));display:grid;place-items:center;font-size:1.4rem;box-shadow:0 6px 18px rgba(216,27,96,.3)}
 .brand h1{font-size:1.15rem;font-weight:800;color:var(--primary-2)}
 .brand small{display:block;font-size:.72rem;color:var(--muted);font-weight:400}
-.settings-btn{width:40px;height:40px;border-radius:50%;background:var(--card);display:grid;place-items:center;box-shadow:var(--shadow);font-size:1.1rem;position:relative}
-.settings-btn .badge-dot{position:absolute;top:4px;right:4px;width:10px;height:10px;border-radius:50%;background:#f44336;display:none}
-.settings-btn.has-badge .badge-dot{display:block}
+.header-actions{display:flex;gap:8px}
+.icon-btn{width:40px;height:40px;border-radius:50%;background:var(--card);display:grid;place-items:center;box-shadow:var(--shadow);font-size:1.1rem;position:relative}
+.icon-btn .badge-dot{position:absolute;top:4px;right:4px;width:10px;height:10px;border-radius:50%;background:#f44336;display:none;border:2px solid var(--card)}
+.icon-btn.has-badge .badge-dot{display:block}
 .sync-status{max-width:900px;margin:0 auto 8px;padding:0 20px;font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:6px}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:#4caf50;animation:pulseDot 2s infinite}
 .sync-dot.offline{background:#ff9800;animation:none}
@@ -69,36 +68,16 @@ main{max-width:900px;margin:0 auto;padding:0 16px}
 .think-btn small{font-size:.75rem;font-weight:400;opacity:.9}
 @keyframes pulse{0%,100%{box-shadow:0 12px 40px rgba(216,27,96,.4),inset 0 -6px 20px rgba(0,0,0,.15)}50%{box-shadow:0 12px 60px rgba(216,27,96,.7),inset 0 -6px 20px rgba(0,0,0,.15)}}
 .ping-log{margin-top:14px;font-size:.82rem;color:var(--muted);text-align:center}
-.surprise-item{background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;border:1px solid var(--border);display:flex;gap:12px;align-items:flex-start}
-.surprise-item.locked{opacity:.75}
-.surprise-icon{width:44px;height:44px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,#fff3e0,#ffe0b2);display:grid;place-items:center;font-size:1.3rem}
-.surprise-item.unlocked .surprise-icon{background:linear-gradient(135deg,#e8f5e9,#c8e6c9)}
-.surprise-body{flex:1;min-width:0}
-.surprise-body p{font-size:.95rem;margin-bottom:6px;word-break:break-word}
-.surprise-time{font-size:.75rem;color:var(--muted)}
-.surprise-sender{font-size:.7rem;color:var(--primary);font-weight:700;margin-top:4px}
-.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.7rem;font-weight:700;margin-top:4px}
-.badge-locked{background:#fff3e0;color:#e65100}
-.badge-ready{background:#e8f5e9;color:#2e7d32}
-.mail-item{background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;border-right:4px solid var(--primary);box-shadow:var(--shadow)}
-.mail-item.delivered{border-right-color:#43a047}
-.mail-item.pending{border-right-color:#ffb300}
-.mail-item h4{font-size:.95rem;margin-bottom:6px}
-.mail-item p{font-size:.88rem;color:var(--muted);margin-bottom:8px;word-break:break-word}
-.mail-meta{font-size:.75rem;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.mem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
-.mem-card{background:var(--card);border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow);position:relative}
-.mem-card img{width:100%;height:120px;object-fit:cover;display:block}
-.mem-card .mem-text{padding:10px;font-size:.85rem;word-break:break-word}
-.mem-card .mem-date{padding:0 10px 10px;font-size:.7rem;color:var(--muted)}
-.mem-card .mem-sender{padding:0 10px 10px;font-size:.7rem;color:var(--primary);font-weight:700}
-.mem-card .mem-del{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.5);color:#fff;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:.9rem;opacity:0;transition:opacity .2s}
-.mem-card:hover .mem-del{opacity:1}
-.mood-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.mood-btn{padding:16px 6px;border-radius:16px;background:var(--card);border:2px solid transparent;text-align:center;box-shadow:var(--shadow);transition:all .2s;font-size:.75rem;font-weight:600}
-.mood-btn .emoji{font-size:1.8rem;display:block;margin-bottom:4px}
-.mood-btn.selected{border-color:var(--primary);background:#fff0f5;transform:translateY(-2px)}
-.mood-response{margin-top:16px;padding:16px;border-radius:16px;background:linear-gradient(135deg,#fff8e1,#ffe0b2);font-size:.95rem;color:#5d4037}
+/* Notifications List */
+.notif-item{background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;border:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;position:relative}
+.notif-item.unread{border-right:4px solid var(--primary);background:#fffafb}
+.notif-icon{width:40px;height:40px;border-radius:50%;background:#fce4ec;display:grid;place-items:center;font-size:1.2rem;flex-shrink:0}
+.notif-body{flex:1;min-width:0}
+.notif-body h4{font-size:.95rem;margin-bottom:4px;font-weight:700}
+.notif-body p{font-size:.85rem;color:var(--muted);margin-bottom:6px;word-break:break-word}
+.notif-time{font-size:.7rem;color:#aaa}
+/* Surprises, Mails, etc. (Kept from previous) */
+.surprise-item,.mail-item,.mem-card,.mood-btn{border-radius:var(--radius-sm);box-shadow:var(--shadow)}
 nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-top:1px solid var(--border);padding:8px 6px calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;align-items:center;z-index:50;max-width:900px;margin:0 auto;border-radius:24px 24px 0 0}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:14px;color:var(--muted);font-size:.7rem;font-weight:600;transition:all .2s;position:relative}
 .nav-btn .ic{font-size:1.3rem;line-height:1}
@@ -113,59 +92,47 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
 .modal h4{font-size:.9rem;color:var(--primary-2);margin:16px 0 8px;padding-top:8px;border-top:1px solid var(--border)}
 .modal label{display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px}
 .modal input,.modal textarea,.modal select{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);font-size:.95rem}
-.modal input:focus,.modal textarea:focus,.modal select:focus{outline:2px solid var(--primary);border-color:transparent}
 .modal textarea{resize:vertical;min-height:80px}
 .modal-actions{display:flex;gap:8px;margin-top:20px}
 .modal-actions .btn{flex:1}
 .modal small.help{display:block;color:var(--muted);font-size:.72rem;margin-top:4px;line-height:1.6}
 .modal .info-box{background:#fff8e1;border:1px solid var(--gold);border-radius:12px;padding:12px;margin:12px 0;font-size:.82rem;color:#5d4037;line-height:1.6}
-.modal .info-box b{color:var(--primary-2)}
 .modal .info-box.ok{background:#e8f5e9;border-color:#4caf50;color:#1b5e20}
-.modal .info-box.warn{background:#fff3e0;border-color:#ff9800;color:#e65100}
 .modal .link-box{background:#f5f5f5;border:1px solid #ddd;border-radius:12px;padding:12px;margin:8px 0;font-family:monospace;font-size:.72rem;word-break:break-all;color:#333}
 .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:12px 20px;border-radius:14px;font-size:.9rem;font-weight:600;opacity:0;transition:all .3s;z-index:200;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty .e-icon{font-size:3rem;margin-bottom:10px;opacity:.5}
-.empty p{font-size:.9rem}
 .full-screen-msg{position:fixed;inset:0;background:var(--bg);z-index:150;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
 .full-screen-msg .box{max-width:400px;background:var(--card);border-radius:var(--radius);padding:32px 24px;box-shadow:var(--shadow-lg)}
 .full-screen-msg h2{color:var(--primary-2);margin-bottom:12px;font-size:1.2rem}
 .full-screen-msg p{color:var(--muted);font-size:.9rem;margin-bottom:16px}
-.full-screen-msg .spinner{width:40px;height:40px;border:3px solid #f8bbd0;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+#splashScreen{position:fixed;inset:0;background:#fdf6f9;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.6s ease}
+#splashScreen img{max-width:85%;max-height:70vh;object-fit:contain;border-radius:20px;box-shadow:0 10px 30px rgba(216,27,96,0.15);margin-bottom:20px}
+.spinner{width:40px;height:40px;border:3px solid #f8bbd0;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
 @keyframes spin{to{transform:rotate(360deg)}}
-input[type=file]{display:none}
-@media(max-width:420px){.cd-cell b{font-size:1.2rem}.think-btn{width:130px;height:130px;font-size:.9rem}}
-
-/* ======== شاشة الترحيب (Splash Screen) ======== */
-#splashScreen {
-  position: fixed; inset: 0; background: #fdf6f9; z-index: 9999;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  transition: opacity 0.6s ease;
-}
-#splashScreen img {
-  max-width: 85%; max-height: 70vh; object-fit: contain;
-  border-radius: 20px; box-shadow: 0 10px 30px rgba(216,27,96,0.15);
-  margin-bottom: 20px;
-}
 </style>
 </head>
 <body>
 
-<!-- شاشة الترحيب تظهر فوراً -->
+<!-- شاشة الترحيب -->
 <div id="splashScreen">
   <img src="https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Za.png" alt="عيون عيوشة">
-  <div class="spinner" style="width:30px;height:30px;border:3px solid #f8bbd0;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;"></div>
+  <div class="spinner"></div>
 </div>
 
 <header>
   <div class="brand"><div class="brand-logo">🌸</div><div><h1>عيون عيوشة</h1><small>إشعارات فورية بين قلبينا</small></div></div>
-  <button class="settings-btn" onclick="openSettings()" title="الإعدادات">⚙️<span class="badge-dot"></span></button>
+  <div class="header-actions">
+    <button class="icon-btn" id="notifBell" onclick="switchView('notifications')" title="الإشعارات">🔔<span class="badge-dot"></span></button>
+    <button class="icon-btn" onclick="openSettings()" title="الإعدادات">⚙️</button>
+  </div>
 </header>
 
 <div class="sync-status"><span class="sync-dot local" id="syncDot"></span><span id="syncText">جاري التحميل...</span></div>
 
 <main>
+  <!-- الأقسام السابقة -->
   <section id="view-home" class="view active">
     <div class="greet">
       <h2 id="greetTitle">صباح الخير يا عيوشة 💕</h2>
@@ -237,6 +204,18 @@ input[type=file]{display:none}
       <div id="moodResponse"></div>
     </div>
   </section>
+
+  <!-- 🔔 قسم الإشعارات -->
+  <section id="view-notifications" class="view">
+    <div class="card">
+      <div class="card-title"><span>🔔</span> مركز الإشعارات</div>
+      <div style="display:flex; gap:8px; margin-bottom:16px">
+        <button id="tab-inbox" class="btn btn-primary" style="flex:1" onclick="switchNotifTab('inbox')">الواردة 📥</button>
+        <button id="tab-sent" class="btn btn-soft" style="flex:1" onclick="switchNotifTab('sent')">المرسلة 📤</button>
+      </div>
+      <div id="notifList"></div>
+    </div>
+  </section>
 </main>
 
 <nav class="bottom">
@@ -253,57 +232,33 @@ input[type=file]{display:none}
 
 <script type="module">
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, onChildAdded, push, set, remove, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue, push, set, remove, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 /* ============================================================
-   🛠️ تسجيل Service Worker (تم تحسينه ليعمل على Vercel)
+   ⚙️ إعدادات Firebase الخاصة بك
    ============================================================ */
-if ('serviceWorker' in navigator) {
-  const swCode = `
-    self.addEventListener('install', function(e) { self.skipWaiting(); });
-    self.addEventListener('activate', function(e) { e.waitUntil(self.clients.claim()); });
-    self.addEventListener('notificationclick', function(event) {
-      event.notification.close();
-      event.waitUntil(
-        clients.matchAll({ type: 'window' }).then(function(clientList) {
-          for (var i = 0; i < clientList.length; i++) {
-            var client = clientList[i];
-            if (client.url === '/' && 'focus' in client) return client.focus();
-          }
-          if (clients.openWindow) return clients.openWindow('/');
-        })
-      );
-    });
-  `;
-  const blob = new Blob([swCode], {type: 'application/javascript'});
-  const swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch((err) => console.log('SW failed:', err));
-}
-
-/* ============================================================
-   ⚙️ الثوابت المضمّنة
-   ============================================================ */
-const FIREBASE_URL = 'https://ayousha-default-rtdb.firebaseio.com/';
-const ICON_URL = 'https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png'; 
-const APP_START = Date.now();
-const NOTIF_GRACE_MS = 3 * 60 * 1000;
-const LS = 'ayousha_v6_';
-
-const MOOD_LABELS = {
-  happy: 'سعيدة 😊', tired: 'متعبة 😴', sad: 'حزينة 🥺', missing: 'مشتاقة 💭',
-  angry: 'زعلانة 😤', calm: 'هادية 😌', excited: 'متحمسة 🤩', sick: 'مريضة 🤒'
+const firebaseConfig = {
+  apiKey: "AIzaSyA5srAIJRXItE5uT9OKpRq0gHeEUeatDp0",
+  authDomain: "ayousha.firebaseapp.com",
+  databaseURL: "https://ayousha-default-rtdb.firebaseio.com",
+  projectId: "ayousha",
+  storageBucket: "ayousha.firebasestorage.app",
+  messagingSenderId: "68680035248",
+  appId: "1:68680035248:web:212c41987a40628969c475"
 };
 
-/* ============================================================
-   الحالة العامة
-   ============================================================ */
+const ICON_URL = 'https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png'; 
+const APP_START = Date.now();
+const LS = 'ayousha_v7_';
+
 let MY_ROLE = null;
 let db = null;
 let firebaseApp = null;
 let firebaseReady = false;
 let modalLocked = false;
 let audioCtx = null;
-let unreadBadge = 0;
+let allNotifs = [];
+let currentNotifTab = 'inbox';
 
 let config = {
   setupComplete: false,
@@ -325,134 +280,142 @@ function pad(n){return String(n).padStart(2,'0');}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
 function fmtDate(d){if(!d)return '';return new Date(d).toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'});}
 function fmtDateTime(d){if(!d)return '';const dt=new Date(d);return dt.toLocaleDateString('ar-EG',{day:'numeric',month:'short'})+' - '+pad(dt.getHours())+':'+pad(dt.getMinutes());}
-function timeUntil(d){const ms=new Date(d)-new Date();if(ms<=0)return 'جاهزة';const s=Math.floor(ms/1000);const days=Math.floor(s/86400);const hrs=Math.floor((s%86400)/3600);const mins=Math.floor((s%3600)/60);if(days>0)return `بعد ${days} يوم و${hrs} ساعة`;if(hrs>0)return `بعد ${hrs} ساعة و${mins} دقيقة`;return `بعد ${mins} دقيقة`;}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function getTodayKey(){return new Date().toISOString().slice(0,10);}
 function toLocalISO(date){const d=new Date(date);const off=d.getTimezoneOffset();return new Date(d.getTime()-off*60000).toISOString().slice(0,16);}
 function setSyncStatus(mode,text){const dot=document.getElementById('syncDot');const txt=document.getElementById('syncText');if(!dot||!txt)return;dot.className='sync-dot';if(mode==='offline')dot.classList.add('offline');if(mode==='local')dot.classList.add('local');txt.textContent=text;}
 function lsGet(k,d){try{const v=localStorage.getItem(LS+k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(LS+k,JSON.stringify(v));}catch(e){}}
-
 function senderName(by){if(!by)return '';return config[by]?.name||(by==='me'?'حبيبي':'عيوشة');}
-
-function itemTime(item){
-  if(!item)return 0;
-  const t = item.at || item.t;
-  return t ? new Date(t).getTime() : 0;
-}
-
-function shouldNotify(item){
-  if(!item)return false;
-  if(item.by === MY_ROLE)return false;
-  const t = itemTime(item);
-  if(!t)return false;
-  return t >= APP_START - NOTIF_GRACE_MS;
-}
 
 /* ============================================================
    🔔 الإشعارات
    ============================================================ */
-function initAudio(){
-  if(!audioCtx){ try{audioCtx = new (window.AudioContext || window.webkitAudioContext)();}catch(e){} }
-  if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume().catch(()=>{}); }
-}
+function initAudio(){ if(!audioCtx){ try{audioCtx = new (window.AudioContext || window.webkitAudioContext)();}catch(e){} } if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume().catch(()=>{}); } }
 document.addEventListener('click', initAudio, {once:false});
-document.addEventListener('touchstart', initAudio, {once:false});
 
-function playBeep(){
-  try{
-    initAudio(); if(!audioCtx)return;
-    const now = audioCtx.currentTime;
-    [880, 1100].forEach((freq, i) => {
-      const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-      osc.type = 'sine'; osc.frequency.value = freq;
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      gain.gain.setValueAtTime(0.0001, now + i * 0.15);
-      gain.gain.exponentialRampToValueAtTime(0.25, now + i * 0.15 + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.15 + 0.3);
-      osc.start(now + i * 0.15); osc.stop(now + i * 0.15 + 0.32);
-    });
-  }catch(e){}
-}
+function playBeep(){ try{ initAudio(); if(!audioCtx)return; const now = audioCtx.currentTime; [880, 1100].forEach((freq, i) => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.value = freq; osc.connect(gain); gain.connect(audioCtx.destination); gain.gain.setValueAtTime(0.0001, now + i * 0.15); gain.gain.exponentialRampToValueAtTime(0.25, now + i * 0.15 + 0.02); gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.15 + 0.3); osc.start(now + i * 0.15); osc.stop(now + i * 0.15 + 0.32); }); }catch(e){} }
 
-async function requestNotifPermission(){
-  if(!('Notification' in window))return false;
-  if(Notification.permission === 'granted')return true;
-  if(Notification.permission === 'denied')return false;
-  try{ const p = await Notification.requestPermission(); return p === 'granted'; }catch(e){return false;}
-}
+async function requestNotifPermission(){ if(!('Notification' in window))return false; if(Notification.permission === 'granted')return true; if(Notification.permission === 'denied')return false; try{ const p = await Notification.requestPermission(); return p === 'granted'; }catch(e){return false;} }
 
-function updateBadge(delta){
-  unreadBadge = Math.max(0, unreadBadge + delta);
-  if(navigator.setAppBadge){
-    if(unreadBadge > 0) navigator.setAppBadge(unreadBadge).catch(()=>{});
-    else if(navigator.clearAppBadge) navigator.clearAppBadge().catch(()=>{});
-  }
-  const sBtn = document.querySelector('.settings-btn');
-  if(sBtn) sBtn.classList.toggle('has-badge', unreadBadge > 0);
-}
-
-function showAppNotification(title, body, type){
+function showAppNotification(title, body){
   playBeep();
   if(navigator.vibrate)navigator.vibrate([200, 100, 200]);
-  updateBadge(1);
   toast('🔔 ' + title);
-  
   if(Notification.permission === 'granted'){
-    try{
-      const n = new Notification(title, {
-        body: body || '', icon: ICON_URL, badge: ICON_URL,
-        tag: 'ayousha-' + (type || 'general') + '-' + Date.now(),
-        silent: true
-      });
-      n.onclick = () => { try{window.focus();}catch(e){} n.close(); updateBadge(-unreadBadge); };
-      setTimeout(() => { try{n.close();}catch(e){} }, 10000);
-    }catch(e){ console.warn('Notification failed', e); }
+    try{ new Notification(title, { body: body || '', icon: ICON_URL, badge: ICON_URL, silent: true }); }catch(e){}
   }
 }
 
-document.addEventListener('visibilitychange', () => {
-  if(!document.hidden) updateBadge(-unreadBadge);
-});
+async function addNotification(title, body, type) {
+  if(!firebaseReady || !db) return;
+  const to = MY_ROLE === 'me' ? 'her' : 'me';
+  const notif = { from: MY_ROLE, to, title, body, type, at: new Date().toISOString(), read: false };
+  try {
+    await push(ref(db, 'app/notifications'), notif);
+    sendFCM(to, title, body);
+  } catch(e) { console.warn('addNotif err', e); }
+}
+
+// دالة إرسال FCM (التي تجعل الإشعار يصل والهاتف مقفل)
+async function sendFCM(toRole, title, body) {
+  const serverKey = config.serverKey;
+  const targetToken = config[toRole]?.fcmToken;
+  if(!serverKey || !targetToken || !serverKey.includes('AAAA')) return; 
+  try {
+    await fetch('https://fcm.googleapis.com/fcm/send', {
+      method: 'POST',
+      headers: { 'Authorization': 'key=' + serverKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: targetToken, notification: { title, body, icon: ICON_URL, sound: 'default' } })
+    });
+  } catch(e) { console.warn('FCM send err', e); }
+}
+
+function renderNotifs(tab) {
+  currentNotifTab = tab;
+  document.getElementById('tab-inbox').className = tab === 'inbox' ? 'btn btn-primary' : 'btn btn-soft';
+  document.getElementById('tab-inbox').style.flex = '1';
+  document.getElementById('tab-sent').className = tab === 'sent' ? 'btn btn-primary' : 'btn btn-soft';
+  document.getElementById('tab-sent').style.flex = '1';
+
+  const el = document.getElementById('notifList');
+  const items = allNotifs.filter(n => tab === 'inbox' ? n.to === MY_ROLE : n.from === MY_ROLE);
+
+  if(!items.length) {
+    el.innerHTML = `<div class="empty"><div class="e-icon">📭</div><p>لا توجد إشعارات ${tab === 'inbox' ? 'واردة' : 'مرسلة'}</p></div>`;
+    return;
+  }
+
+  el.innerHTML = items.map(n => {
+    const isUnread = tab === 'inbox' && !n.read;
+    let icon = '🔔';
+    if(n.type === 'mail') icon = '💌';
+    if(n.type === 'surprise') icon = '🎁';
+    if(n.type === 'memory') icon = '📸';
+    if(n.type === 'ping') icon = '💗';
+    if(n.type === 'mood') icon = '🌙';
+    if(n.type === 'answer') icon = '📝';
+
+    return `<div class="notif-item ${isUnread ? 'unread' : ''}">
+      <div class="notif-icon">${icon}</div>
+      <div class="notif-body">
+        <h4>${escapeHtml(n.title)} ${tab === 'sent' ? '(أرسلت)' : ''}</h4>
+        <p>${escapeHtml(n.body)}</p>
+        <div class="notif-time">${fmtDateTime(n.at)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateNotifBell() {
+  const unread = allNotifs.filter(n => n.to === MY_ROLE && !n.read).length;
+  const bell = document.getElementById('notifBell');
+  if(bell) bell.classList.toggle('has-badge', unread > 0);
+}
+
+async function markNotifsRead() {
+  if(!firebaseReady) return;
+  const unread = allNotifs.filter(n => n.to === MY_ROLE && !n.read);
+  for(const n of unread) {
+    try { await update(ref(db, 'app/notifications/' + n.id), { read: true }); } catch(e){}
+  }
+}
+
+window.switchNotifTab = function(tab) { renderNotifs(tab); if(tab === 'inbox') markNotifsRead(); };
 
 /* ============================================================
    Firebase Init
    ============================================================ */
-function initFirebase(url){
+function initFirebase(){
   try{
     if(firebaseApp){try{deleteApp(firebaseApp);}catch(e){}firebaseApp=null;db=null;}
-    if(!url)throw new Error('URL مفقود');
-    firebaseApp = initializeApp({databaseURL:url});
+    firebaseApp = initializeApp(firebaseConfig);
     db = getDatabase(firebaseApp);
     firebaseReady = true; return true;
   }catch(e){ console.error('Firebase init', e); firebaseReady = false; db = null; return false; }
 }
 
 /* ============================================================
-   شاشات ملء الشاشة
+   شاشات ملء الشاشة والإعداد
    ============================================================ */
 function showFullScreen(html){document.getElementById('fullScreen').innerHTML=`<div class="full-screen-msg">${html}</div>`;}
 function hideFullScreen(){document.getElementById('fullScreen').innerHTML='';}
+function showWaitingScreen(){ showFullScreen(`<div class="box"><div style="font-size:3rem;margin-bottom:12px">⏳</div><h2>جاري تجهيز التطبيق</h2><p>زوجكِ لم يكمل إعداد التطبيق بعد. سيُفتح تلقائياً بمجرد أن ينهي.</p><div class="spinner"></div><button class="btn btn-soft btn-full" onclick="location.reload()">🔄 إعادة المحاولة</button></div>`); }
 
-function showWaitingScreen(){
-  showFullScreen(`<div class="box"><div style="font-size:3rem;margin-bottom:12px">⏳</div><h2>جاري تجهيز التطبيق</h2><p>زوجكِ لم يكمل إعداد التطبيق بعد. سيُفتح تلقائياً بمجرد أن ينهي.</p><div class="spinner"></div><button class="btn btn-soft btn-full" onclick="location.reload()">🔄 إعادة المحاولة</button></div>`);
-}
-
-/* ============================================================
-   معالج الإعداد (للمالك فقط)
-   ============================================================ */
 function showSetupWizard(){
   modalLocked = true;
   openModal(`
     <h3>⚙️ إعداد التطبيق (مرة واحدة)</h3>
     <div class="info-box"><b>👋 أهلاً!</b> هذا الإعداد يتم مرة واحدة فقط من هاتفك. عيوشة لن تحتاج لأي إعداد — فقط تفتح رابطها.</div>
-    <label>اسمك</label>
-    <input id="wizMe" value="${escapeHtml(config.me.name || 'حبيبي')}">
-    <label>اسمها</label>
-    <input id="wizHer" value="${escapeHtml(config.her.name || 'عيوشة')}">
-    <label>يوم اللقاء (اختياري)</label>
-    <input type="datetime-local" id="wizMeet" value="${state.meetupDate ? toLocalISO(new Date(state.meetupDate)) : ''}">
-    <div class="info-box">🔔 سيُطلب منك تفعيل الإشعارات بعد الحفظ — ضروري لعمل التطبيق بكامل قوته.</div>
+    <label>اسمك</label><input id="wizMe" value="${escapeHtml(config.me.name || 'حبيبي')}">
+    <label>اسمها</label><input id="wizHer" value="${escapeHtml(config.her.name || 'عيوشة')}">
+    <label>يوم اللقاء (اختياري)</label><input type="datetime-local" id="wizMeet" value="${state.meetupDate ? toLocalISO(new Date(state.meetupDate)) : ''}">
+    
+    <h4>🔔 إعدادات FCM (لتصلك الإشعارات والهاتف مقفل)</h4>
+    <small class="help" style="margin-bottom:8px; display:block">ضع المفاتيح التي حصلت عليها من Firebase.</small>
+    <label>Server Key (مفتاح الخادم)</label><input id="wizFcmKey" placeholder="AAAA..." value="${escapeHtml(config.serverKey || '')}">
+    <label>VAPID Key (مفتاح الويب)</label><input id="wizVapidKey" placeholder="B..." value="${escapeHtml(config.vapidKey || '')}">
+
     <div class="modal-actions"><button class="btn btn-primary btn-full" onclick="saveWizard()">💾 حفظ ومتابعة</button></div>
   `);
 }
@@ -461,27 +424,31 @@ window.saveWizard = async function(){
   const meName = document.getElementById('wizMe').value.trim() || 'حبيبي';
   const herName = document.getElementById('wizHer').value.trim() || 'عيوشة';
   const meet = document.getElementById('wizMeet').value;
+  const fcmKey = document.getElementById('wizFcmKey').value.trim();
+  const vapidKey = document.getElementById('wizVapidKey').value.trim();
+  
   if(!firebaseReady){toast('⚠️ لا يوجد اتصال بقاعدة البيانات');return;}
-  config.me = { name: meName };
-  config.her = { name: herName };
+  config.me.name = meName; config.her.name = herName;
+  config.serverKey = fcmKey; config.vapidKey = vapidKey;
   config.setupComplete = true;
   state.settings = { wifeName: herName, myName: meName };
   state.meetupDate = meet ? new Date(meet).toISOString() : '';
-  lsSet('config', { me: config.me, her: config.her });
-  lsSet('settings', state.settings);
-  lsSet('meetupDate', state.meetupDate);
-  localStorage.setItem('ayousha_role', 'me');
-  MY_ROLE = 'me';
+  
+  lsSet('config', config); lsSet('settings', state.settings); lsSet('meetupDate', state.meetupDate);
+  localStorage.setItem('ayousha_role', 'me'); MY_ROLE = 'me';
+  
   try{
     await set(ref(db, 'config/me'), config.me);
     await set(ref(db, 'config/her'), config.her);
+    await set(ref(db, 'config/serverKey'), config.serverKey);
+    await set(ref(db, 'config/vapidKey'), config.vapidKey);
     await set(ref(db, 'config/setupComplete'), true);
     await set(ref(db, 'app/settings'), state.settings);
     await set(ref(db, 'app/meetupDate'), state.meetupDate);
-  }catch(e){
-    console.error(e); toast('⚠️ فشل الحفظ — تحقق من قواعد Firebase'); return;
-  }
+  }catch(e){ console.error(e); toast('⚠️ فشل الحفظ'); return; }
+  
   await requestNotifPermission();
+  if(typeof initFCM === 'function') initFCM(); 
   closeModal(); modalLocked = false;
   showSuccessScreen();
 };
@@ -497,97 +464,79 @@ function showSuccessScreen(){
     <h4>📱 رابط عيوشة (أرسله لها)</h4>
     <div class="link-box" id="herLinkBox">${escapeHtml(herLink)}</div>
     <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="copyLink('herLinkBox')">📋 نسخ الرابط</button></div>
-    <h4>💾 رابطك أيضاً</h4>
-    <div class="link-box" id="myLinkBox">${escapeHtml(myLink)}</div>
-    <div class="modal-actions"><button class="btn btn-soft btn-full" onclick="copyLink('myLinkBox')">📋 نسخ</button></div>
-    <small class="help">💡 قم بتثبيت التطبيق على الشاشة الرئيسية من قائمة المتصفح.</small>
     <div class="modal-actions" style="margin-top:20px"><button class="btn btn-primary btn-full" onclick="finishSetup()">✅ بدء الاستخدام</button></div>
   `);
 }
-
-window.copyLink = function(id){
-  const text = document.getElementById(id).textContent;
-  navigator.clipboard.writeText(text).then(()=>toast('📋 تم النسخ')).catch(()=>toast('⚠️ فشل النسخ'));
-};
+window.copyLink = function(id){ const text = document.getElementById(id).textContent; navigator.clipboard.writeText(text).then(()=>toast('📋 تم النسخ')).catch(()=>toast('⚠️ فشل النسخ')); };
 window.finishSetup = function(){ closeModal(); modalLocked = false; hideFullScreen(); boot(); };
 
-/* ============================================================
-   تحميل الإعدادات من Firebase
-   ============================================================ */
 async function loadConfigFromFirebase(){
   try{
-    const [meSnap, herSnap, setupSnap] = await Promise.all([
-      get(ref(db, 'config/me')), get(ref(db, 'config/her')), get(ref(db, 'config/setupComplete'))
+    const [meSnap, herSnap, setupSnap, keySnap, vapidSnap] = await Promise.all([
+      get(ref(db, 'config/me')), get(ref(db, 'config/her')), get(ref(db, 'config/setupComplete')),
+      get(ref(db, 'config/serverKey')), get(ref(db, 'config/vapidKey'))
     ]);
-    if(meSnap.val()) config.me = meSnap.val();
-    if(herSnap.val()) config.her = herSnap.val();
+    if(meSnap.val()) config.me = { ...config.me, ...meSnap.val() };
+    if(herSnap.val()) config.her = { ...config.her, ...herSnap.val() };
+    if(keySnap.val()) config.serverKey = keySnap.val();
+    if(vapidSnap.val()) config.vapidKey = vapidSnap.val();
     config.setupComplete = !!setupSnap.val();
-    lsSet('config', { me: config.me, her: config.her });
+    lsSet('config', config);
     return config.setupComplete;
   }catch(e){console.warn('Config load', e);return false;}
 }
+async function isSetupComplete(){ try{ const snap = await get(ref(db, 'config/setupComplete')); return !!snap.val(); }catch(e){return false;} }
 
-async function isSetupComplete(){
-  try{ const snap = await get(ref(db, 'config/setupComplete')); return !!snap.val(); }catch(e){return false;}
+/* ============================================================
+   FCM Setup
+   ============================================================ */
+async function initFCM(){
+  if(!config.vapidKey) {
+    console.log("لا يوجد VAPID Key، لن يتم تفعيل الإشعارات الخلفية.");
+    return;
+  }
+  try {
+    const { getMessaging, getToken, onMessage } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js");
+    const messaging = getMessaging(firebaseApp);
+    
+    // طلب الإذن أولاً
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+
+    const token = await getToken(messaging, { vapidKey: config.vapidKey });
+    if(token) {
+      await set(ref(db, `config/${MY_ROLE}/fcmToken`), token);
+      console.log('✅ FCM Token saved:', token);
+    }
+    onMessage(messaging, (payload) => {
+      showAppNotification(payload.notification.title, payload.notification.body);
+    });
+  } catch(e) { console.warn('FCM Init error:', e); }
 }
 
 /* ============================================================
-   🔄 مزامنة Firebase + الإشعارات
+   🔄 مزامنة Firebase
    ============================================================ */
 function startSync(){
   if(!firebaseReady || !db)return;
 
+  onValue(ref(db, 'app/notifications'), s => {
+    const v = s.val();
+    allNotifs = v ? Object.entries(v).map(([id,item])=>({id, ...item})).sort((a,b)=>new Date(b.at)-new Date(a.at)) : [];
+    updateNotifBell();
+    if(document.getElementById('view-notifications').classList.contains('active')) {
+      renderNotifs(currentNotifTab);
+    }
+  });
+
   onValue(ref(db, 'app/meetupDate'), s => { state.meetupDate = s.val() || ''; updateCountdown(); });
   onValue(ref(db, 'app/settings'), s => { if(s.val()) state.settings = s.val(); updateGreet(); });
   onValue(ref(db, 'app/answers'), s => { state.answers = s.val() || {}; renderDaily(); });
-  onValue(ref(db, 'app/surprises'), s => {
-    const v = s.val(); state.surprises = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : [];
-    renderSurprises(); checkReadyItems();
-  });
-  onValue(ref(db, 'app/mails'), s => {
-    const v = s.val(); state.mails = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : [];
-    renderMails();
-  });
-  onValue(ref(db, 'app/memories'), s => {
-    const v = s.val(); state.memories = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : [];
-    renderMemories();
-  });
+  onValue(ref(db, 'app/surprises'), s => { const v = s.val(); state.surprises = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderSurprises(); checkReadyItems(); });
+  onValue(ref(db, 'app/mails'), s => { const v = s.val(); state.mails = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMails(); });
+  onValue(ref(db, 'app/memories'), s => { const v = s.val(); state.memories = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMemories(); });
   onValue(ref(db, 'app/moods'), s => { state.moods = s.val() || {}; renderMood(); });
-  onValue(ref(db, 'app/pings'), s => {
-    const v = s.val(); state.pings = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : [];
-    renderPings();
-  });
-
-  onChildAdded(ref(db, 'app/mails'), s => {
-    const m = s.val(); if(!shouldNotify(m))return;
-    showAppNotification('💌 رسالة جديدة من ' + senderName(m.by), m.text.slice(0, 120), 'mail');
-  });
-  onChildAdded(ref(db, 'app/surprises'), s => {
-    const sp = s.val(); if(!shouldNotify(sp))return;
-    showAppNotification('🎁 مفاجأة جديدة من ' + senderName(sp.by), sp.text.slice(0, 120), 'surprise');
-  });
-  onChildAdded(ref(db, 'app/memories'), s => {
-    const m = s.val(); if(!shouldNotify(m))return;
-    showAppNotification('📸 ذكرى جديدة من ' + senderName(m.by), m.text ? m.text.slice(0, 120) : 'صورة جديدة', 'memory');
-  });
-  onChildAdded(ref(db, 'app/pings'), s => {
-    const p = s.val(); if(!shouldNotify(p))return;
-    showAppNotification('💗 ' + senderName(p.by) + ' يفكر فيك الآن', 'افتح التطبيق وشاركيه الحب', 'ping');
-  });
-  onChildAdded(ref(db, 'app/moods'), s => {
-    const m = s.val(); if(!m || !m.at)return;
-    if(m.by === MY_ROLE)return;
-    if(new Date(m.at).getTime() < APP_START - NOTIF_GRACE_MS)return;
-    const label = MOOD_LABELS[m.mood] || m.mood || 'مزاج جديد';
-    showAppNotification('🌙 مزاج جديد', senderName(m.by) + ': ' + label, 'mood');
-  });
-  onChildAdded(ref(db, 'app/answers'), s => {
-    const a = s.val(); if(!a || !a.by)return;
-    if(a.by === MY_ROLE)return;
-    const t = a.t ? new Date(a.t).getTime() : 0;
-    if(!t || t < APP_START - NOTIF_GRACE_MS)return;
-    showAppNotification('📝 سؤال اليوم', senderName(a.by) + ' أجاب: ' + (a.a || '').slice(0, 80), 'answer');
-  });
+  onValue(ref(db, 'app/pings'), s => { const v = s.val(); state.pings = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderPings(); });
 
   setSyncStatus('online', 'متصل — الإشعارات تعمل');
 }
@@ -600,55 +549,21 @@ function switchView(name){
   document.getElementById('view-'+name).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view === name));
   window.scrollTo({top:0, behavior:'smooth'});
+  if(name === 'notifications') { renderNotifs('inbox'); markNotifsRead(); }
 }
 window.switchView = switchView;
 
 function openModal(html){document.getElementById('modalContent').innerHTML = html;document.getElementById('modalBg').classList.add('show');}
 function closeModal(){if(modalLocked)return;document.getElementById('modalBg').classList.remove('show');}
-window.openModal = openModal;
-window.closeModal = closeModal;
+window.openModal = openModal; window.closeModal = closeModal;
 
-function updateGreet(){
-  const h = new Date().getHours(); const name = state.settings.wifeName || 'عيوشة'; let title, sub;
-  if(h>=5 && h<12){title = `صباح الخير يا ${name} ☀️`; sub = 'أول شيء فكرت فيه اليوم… أنتِ.';}
-  else if(h>=12 && h<17){title = `نهارك سعيد يا ${name} 🌸`; sub = 'أتمنى تكوني أكلتِ شي حلو اليوم.';}
-  else if(h>=17 && h<22){title = `مساء الحب يا ${name} 🌙`; sub = 'الليل يحلى بسوالفك.';}
-  else{title = `سهران معك يا ${name} ✨`; sub = 'لو ما نمتِ، أنا صاحي في قلبي.';}
-  document.getElementById('greetTitle').textContent = title;
-  document.getElementById('greetSub').textContent = sub;
-}
+function updateGreet(){ const h = new Date().getHours(); const name = state.settings.wifeName || 'عيوشة'; let title, sub; if(h>=5 && h<12){title = `صباح الخير يا ${name} ☀️`; sub = 'أول شيء فكرت فيه اليوم… أنتِ.';} else if(h>=12 && h<17){title = `نهارك سعيد يا ${name} 🌸`; sub = 'أتمنى تكوني أكلتِ شي حلو اليوم.';} else if(h>=17 && h<22){title = `مساء الحب يا ${name} 🌙`; sub = 'الليل يحلى بسوالفك.';} else{title = `سهران معك يا ${name} ✨`; sub = 'لو ما نمتِ، أنا صاحي في قلبي.';} document.getElementById('greetTitle').textContent = title; document.getElementById('greetSub').textContent = sub; }
+function updateCountdown(){ const el = document.getElementById('countdown'); if(!state.meetupDate){ el.innerHTML = '<div style="grid-column:1/-1;text-align:center;opacity:.8;font-size:.85rem">اضغطي ⚙️ لتحديد يوم اللقاء</div>'; return; } const diff = new Date(state.meetupDate) - new Date(); if(diff <= 0){ el.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:1rem;font-weight:700">🎉 وصلنا! اليوم نلتقي</div>'; return; } const d = Math.floor(diff/86400000); const hh = Math.floor((diff%86400000)/3600000); const mm = Math.floor((diff%3600000)/60000); const ss = Math.floor((diff%60000)/1000); el.innerHTML = `<div class="cd-cell"><b>${d}</b><small>يوم</small></div><div class="cd-cell"><b>${pad(hh)}</b><small>ساعة</small></div><div class="cd-cell"><b>${pad(mm)}</b><small>دقيقة</small></div><div class="cd-cell"><b>${pad(ss)}</b><small>ثانية</small></div>`; }
 
-function updateCountdown(){
-  const el = document.getElementById('countdown');
-  if(!state.meetupDate){
-    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;opacity:.8;font-size:.85rem">اضغطي ⚙️ لتحديد يوم اللقاء</div>'; return;
-  }
-  const diff = new Date(state.meetupDate) - new Date();
-  if(diff <= 0){
-    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:1rem;font-weight:700">🎉 وصلنا! اليوم نلتقي</div>'; return;
-  }
-  const d = Math.floor(diff/86400000); const hh = Math.floor((diff%86400000)/3600000);
-  const mm = Math.floor((diff%3600000)/60000); const ss = Math.floor((diff%60000)/1000);
-  el.innerHTML = `
-    <div class="cd-cell"><b>${d}</b><small>يوم</small></div>
-    <div class="cd-cell"><b>${pad(hh)}</b><small>ساعة</small></div>
-    <div class="cd-cell"><b>${pad(mm)}</b><small>دقيقة</small></div>
-    <div class="cd-cell"><b>${pad(ss)}</b><small>ثانية</small></div>`;
-}
-
-/* ============================================================
-   سؤال اليوم
-   ============================================================ */
+/* سؤال اليوم */
 const DEFAULT_QUESTIONS = ["لو عندك يوم كامل فاضي، شو أول شي تعمليه؟","شو أحلى شي صار معك هذا الأسبوع؟","إيش الشي اللي لو سمعتيه مني اليوم يفرحك؟","لو نسافر بكرة، وين نروح؟","شو أكثر شي يضحكك لما تتذكريه؟","لو كان عندك قوة خارقة وحدة، شو تختاري؟","شو أكلة نفسك فيها اليوم؟","إيش الشي اللي تحبي فينا كأزواج؟","شو أغنية تعبر عن حالتك اليوم؟","أحلى هدية تلقيتيها مني؟","شو نفسك نعمل أول ما نشوف بعض؟","شو أكثر لحظة حسيتي فيها إني أحبك؟","شو حلمك الصغير لهذا الشهر؟","شو أكثر شي يريحك لما تسمعيه مني؟","لو تختاري مكان نعيش فيه، وين يكون؟","شو الشي اللي دايمًا يخليك تبتسمي؟"];
 function getDailyQuestion(){const key = getTodayKey(); if(state.answers[key]?.q)return state.answers[key].q; const idx = Math.floor(new Date().setHours(0,0,0,0) / 86400000); return DEFAULT_QUESTIONS[idx % DEFAULT_QUESTIONS.length];}
-function renderDaily(){
-  const key = getTodayKey(); const q = getDailyQuestion(); document.getElementById('dailyQ').textContent = q;
-  const ta = document.getElementById('dailyAnswer'); const a = state.answers[key];
-  if(document.activeElement !== ta)ta.value = a?.a || '';
-  const saved = document.getElementById('answerSaved');
-  if(a?.a)saved.innerHTML = `<div class="answer-saved">💚 محفوظ — ${fmtDateTime(a.t)}${a.by ? ' — ' + senderName(a.by) : ''}</div>`;
-  else saved.innerHTML = '';
-}
+function renderDaily(){ const key = getTodayKey(); const q = getDailyQuestion(); document.getElementById('dailyQ').textContent = q; const ta = document.getElementById('dailyAnswer'); const a = state.answers[key]; if(document.activeElement !== ta)ta.value = a?.a || ''; const saved = document.getElementById('answerSaved'); if(a?.a)saved.innerHTML = `<div class="answer-saved">💚 محفوظ — ${fmtDateTime(a.t)}${a.by ? ' — ' + senderName(a.by) : ''}</div>`; else saved.innerHTML = ''; }
 let dailyTimer = null;
 document.addEventListener('input', e => {
   if(e.target.id === 'dailyAnswer'){
@@ -657,172 +572,65 @@ document.addEventListener('input', e => {
       const key = getTodayKey(); const payload = { q: getDailyQuestion(), a: e.target.value, t: new Date().toISOString(), by: MY_ROLE };
       state.answers[key] = payload;
       if(firebaseReady && db){ try{await set(ref(db, 'app/answers/'+key), payload);}catch(err){} }
+      if(e.target.value.trim()) addNotification('إجابة سؤال اليوم', e.target.value.slice(0,80), 'answer');
       document.getElementById('answerSaved').innerHTML = e.target.value.trim() ? '<div class="answer-saved">💚 ينحفظ تلقائياً</div>' : '';
-    }, 800);
+    }, 1000);
   }
 });
 
-/* ============================================================
-   Ping
-   ============================================================ */
-async function sendPing(){
-  const ping = { at: new Date().toISOString(), by: MY_ROLE };
-  state.pings.unshift({id:uid(), ...ping}); renderPings();
-  if(firebaseReady && db){ try{await push(ref(db, 'app/pings'), ping);}catch(e){} }
-  toast('💗 وصل حبك'); burstHearts();
-}
+/* Ping */
+async function sendPing(){ const ping = { at: new Date().toISOString(), by: MY_ROLE }; state.pings.unshift({id:uid(), ...ping}); renderPings(); if(firebaseReady && db){ try{await push(ref(db, 'app/pings'), ping);}catch(e){} } addNotification('أنا أفكر فيك', 'اضغطي لتعرفي المزيد 💗', 'ping'); toast('💗 وصل حبك'); burstHearts(); }
 window.sendPing = sendPing;
-function renderPings(){
-  const el = document.getElementById('pingLog');
-  if(!state.pings.length){el.textContent = 'لسا ما أرسلتِ ولا مرة 💭'; return;}
-  const sorted = [...state.pings].sort((a,b)=>new Date(b.at)-new Date(a.at));
-  const last = sorted[0]; const byName = last.by ? ` (${senderName(last.by)})` : '';
-  el.innerHTML = `💗 آخر مرة: ${fmtDateTime(last.at)}${byName} — المجموع: <b>${state.pings.length}</b> مرة`;
-}
-function burstHearts(){
-  for(let i=0;i<12;i++){
-    const h = document.createElement('div'); h.textContent = ['💗','💖','🌸','✨','💕'][i%5];
-    h.style.cssText = `position:fixed;left:${50+(Math.random()-0.5)*40}%;bottom:200px;font-size:${1+Math.random()*1.5}rem;pointer-events:none;z-index:999;transition:all 1.5s ease;opacity:1;`;
-    document.body.appendChild(h);
-    requestAnimationFrame(()=>{ h.style.transform = `translate(${(Math.random()-0.5)*200}px, -${200+Math.random()*200}px) rotate(${(Math.random()-0.5)*60}deg)`; h.style.opacity = '0'; });
-    setTimeout(()=>h.remove(), 1600);
-  }
-}
+function renderPings(){ const el = document.getElementById('pingLog'); if(!state.pings.length){el.textContent = 'لسا ما أرسلتِ ولا مرة 💭'; return;} const sorted = [...state.pings].sort((a,b)=>new Date(b.at)-new Date(a.at)); const last = sorted[0]; const byName = last.by ? ` (${senderName(last.by)})` : ''; el.innerHTML = `💗 آخر مرة: ${fmtDateTime(last.at)}${byName} — المجموع: <b>${state.pings.length}</b> مرة`; }
+function burstHearts(){ for(let i=0;i<12;i++){ const h = document.createElement('div'); h.textContent = ['💗','💖','🌸','✨','💕'][i%5]; h.style.cssText = `position:fixed;left:${50+(Math.random()-0.5)*40}%;bottom:200px;font-size:${1+Math.random()*1.5}rem;pointer-events:none;z-index:999;transition:all 1.5s ease;opacity:1;`; document.body.appendChild(h); requestAnimationFrame(()=>{ h.style.transform = `translate(${(Math.random()-0.5)*200}px, -${200+Math.random()*200}px) rotate(${(Math.random()-0.5)*60}deg)`; h.style.opacity = '0'; }); setTimeout(()=>h.remove(), 1600); } }
 
-/* ============================================================
-   المفاجآت
-   ============================================================ */
-function openAddSurprise(){
-  openModal(`<h3>🎁 مفاجأة جديدة</h3><label>نص المفاجأة</label><textarea id="spText" placeholder="اكتبي رسالة، ذكرى، وعد..."></textarea><label>تفتح في</label><input type="datetime-local" id="spTime"><small class="help">🔔 سيصل إشعار فوري للطرف الآخر في التطبيق.</small><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveSurprise()">حفظ</button></div>`);
-  const dt = new Date(Date.now()+3600000); dt.setMinutes(0,0,0); document.getElementById('spTime').value = toLocalISO(dt);
-}
+/* المفاجآت */
+function openAddSurprise(){ openModal(`<h3>🎁 مفاجأة جديدة</h3><label>نص المفاجأة</label><textarea id="spText" placeholder="اكتبي رسالة، ذكرى، وعد..."></textarea><label>تفتح في</label><input type="datetime-local" id="spTime"><small class="help">🔔 سيصل إشعار فوري للطرف الآخر في التطبيق.</small><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveSurprise()">حفظ</button></div>`); const dt = new Date(Date.now()+3600000); dt.setMinutes(0,0,0); document.getElementById('spTime').value = toLocalISO(dt); }
 window.openAddSurprise = openAddSurprise;
-async function saveSurprise(){
-  const text = document.getElementById('spText').value.trim(); const time = document.getElementById('spTime').value;
-  if(!text || !time){toast('املئي الحقول'); return;}
-  const item = { text, at: new Date(time).toISOString(), opened: false, by: MY_ROLE };
-  if(firebaseReady && db){ try{await push(ref(db, 'app/surprises'), item);}catch(e){} } else { state.surprises.push({id:uid(), ...item}); }
-  renderSurprises(); closeModal(); toast('🎁 مفاجأة محفوظة');
-}
+async function saveSurprise(){ const text = document.getElementById('spText').value.trim(); const time = document.getElementById('spTime').value; if(!text || !time){toast('املئي الحقول'); return;} const item = { text, at: new Date(time).toISOString(), opened: false, by: MY_ROLE }; if(firebaseReady && db){ try{await push(ref(db, 'app/surprises'), item);}catch(e){} } renderSurprises(); closeModal(); addNotification('مفاجأة جديدة', text, 'surprise'); toast('🎁 مفاجأة محفوظة'); }
 window.saveSurprise = saveSurprise;
-function renderSurprises(){
-  const el = document.getElementById('surpriseList'); const items = [...state.surprises].sort((a,b)=>new Date(a.at)-new Date(b.at));
-  if(!items.length){el.innerHTML = `<div class="empty"><div class="e-icon">🎁</div><p>ما في مفاجآت بعد</p></div>`; return;}
-  el.innerHTML = items.map(s => {
-    const ready = new Date(s.at) <= new Date(); const byLabel = s.by ? `<div class="surprise-sender">من: ${senderName(s.by)}</div>` : '';
-    return `<div class="surprise-item ${ready?'unlocked':'locked'}"><div class="surprise-icon">${ready?'✅':'🔒'}</div><div class="surprise-body"><p>${ready ? escapeHtml(s.text) : '🔒 مفاجأة مقفلة — '+timeUntil(s.at)}</p><div class="surprise-time">⏰ ${fmtDateTime(s.at)}</div>${byLabel}<span class="badge ${ready?'badge-ready':'badge-locked'}">${ready?'جاهزة':'مقفلة'}</span></div><button onclick="deleteSurprise('${s.id}')" style="color:#c62828;font-size:1.2rem;padding:4px">✕</button></div>`;
-  }).join('');
-}
-async function deleteSurprise(id){
-  if(!confirm('حذف المفاجأة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/surprises/'+id));}catch(e){} }
-  state.surprises = state.surprises.filter(s => s.id !== id); renderSurprises();
-}
+function renderSurprises(){ const el = document.getElementById('surpriseList'); const items = [...state.surprises].sort((a,b)=>new Date(a.at)-new Date(b.at)); if(!items.length){el.innerHTML = `<div class="empty"><div class="e-icon">🎁</div><p>ما في مفاجآت بعد</p></div>`; return;} el.innerHTML = items.map(s => { const ready = new Date(s.at) <= new Date(); const byLabel = s.by ? `<div class="surprise-sender">من: ${senderName(s.by)}</div>` : ''; return `<div class="surprise-item ${ready?'unlocked':'locked'}"><div class="surprise-icon">${ready?'✅':'🔒'}</div><div class="surprise-body"><p>${ready ? escapeHtml(s.text) : '🔒 مفاجأة مقفلة — '+timeUntil(s.at)}</p><div class="surprise-time">⏰ ${fmtDateTime(s.at)}</div>${byLabel}<span class="badge ${ready?'badge-ready':'badge-locked'}">${ready?'جاهزة':'مقفلة'}</span></div><button onclick="deleteSurprise('${s.id}')" style="color:#c62828;font-size:1.2rem;padding:4px">✕</button></div>`; }).join(''); }
+async function deleteSurprise(id){ if(!confirm('حذف المفاجأة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/surprises/'+id));}catch(e){} } state.surprises = state.surprises.filter(s => s.id !== id); renderSurprises(); }
 window.deleteSurprise = deleteSurprise;
 
-/* ============================================================
-   البريد
-   ============================================================ */
-function openComposeMail(){
-  openModal(`<h3>💌 رسالة حنين</h3><label>إلى</label><input value="${escapeHtml(MY_ROLE==='me' ? state.settings.wifeName : state.settings.myName)}" readonly><label>نص الرسالة</label><textarea id="mailText" placeholder="اكتبي من قلبك..." style="min-height:120px"></textarea><label>توصل في</label><input type="datetime-local" id="mailTime"><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMail()">إرسال</button></div>`);
-  document.getElementById('mailTime').value = toLocalISO(new Date(Date.now()+86400000));
-}
+/* البريد */
+function openComposeMail(){ openModal(`<h3>💌 رسالة حنين</h3><label>إلى</label><input value="${escapeHtml(MY_ROLE==='me' ? state.settings.wifeName : state.settings.myName)}" readonly><label>نص الرسالة</label><textarea id="mailText" placeholder="اكتبي من قلبك..." style="min-height:120px"></textarea><label>توصل في</label><input type="datetime-local" id="mailTime"><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMail()">إرسال</button></div>`); document.getElementById('mailTime').value = toLocalISO(new Date(Date.now()+86400000)); }
 window.openComposeMail = openComposeMail;
-async function saveMail(){
-  const text = document.getElementById('mailText').value.trim(); const time = document.getElementById('mailTime').value;
-  if(!text || !time){toast('املئي الحقول'); return;}
-  const item = { text, at: new Date(time).toISOString(), read: false, by: MY_ROLE };
-  if(firebaseReady && db){ try{await push(ref(db, 'app/mails'), item);}catch(e){} } else { state.mails.push({id:uid(), ...item}); }
-  renderMails(); closeModal(); toast('💌 رسالتك في الطريق');
-}
+async function saveMail(){ const text = document.getElementById('mailText').value.trim(); const time = document.getElementById('mailTime').value; if(!text || !time){toast('املئي الحقول'); return;} const item = { text, at: new Date(time).toISOString(), read: false, by: MY_ROLE }; if(firebaseReady && db){ try{await push(ref(db, 'app/mails'), item);}catch(e){} } renderMails(); closeModal(); addNotification('رسالة حنين', text, 'mail'); toast('💌 رسالتك في الطريق'); }
 window.saveMail = saveMail;
-function renderMails(){
-  const el = document.getElementById('mailList'); const items = [...state.mails].sort((a,b)=>new Date(b.at)-new Date(a.at));
-  if(!items.length){el.innerHTML = `<div class="empty"><div class="e-icon">💌</div><p>ما في رسائل بعد</p></div>`; return;}
-  el.innerHTML = items.map(m => {
-    const delivered = new Date(m.at) <= new Date();
-    return `<div class="mail-item ${delivered?'delivered':'pending'}"><h4>${delivered?'📬 وصلت':'⏳ في الطريق'}${m.by?' — من '+senderName(m.by):''}</h4><p>${delivered ? escapeHtml(m.text) : 'رسالة ستصل '+timeUntil(m.at)}</p><div class="mail-meta"><span>⏰ ${fmtDateTime(m.at)}</span><button onclick="deleteMail('${m.id}')" style="color:#c62828;font-size:.8rem">حذف</button></div></div>`;
-  }).join('');
-}
-async function deleteMail(id){
-  if(!confirm('حذف الرسالة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/mails/'+id));}catch(e){} }
-  state.mails = state.mails.filter(m => m.id !== id); renderMails();
-}
+function renderMails(){ const el = document.getElementById('mailList'); const items = [...state.mails].sort((a,b)=>new Date(b.at)-new Date(a.at)); if(!items.length){el.innerHTML = `<div class="empty"><div class="e-icon">💌</div><p>ما في رسائل بعد</p></div>`; return;} el.innerHTML = items.map(m => { const delivered = new Date(m.at) <= new Date(); return `<div class="mail-item ${delivered?'delivered':'pending'}"><h4>${delivered?'📬 وصلت':'⏳ في الطريق'}${m.by?' — من '+senderName(m.by):''}</h4><p>${delivered ? escapeHtml(m.text) : 'رسالة ستصل '+timeUntil(m.at)}</p><div class="mail-meta"><span>⏰ ${fmtDateTime(m.at)}</span><button onclick="deleteMail('${m.id}')" style="color:#c62828;font-size:.8rem">حذف</button></div></div>`; }).join(''); }
+async function deleteMail(id){ if(!confirm('حذف الرسالة؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/mails/'+id));}catch(e){} } state.mails = state.mails.filter(m => m.id !== id); renderMails(); }
 window.deleteMail = deleteMail;
 
-/* ============================================================
-   الذكريات
-   ============================================================ */
+/* الذكريات */
 let tempPhoto = null;
-function addMemory(type){
-  if(type === 'text'){
-    openModal(`<h3>📝 ذكرى نصية</h3><label>العنوان</label><input id="memTitle"><label>الذكرى</label><textarea id="memText"></textarea><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('text')">حفظ</button></div>`);
-  } else {
-    tempPhoto = null;
-    openModal(`<h3>📷 ذكرى صورة</h3><label>العنوان</label><input id="memTitle"><label>اختاري صورة</label><input type="file" id="memFile" accept="image/*" onchange="previewPhoto(event)"><div id="photoPreview" style="margin-top:10px"></div><small class="help">⚠️ اختر صورة أقل من 500KB.</small><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('photo')">حفظ</button></div>`);
-  }
-}
+function addMemory(type){ if(type === 'text'){ openModal(`<h3>📝 ذكرى نصية</h3><label>العنوان</label><input id="memTitle"><label>الذكرى</label><textarea id="memText"></textarea><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('text')">حفظ</button></div>`); } else { tempPhoto = null; openModal(`<h3>📷 ذكرى صورة</h3><label>العنوان</label><input id="memTitle"><label>اختاري صورة</label><input type="file" id="memFile" accept="image/*" onchange="previewPhoto(event)"><div id="photoPreview" style="margin-top:10px"></div><small class="help">⚠️ اختر صورة أقل من 500KB.</small><div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">إلغاء</button><button class="btn btn-primary" onclick="saveMemory('photo')">حفظ</button></div>`); } }
 window.addMemory = addMemory;
-function previewPhoto(e){
-  const f = e.target.files[0]; if(!f)return;
-  if(f.size > 800000){toast('الصورة كبيرة — اختر أصغر من 800KB'); return;}
-  const r = new FileReader();
-  r.onload = ev => { tempPhoto = ev.target.result; document.getElementById('photoPreview').innerHTML = `<img src="${tempPhoto}" style="width:100%;border-radius:12px;max-height:240px;object-fit:cover">`; };
-  r.readAsDataURL(f);
-}
+function previewPhoto(e){ const f = e.target.files[0]; if(!f)return; if(f.size > 800000){toast('الصورة كبيرة — اختر أصغر من 800KB'); return;} const r = new FileReader(); r.onload = ev => { tempPhoto = ev.target.result; document.getElementById('photoPreview').innerHTML = `<img src="${tempPhoto}" style="width:100%;border-radius:12px;max-height:240px;object-fit:cover">`; }; r.readAsDataURL(f); }
 window.previewPhoto = previewPhoto;
-async function saveMemory(type){
-  const title = document.getElementById('memTitle')?.value.trim() || '';
-  const item = { type, title, at: new Date().toISOString(), by: MY_ROLE };
-  if(type === 'text'){
-    const text = document.getElementById('memText').value.trim(); if(!text){toast('اكتبي الذكرى'); return;} item.text = text;
-  } else {
-    if(!tempPhoto){toast('اختاري صورة'); return;} item.src = tempPhoto; tempPhoto = null;
-  }
-  if(firebaseReady && db){ try{await push(ref(db, 'app/memories'), item);}catch(e){} } else { state.memories.unshift({id:uid(), ...item}); }
-  renderMemories(); closeModal(); toast('📸 الذكرى محفوظة');
-}
+async function saveMemory(type){ const title = document.getElementById('memTitle')?.value.trim() || ''; const item = { type, title, at: new Date().toISOString(), by: MY_ROLE }; if(type === 'text'){ const text = document.getElementById('memText').value.trim(); if(!text){toast('اكتبي الذكرى'); return;} item.text = text; } else { if(!tempPhoto){toast('اختاري صورة'); return;} item.src = tempPhoto; tempPhoto = null; } if(firebaseReady && db){ try{await push(ref(db, 'app/memories'), item);}catch(e){} } renderMemories(); closeModal(); addNotification('ذكرى جديدة', title || 'صورة جديدة', 'memory'); toast('📸 الذكرى محفوظة'); }
 window.saveMemory = saveMemory;
-function renderMemories(){
-  const el = document.getElementById('memGrid');
-  if(!state.memories.length){el.innerHTML = `<div class="empty"><div class="e-icon">📸</div><p>أرشيفنا فاضي</p></div>`; return;}
-  el.innerHTML = state.memories.map(m => {
-    let body = ''; if(m.type === 'photo' && m.src)body = `<img src="${m.src}">`; else if(m.text)body = `<div class="mem-text">${escapeHtml(m.text)}</div>`;
-    return `<div class="mem-card">${body}${m.title?`<div style="padding:0 10px;font-weight:700;font-size:.85rem">${escapeHtml(m.title)}</div>`:''}<div class="mem-date">${fmtDate(m.at)}</div>${m.by?`<div class="mem-sender">من: ${senderName(m.by)}</div>`:''}<button class="mem-del" onclick="deleteMemory('${m.id}')">✕</button></div>`;
-  }).join('');
-}
-async function deleteMemory(id){
-  if(!confirm('حذف الذكرى؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/memories/'+id));}catch(e){} }
-  state.memories = state.memories.filter(m => m.id !== id); renderMemories();
-}
+function renderMemories(){ const el = document.getElementById('memGrid'); if(!state.memories.length){el.innerHTML = `<div class="empty"><div class="e-icon">📸</div><p>أرشيفنا فاضي</p></div>`; return;} el.innerHTML = state.memories.map(m => { let body = ''; if(m.type === 'photo' && m.src)body = `<img src="${m.src}">`; else if(m.text)body = `<div class="mem-text">${escapeHtml(m.text)}</div>`; return `<div class="mem-card">${body}${m.title?`<div style="padding:0 10px;font-weight:700;font-size:.85rem">${escapeHtml(m.title)}</div>`:''}<div class="mem-date">${fmtDate(m.at)}</div>${m.by?`<div class="mem-sender">من: ${senderName(m.by)}</div>`:''}<button class="mem-del" onclick="deleteMemory('${m.id}')">✕</button></div>`; }).join(''); }
+async function deleteMemory(id){ if(!confirm('حذف الذكرى؟'))return; if(firebaseReady && db){ try{await remove(ref(db, 'app/memories/'+id));}catch(e){} } state.memories = state.memories.filter(m => m.id !== id); renderMemories(); }
 window.deleteMemory = deleteMemory;
 
-/* ============================================================
-   المزاج
-   ============================================================ */
+/* المزاج */
 const MOOD_RESPONSES = { happy: ["😊 فرحتك تفرحني."], tired: ["😴 ارتاحي حبيبتي."], sad: ["🥺 ما أحب أشوفك زعلانة."], missing: ["💭 وأنا مشتاق لك أكثر."], angry: ["😤 أنا معك."], calm: ["😌 هدوءك جميل."], excited: ["🤩 شاركيني الحماس!"], sick: ["🤒 سلامتك."] };
 function getMoodValue(m){ if(typeof m === 'string')return m; if(m && m.mood)return m.mood; return null; }
-function renderMood(){
-  const key = getTodayKey(); const current = getMoodValue(state.moods[key]);
-  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('selected', b.dataset.mood === current));
-  renderMoodResponse(current);
-}
-function renderMoodResponse(mood){
-  const el = document.getElementById('moodResponse');
-  if(!mood){el.innerHTML = ''; return;} el.innerHTML = `<div class="mood-response">${(MOOD_RESPONSES[mood]||['💗'])[0]}</div>`;
-}
+function renderMood(){ const key = getTodayKey(); const current = getMoodValue(state.moods[key]); document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('selected', b.dataset.mood === current)); renderMoodResponse(current); }
+function renderMoodResponse(mood){ const el = document.getElementById('moodResponse'); if(!mood){el.innerHTML = ''; return;} el.innerHTML = `<div class="mood-response">${(MOOD_RESPONSES[mood]||['💗'])[0]}</div>`; }
 document.querySelectorAll('.mood-btn').forEach(btn => {
   btn.addEventListener('click', async () => {
     const key = getTodayKey(); const mood = btn.dataset.mood;
     const payload = { mood, by: MY_ROLE, at: new Date().toISOString() };
     state.moods[key] = payload; renderMood();
     if(firebaseReady && db){ try{await set(ref(db, 'app/moods/'+key), payload);}catch(e){} }
+    addNotification('مزاج جديد', btn.textContent.trim(), 'mood');
     toast('سجلنا مزاجك 💭');
   });
 });
 
-/* ============================================================
-   الإعدادات
-   ============================================================ */
+/* الإعدادات */
 function openSettings(){
   const notifStatus = !('Notification' in window) ? '<div class="info-box warn">⚠️ متصفحك لا يدعم الإشعارات</div>'
     : Notification.permission === 'granted' ? '<div class="info-box ok">✅ الإشعارات مفعّلة</div>'
@@ -855,18 +663,9 @@ function openSettings(){
 }
 window.openSettings = openSettings;
 
-async function askNotifPermission(){
-  const ok = await requestNotifPermission();
-  if(ok){ toast('✅ الإشعارات مفعّلة'); showAppNotification('🎉 الإشعارات تعمل!', 'ستصلك إشعارات فورية هنا وهاتفك', 'test'); }
-  else { toast('❌ لم يتم تفعيل الإشعارات'); }
-  closeModal();
-}
+async function askNotifPermission(){ const ok = await requestNotifPermission(); if(ok){ toast('✅ الإشعارات مفعّلة'); showAppNotification('🎉 الإشعارات تعمل!', 'ستصلك إشعارات فورية هنا وهاتفك'); initFCM(); } else { toast('❌ لم يتم تفعيل الإشعارات'); } closeModal(); }
 window.askNotifPermission = askNotifPermission;
-
-function testNotification(){
-  if(Notification.permission !== 'granted'){ toast('فعّل الإشعارات أولاً'); return; }
-  showAppNotification('🧪 إشعار تجريبي', 'إذا وصلتك هذه الرسالة، فكل شيء يعمل بشكل صحيح', 'test');
-}
+function testNotification(){ if(Notification.permission !== 'granted'){ toast('فعّل الإشعارات أولاً'); return; } showAppNotification('🧪 إشعار تجريبي', 'إذا وصلتك هذه الرسالة، فكل شيء يعمل بشكل صحيح'); }
 window.testNotification = testNotification;
 
 async function saveSettingsSimple(){
@@ -880,69 +679,63 @@ async function saveSettingsSimple(){
 }
 window.saveSettingsSimple = saveSettingsSimple;
 
-function resendHerLink(){
-  const baseUrl = location.origin + location.pathname; const herLink = `${baseUrl}?for=her`;
-  openModal(`<h3>🔗 رابط عيوشة</h3><div class="link-box" id="herLinkBox">${escapeHtml(herLink)}</div><div class="modal-actions"><button class="btn btn-soft btn-full" onclick="copyLink('herLinkBox')">📋 نسخ الرابط</button></div><small class="help">أرسله لها. تفتحه وتثبّته على الشاشة الرئيسية.</small><div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>`);
-}
+function resendHerLink(){ const baseUrl = location.origin + location.pathname; const herLink = `${baseUrl}?for=her`; openModal(`<h3>🔗 رابط عيوشة</h3><div class="link-box" id="herLinkBox">${escapeHtml(herLink)}</div><div class="modal-actions"><button class="btn btn-soft btn-full" onclick="copyLink('herLinkBox')">📋 نسخ الرابط</button></div><small class="help">أرسله لها. تفتحه وتثبّته على الشاشة الرئيسية.</small><div class="modal-actions"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>`); }
 window.resendHerLink = resendHerLink;
-
 function openSetupAgain(){ if(!confirm('إعادة الإعداد ستطلب البيانات من جديد. متأكد؟'))return; closeModal(); setTimeout(()=>showSetupWizard(), 300); }
 window.openSetupAgain = openSetupAgain;
-function checkReadyItems(){
-  const now = new Date(); const hasReady = state.surprises.some(s => !s.opened && new Date(s.at) <= now);
-  document.querySelector('.nav-btn[data-view="surprise"]')?.classList.toggle('has-badge', hasReady);
-}
+function checkReadyItems(){ const now = new Date(); const hasReady = state.surprises.some(s => !s.opened && new Date(s.at) <= now); document.querySelector('.nav-btn[data-view="surprise"]')?.classList.toggle('has-badge', hasReady); }
 
 /* ============================================================
    🚀 الإقلاع
    ============================================================ */
 async function boot(){
-  setTimeout(() => {
-    const splash = document.getElementById('splashScreen');
-    if(splash){ splash.style.opacity = '0'; setTimeout(() => splash.remove(), 600); }
-  }, 2500); 
+  setTimeout(() => { const splash = document.getElementById('splashScreen'); if(splash){ splash.style.opacity = '0'; setTimeout(() => splash.remove(), 600); } }, 2000); 
 
   const urlParams = new URLSearchParams(location.search);
   const urlRole = urlParams.get('for');
   if(urlRole === 'her' || urlRole === 'me'){ MY_ROLE = urlRole; localStorage.setItem('ayousha_role', urlRole); }
-  else { MY_ROLE = localStorage.getItem('ayousha_role'); }
+  else { MY_ROLE = localStorage.getItem('ayousha_role') || 'me'; localStorage.setItem('ayousha_role', MY_ROLE); }
 
   const savedCfg = lsGet('config', null);
-  if(savedCfg){ config.me = { ...config.me, ...savedCfg.me }; config.her = { ...config.her, ...savedCfg.her }; }
+  if(savedCfg){ config = { ...config, ...savedCfg }; }
   const savedSettings = lsGet('settings', null); if(savedSettings)state.settings = savedSettings;
   const savedMeet = lsGet('meetupDate', ''); if(savedMeet)state.meetupDate = savedMeet;
 
   updateGreet(); updateCountdown(); renderDaily(); renderPings(); renderSurprises(); renderMails(); renderMemories(); renderMood();
 
   setSyncStatus('online', 'جاري الاتصال...');
-  if(!initFirebase(FIREBASE_URL)){
+  if(!initFirebase()){
     setSyncStatus('offline', 'فشل الاتصال');
     showFullScreen(`<div class="box"><div style="font-size:3rem">⚠️</div><h2>خطأ في الاتصال</h2><p>تأكد من اتصال الإنترنت ثم أعد المحاولة.</p><button class="btn btn-primary btn-full" onclick="location.reload()">🔄 إعادة المحاولة</button></div>`);
     return;
   }
 
+  // تسجيل Service Worker لـ FCM
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(err => console.log('SW reg error', err));
+  }
+
   const setupDone = await isSetupComplete();
   if(setupDone){
-    await loadConfigFromFirebase(); startSync();
-    if(!MY_ROLE){MY_ROLE = 'me'; localStorage.setItem('ayousha_role', 'me');}
+    await loadConfigFromFirebase(); startSync(); initFCM();
     setSyncStatus('online', 'متصل — الإشعارات تعمل'); toast('👋 أهلاً ' + senderName(MY_ROLE));
   } else {
     if(MY_ROLE === 'her'){
       showWaitingScreen();
       const t = setInterval(async () => {
         if(await isSetupComplete()){
-          clearInterval(t); await loadConfigFromFirebase(); hideFullScreen(); startSync();
+          clearInterval(t); await loadConfigFromFirebase(); hideFullScreen(); startSync(); initFCM();
           setSyncStatus('online', 'متصل — الإشعارات تعمل'); toast('🎉 التطبيق جاهز');
         }
       }, 3000);
     } else {
-      MY_ROLE = 'me'; localStorage.setItem('ayousha_role', 'me'); showSetupWizard();
+      showSetupWizard();
     }
   }
 
   setInterval(updateCountdown, 1000);
   setInterval(updateGreet, 60000);
-  setInterval(()=>{ checkReadyItems(); const active = document.querySelector('.view.active')?.id; if(active === 'view-surprise')renderSurprises(); if(active === 'view-mail')renderMails(); }, 20000);
+  setInterval(()=>{ checkReadyItems(); }, 20000);
 }
 
 document.addEventListener('click', () => { initAudio(); }, { once: true });
@@ -951,4 +744,4 @@ document.addEventListener('touchstart', () => { initAudio(); }, { once: true });
 boot();
 </script>
 </body>
-  </html>
+</html>
