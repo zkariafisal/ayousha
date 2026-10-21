@@ -139,6 +139,22 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
 #mailList.messenger-messages{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:16px 10px;display:flex;flex-direction:column;gap:9px;background:radial-gradient(circle at 15% 20%,#fff7fa 0,transparent 48%),#faf1f5;scroll-behavior:smooth}
 #mailList .chat-row{flex-shrink:0}#mailList .chat-bubble{min-width:0;max-width:83%;padding:9px 12px;border-radius:16px;box-shadow:0 2px 8px #40203010}#mailList .mine .chat-bubble{background:#dcf8e7;border-color:#bdebd0;border-radius:16px 16px 5px 16px}#mailList .theirs .chat-bubble{background:white;border-color:#f1e0eb;border-radius:16px 16px 16px 5px}#mailList .chat-head{font-size:.72rem}#mailList .chat-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;margin:5px 0}#mailList .chat-foot{font-size:.68rem}
 .messenger-composer{display:flex;gap:8px;align-items:flex-end;background:#fff;padding:10px;border-top:1px solid #f1dfe8;flex-shrink:0}.messenger-composer textarea{flex:1;min-width:0;max-height:115px;min-height:43px;border:1px solid #eedce6;border-radius:22px;padding:11px 15px;font:inherit;font-size:16px;resize:none;background:#fff9fc;outline:none}.messenger-composer textarea:focus{border-color:#e36c9e}.messenger-composer button{height:43px;width:43px;border-radius:50%;background:#d82b72;color:#fff;font-size:23px;display:grid;place-items:center;flex-shrink:0;transform:rotate(180deg)}.messenger-composer button:disabled{opacity:.55}.messenger-status{font-size:.72rem;color:#a22e56;background:#fff;text-align:center}.messenger-status:empty{display:none}
+
+/* Ayousha V8 • smart messenger */
+#view-mail .messenger-shell{overflow:hidden}
+#chatPresence{display:block;color:#7a6275;font-size:.74rem}
+.chat-typing{min-height:20px;padding:0 18px;font-size:.76rem;color:#c12f79}
+.chat-pinned:not([hidden]){padding:9px 15px;background:#fff5d9;border-bottom:1px solid #eecb90;font-size:.82rem;cursor:pointer}
+.chat-reply:not([hidden]){padding:8px 16px;background:#fff0f7;border-right:3px solid #d42e7e;font-size:.8rem;display:flex;justify-content:space-between;gap:10px}
+.chat-attach{flex:0 0 33px;font-size:1.4rem;color:#c72c77;border-radius:50%}
+#voiceRecordBtn.recording{background:#ffdde9;animation:mailGlow 1s infinite}
+.chat-status{font-weight:800;color:#6d8d80}.chat-status.read{color:#df2580}
+.chat-reactions{display:flex;gap:4px;flex-wrap:wrap}.chat-reaction{border-radius:15px;background:#fff9ff;border:1px solid #f0d6e7;padding:1px 6px;font-size:.8rem}
+.chat-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:6px;opacity:.8}.chat-actions button{font-size:.72rem;color:#9e3d75}
+.chat-media{display:block;max-width:100%;max-height:280px;border-radius:12px;margin:7px 0;object-fit:contain}
+.chat-bubble audio{max-width:230px;width:100%}.chat-bubble video{max-width:100%}
+.chat-quoted{border-right:3px solid #d85b98;padding:4px 8px;background:#ffffff80;font-size:.76rem;border-radius:5px}
+body.chat-dark #view-mail .messenger-shell{background:#201d29;color:#fff}body.chat-dark #mailList .chat-bubble{background:#343044;color:#fff;border-color:#51435b}body.chat-dark #mailList .chat-text{color:#fff}
 </style>
 <style>
 /* Interactive message experience */
@@ -221,9 +237,9 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
 
   <section id="view-mail" class="view">
     <div class="messenger-shell">
-      <header class="messenger-header"><div class="messenger-avatar">💗</div><div class="messenger-title"><strong id="chatPartnerName">عيوشة</strong><small>🟢 محادثة فورية • تصل الرسائل مباشرة</small></div><span class="messenger-lock" title="محادثة خاصة">♡</span></header>
-      <div id="mailList" class="messenger-messages" role="log" aria-live="polite" aria-label="المحادثة"></div>
-      <form id="instantMailForm" class="messenger-composer" onsubmit="window.sendInstantMail(event)"><textarea id="instantMailText" rows="1" maxlength="5000" placeholder="اكتب رسالة..." aria-label="نص الرسالة" oninput="window.resizeChatInput(this)"></textarea><button id="instantMailSend" type="submit" aria-label="إرسال الرسالة">➤</button></form>
+      <header class="messenger-header"><div class="messenger-avatar">💗</div><div class="messenger-title"><strong id="chatPartnerName">عيوشة</strong><small id="chatPresence">جارٍ التحقق من الاتصال...</small></div><button class="messenger-lock" onclick="window.toggleChatDark()" title="الوضع الليلي">☾</button><button class="messenger-lock" onclick="window.sendPing()" title="اشتقت لك">💗</button></header>
+      <div id="chatPinned" class="chat-pinned" hidden></div><div id="chatTyping" class="chat-typing" aria-live="polite"></div><div id="mailList" class="messenger-messages" role="log" aria-live="polite" aria-label="المحادثة"></div>
+      <div id="chatReply" class="chat-reply" hidden></div><form id="instantMailForm" class="messenger-composer" onsubmit="window.sendInstantMail(event)"><button type="button" class="chat-attach" onclick="window.chooseChatAttachment()" title="إرفاق صورة أو فيديو أو صوت">＋</button><input id="chatAttachment" type="file" accept="image/*,video/*,audio/*" hidden onchange="window.sendChatAttachment(event)"><button type="button" id="voiceRecordBtn" class="chat-attach" onclick="window.toggleVoiceRecording()" title="تسجيل صوت">🎙️</button><textarea id="instantMailText" rows="1" maxlength="5000" placeholder="اكتب رسالة..." aria-label="نص الرسالة" oninput="window.resizeChatInput(this);window.chatTypingInput()"></textarea><button id="instantMailSend" type="submit" aria-label="إرسال الرسالة">➤</button></form>
       <div id="instantMailStatus" class="messenger-status" role="status" aria-live="polite"></div>
     </div>
   </section>
@@ -284,8 +300,9 @@ nav.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9
 
 <script type="module">
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, set, remove, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue, push, set, remove, get, update, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const firebaseConfig = {
   apiKey: "AIzaSyA5srAIJRXItE5uT9OKpRq0gHeEUeatDp0",
   authDomain: "ayousha.firebaseapp.com",
@@ -309,6 +326,7 @@ let modalLocked = false;
 let audioCtx = null;
 let allNotifs = [];
 let currentNotifTab = 'inbox';
+let chatPresence={}, chatTyping={}, chatReplyId=null, chatRecorder=null, chatChunks=[], chatRecordingStream=null, lastTypingWrite=0, lastReadWrite=0;
 
 let config = {
   setupComplete: false,
@@ -532,14 +550,15 @@ function startSync(){
   onValue(ref(db, 'app/answers'), s => { state.answers = s.val() || {}; renderDaily(); });
   onValue(ref(db, 'app/surprises'), s => { const v = s.val(); state.surprises = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderSurprises(); checkReadyItems(); });
   onValue(ref(db, '.info/connected'), s => { const connected=s.val()===true; window.mailConnected=connected; setSyncStatus(connected?'online':'offline', connected?'متصل بقاعدة البيانات':'غير متصل — تحقق من الإنترنت'); }, e=>console.error('Connection monitor',e));
-  onValue(ref(db, 'app/mails'), s => { const v = s.val(); state.mails = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMails(); if(pendingDeepLink)focusRequestedMail(pendingDeepLink); }, e=>{ console.error('Mail sync:',e); setSyncStatus('offline','تعذر قراءة البريد'); toast('⚠️ تعذّر تحميل الرسائل: '+e.message); });
+  onValue(ref(db, 'app/mails'), s => { const v = s.val(); state.mails = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMails(); markDelivered().then(markChatMessages); if(pendingDeepLink)focusRequestedMail(pendingDeepLink); }, e=>{ console.error('Mail sync:',e); setSyncStatus('offline','تعذر قراءة البريد'); toast('⚠️ تعذّر تحميل الرسائل: '+e.message); });
   onValue(ref(db, 'app/memories'), s => { const v = s.val(); state.memories = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderMemories(); });
   onValue(ref(db, 'app/moods'), s => { state.moods = s.val() || {}; renderMood(); });
+  setupChatPresence();
   onValue(ref(db, 'app/pings'), s => { const v = s.val(); state.pings = v ? Object.entries(v).map(([id,item])=>({id, ...item})) : []; renderPings(); });
   setSyncStatus('online', 'متصل بقاعدة البيانات');
 }
 
-function switchView(name){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById('view-'+name).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view === name)); window.scrollTo({top:0, behavior:'smooth'}); if(name === 'mail'){const partner=document.getElementById('chatPartnerName');if(partner)partner.textContent=MY_ROLE==='me'?state.settings.wifeName:state.settings.myName;setTimeout(()=>{const el=document.getElementById('mailList');if(el)el.scrollTop=el.scrollHeight;},80);} if(name === 'notifications') { renderNotifs('inbox'); markNotifsRead(); } }
+function switchView(name){updateOwnChatPresence(); document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById('view-'+name).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view === name)); window.scrollTo({top:0, behavior:'smooth'}); if(name === 'mail'){setTimeout(()=>{updateOwnChatPresence();markChatMessages();},100);const partner=document.getElementById('chatPartnerName');if(partner)partner.textContent=MY_ROLE==='me'?state.settings.wifeName:state.settings.myName;setTimeout(()=>{const el=document.getElementById('mailList');if(el)el.scrollTop=el.scrollHeight;},80);} if(name === 'notifications') { renderNotifs('inbox'); markNotifsRead(); } }
 window.switchView = switchView;
 function openModal(html){document.getElementById('modalContent').innerHTML = html;document.getElementById('modalBg').classList.add('show');}
 function closeModal(){if(modalLocked)return;document.getElementById('modalBg').classList.remove('show');}
@@ -589,25 +608,89 @@ window.sendInstantMail=async function(event){
  if(!firebaseReady||!db){status.textContent='تعذر الاتصال بقاعدة البيانات. تحقق من الإنترنت.';return;}
  button.disabled=true;status.textContent='جارٍ الإرسال...';
  try{
-  const item={text:message,at:new Date().toISOString(),createdAt:new Date().toISOString(),instant:true,read:false,by:MY_ROLE,to:MY_ROLE==='me'?'her':'me'};
+  const item={text:message,at:new Date().toISOString(),createdAt:new Date().toISOString(),instant:true,read:false,by:MY_ROLE,to:MY_ROLE==='me'?'her':'me',replyTo:chatReplyId||null};
   const record=await push(ref(db,'app/mails'),item);
-  field.value='';window.resizeChatInput(field);status.textContent='';playEventSound('mail',true);
+  field.value='';window.resizeChatInput(field);status.textContent='';window.cancelChatReply();clearTyping();playEventSound('mail',true);
   requestAnimationFrame(()=>{const list=document.getElementById('mailList');if(list)list.scrollTop=list.scrollHeight;});
   Promise.resolve().then(()=>addNotification('💌 رسالة جديدة من '+senderName(MY_ROLE),message,'mail',record.key)).catch(console.warn);
  }catch(error){console.error('Instant message failed:',error);status.textContent='تعذر الإرسال: '+(error?.message||'تحقق من الاتصال');}
  finally{button.disabled=false;}
 };
+function chatTime(d){const x=new Date(d||Date.now());return Number.isNaN(x.getTime())?'':x.toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});}
+function chatMessageHtml(m){
+ const mine=m.by===MY_ROLE, partner=MY_ROLE==='me'?'her':'me';
+ const status=m.readAt?'◉':m.deliveredAt?'✓✓':'✓';
+ const label=m.readAt?'قُرئت '+chatTime(m.readAt):m.deliveredAt?'استُلمت '+chatTime(m.deliveredAt):'أُرسلت';
+ const quoted=m.replyTo&&state.mails.find(x=>x.id===m.replyTo);
+ let media='';const u=m.mediaUrl;
+ if(u&&/^https:\/\//.test(u)){
+  const safe=escapeHtml(u);
+  if(m.mediaType?.startsWith('image/'))media=`<img class="chat-media" src="${safe}" loading="lazy" alt="صورة مرفقة">`;
+  else if(m.mediaType?.startsWith('audio/'))media=`<audio controls preload="none" src="${safe}"></audio>`;
+  else if(m.mediaType?.startsWith('video/'))media=`<video controls preload="none" class="chat-media" src="${safe}"></video>`;
+ }
+ const reactions=Object.entries(m.reactions||{}).filter(([,v])=>v).map(([r,v])=>`<span class="chat-reaction">${escapeHtml(v)} ${r==='me'?'💗':'💜'}</span>`).join('');
+ return `<article class="chat-row ${mine?'mine':'theirs'}" data-mail-id="${escapeHtml(m.id)}"><div class="chat-bubble">
+ ${quoted?`<div class="chat-quoted">↪ ${escapeHtml(senderName(quoted.by))}: ${escapeHtml((quoted.text||'مرفق').slice(0,90))}</div>`:''}
+ ${m.pinned?'<div style="font-size:.7rem">📌 مثبتة</div>':''}
+ ${m.text?`<p class="chat-text">${escapeHtml(m.text)}</p>`:''}${media}
+ <div class="chat-reactions">${reactions}</div>
+ <div class="chat-foot"><span>${chatTime(m.createdAt||m.at)}</span>${mine?`<span class="chat-status ${m.readAt?'read':''}" title="${label}">${status} ${label}</span>`:''}</div>
+ <div class="chat-actions"><button onclick="window.replyToChat('${m.id}')">↩ رد</button><button onclick="window.reactToChat('${m.id}')">♡ تفاعل</button><button onclick="window.pinChat('${m.id}')">📌</button><button onclick="window.saveChatMemory('${m.id}')">💗 ذكرى</button>${mine?`<button onclick="window.deleteMail('${m.id}')">🗑️</button>`:''}</div>
+ </div></article>`;
+}
 function renderMails(){
  const el=document.getElementById('mailList');if(!el)return;
- // الرسائل القديمة المجدولة تظهر الآن فوراً، بغض النظر عن حقل at القديم.
  const items=[...state.mails].filter(m=>m.by===MY_ROLE||m.to===MY_ROLE||!m.to).sort((a,b)=>new Date(a.createdAt||a.at||0)-new Date(b.createdAt||b.at||0));
- if(!items.length){el.innerHTML='<div class="empty"><div class="e-icon">💌</div><p>ابدآ المحادثة برسالة جميلة 💗</p></div>';return;}
- const wasNearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<130;const previousCount=el.querySelectorAll('[data-mail-id]').length;
- el.innerHTML=items.map(m=>{const mine=m.by===MY_ROLE,ready=true,visible=true;
- return `<article class="chat-row ${mine?'mine':'theirs'}" data-mail-id="${escapeHtml(m.id)}"><div class="chat-bubble"><div class="chat-head"><span>${mine?'💗 أنا':'💜 '+escapeHtml(senderName(m.by))}</span><span>${mine?'✓ أُرسلت':'📩 واردة'}</span></div><p class="chat-text">${escapeHtml(m.text)}</p><div class="chat-foot"><span>🕒 ${fmtDateTime(m.createdAt||m.at)}</span>${mine?`<button onclick="window.deleteMail('${m.id}')" aria-label="حذف الرسالة">🗑️</button>`:''}</div></div></article>`;
- }).join('');
- if(wasNearBottom||items.length>previousCount&&previousCount===0)requestAnimationFrame(()=>{el.scrollTop=el.scrollHeight;});
+ const nearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<160;
+ const previousCount=el.querySelectorAll('[data-mail-id]').length;
+ el.innerHTML=items.length?items.map(chatMessageHtml).join(''):'<div class="empty"><div class="e-icon">💌</div><p>ابدآ المحادثة برسالة جميلة 💗</p></div>';
+ const pinned=items.filter(m=>m.pinned).at(-1), banner=document.getElementById('chatPinned');
+ if(banner){banner.hidden=!pinned;if(pinned){banner.textContent='📌 '+(pinned.text||'رسالة مرفقة').slice(0,110);banner.onclick=()=>focusRequestedMail(pinned.id);}}
+ if(nearBottom||previousCount===0)requestAnimationFrame(()=>{el.scrollTop=el.scrollHeight;});
 }
+const otherRole=()=>MY_ROLE==='me'?'her':'me';
+function chatIsOpen(){return document.getElementById('view-mail')?.classList.contains('active')&&document.visibilityState==='visible';}
+function setupChatPresence(){
+ if(!db||!MY_ROLE)return;
+ const mine=ref(db,'app/chatPresence/'+MY_ROLE), other=ref(db,'app/chatPresence/'+otherRole());
+ onValue(ref(db,'.info/connected'),async snap=>{if(snap.val()!==true)return;try{await onDisconnect(mine).set({online:false,lastSeen:serverTimestamp(),inChat:false});await set(mine,{online:true,lastSeen:serverTimestamp(),inChat:chatIsOpen()});}catch(e){console.warn('presence',e);}});
+ onValue(other,snap=>{chatPresence=snap.val()||{};updateChatPresence();});
+ onValue(ref(db,'app/chatTyping/'+otherRole()),snap=>{chatTyping=snap.val()||{};updateChatPresence();});
+ document.addEventListener('visibilitychange',()=>{updateOwnChatPresence();if(chatIsOpen())markChatMessages();});
+ window.addEventListener('pagehide',()=>{if(db)update(ref(db,'app/chatPresence/'+MY_ROLE),{inChat:false}).catch(()=>{});});
+ updateChatPresence();
+}
+function updateOwnChatPresence(){if(firebaseReady&&db&&MY_ROLE)update(ref(db,'app/chatPresence/'+MY_ROLE),{online:true,inChat:chatIsOpen(),lastSeen:serverTimestamp()}).catch(()=>{});}
+function updateChatPresence(){
+ const el=document.getElementById('chatPresence'),typing=document.getElementById('chatTyping');
+ if(!el)return;
+ const active=chatTyping.active&&Date.now()-(chatTyping.at||0)<4500;
+ const last=chatPresence.lastSeen?new Date(chatPresence.lastSeen).toLocaleString('ar'):'';
+ el.textContent=active?'✍️ يكتب الآن...':chatPresence.online?(chatPresence.inChat?'💗 أنتما معًا الآن':'🟢 متصل الآن'):(last?'آخر ظهور: '+last:'غير متصل حاليًا');
+ if(typing)typing.textContent=active?'💗 '+senderName(otherRole())+' يكتب الآن...':'';
+}
+window.chatTypingInput=function(){if(!db||!MY_ROLE)return;const now=Date.now();if(now-lastTypingWrite<1200)return;lastTypingWrite=now;set(ref(db,'app/chatTyping/'+MY_ROLE),{active:true,at:now}).catch(()=>{});clearTimeout(window._chatTypingTimeout);window._chatTypingTimeout=setTimeout(clearTyping,3000);};
+function clearTyping(){if(db&&MY_ROLE)set(ref(db,'app/chatTyping/'+MY_ROLE),{active:false,at:Date.now()}).catch(()=>{});}
+async function markChatMessages(){
+ if(!chatIsOpen()||!db||!MY_ROLE)return;
+ const now=Date.now();if(now-lastReadWrite<1300)return;lastReadWrite=now;
+ const pending=state.mails.filter(m=>m.by!==MY_ROLE&&(m.to===MY_ROLE||!m.to)&&!m.readAt);
+ for(const m of pending.slice(0,50))try{await update(ref(db,'app/mails/'+m.id),{deliveredAt:m.deliveredAt||new Date().toISOString(),readAt:new Date().toISOString(),read:true});}catch(e){console.warn(e);break;}
+}
+async function markDelivered(){if(!db||!MY_ROLE)return;const pending=state.mails.filter(m=>m.by!==MY_ROLE&&(m.to===MY_ROLE||!m.to)&&!m.deliveredAt);for(const m of pending.slice(0,50))try{await update(ref(db,'app/mails/'+m.id),{deliveredAt:new Date().toISOString()});}catch(e){break;}}
+window.replyToChat=function(id){const m=state.mails.find(x=>x.id===id);if(!m)return;chatReplyId=id;const el=document.getElementById('chatReply');el.hidden=false;el.innerHTML=`<span>↩ ${escapeHtml(senderName(m.by))}: ${escapeHtml((m.text||'مرفق').slice(0,80))}</span><button type="button" onclick="window.cancelChatReply()">✕</button>`;document.getElementById('instantMailText').focus();};
+window.cancelChatReply=function(){chatReplyId=null;document.getElementById('chatReply').hidden=true;};
+window.reactToChat=async function(id){const m=state.mails.find(x=>x.id===id);if(!m)return;const emoji=prompt('اختر تفاعلك: ❤️ 😍 😘 🥹 😂 💗','❤️');if(!emoji)return;if(!['❤️','😍','😘','🥹','😂','💗'].includes(emoji.trim()))return toast('اختر رمزًا من الرموز المتاحة');try{await update(ref(db,'app/mails/'+id+'/reactions'),{[MY_ROLE]:emoji.trim()});playEventSound('ping',true);}catch(e){toast('تعذر حفظ التفاعل');}};
+window.pinChat=async function(id){const m=state.mails.find(x=>x.id===id);if(!m)return;try{await update(ref(db,'app/mails/'+id),{pinned:!m.pinned});}catch(e){toast('تعذر تثبيت الرسالة');}};
+window.saveChatMemory=async function(id){const m=state.mails.find(x=>x.id===id);if(!m)return;try{await push(ref(db,'app/memories'),{type:'text',title:'💌 من محادثتنا',text:m.text||'رسالة مرفقة',at:new Date().toISOString(),by:MY_ROLE});toast('💗 حُفظت في الذكريات');}catch(e){toast('تعذر حفظ الذكرى');}};
+window.toggleChatDark=function(){document.body.classList.toggle('chat-dark');localStorage.setItem('ayousha_chat_dark',document.body.classList.contains('chat-dark')?'1':'0');};
+if(localStorage.getItem('ayousha_chat_dark')==='1')document.body.classList.add('chat-dark');
+window.chooseChatAttachment=()=>document.getElementById('chatAttachment').click();
+async function uploadChatFile(file){if(!file)throw Error('لم يتم اختيار ملف');if(file.size>15*1024*1024)throw Error('الحد الأقصى 15 ميجابايت');const storage=getStorage(firebaseApp);const path='chat/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'-'+file.name.replace(/[^a-zA-Z0-9_.-]/g,'_');const r=storageRef(storage,path);await uploadBytes(r,file,{contentType:file.type||'application/octet-stream'});return getDownloadURL(r);}
+async function sendChatMedia(file){if(!db||!firebaseReady)return toast('لا يوجد اتصال');const status=document.getElementById('instantMailStatus');try{status.textContent='جارٍ رفع المرفق...';const url=await uploadChatFile(file);const item={text:'',mediaUrl:url,mediaType:file.type||'application/octet-stream',at:new Date().toISOString(),createdAt:new Date().toISOString(),instant:true,by:MY_ROLE,to:otherRole()};const record=await push(ref(db,'app/mails'),item);status.textContent='';playEventSound('mail',true);addNotification('💌 مرفق جديد من '+senderName(MY_ROLE),'أرسل لك ملفًا','mail',record.key).catch(console.warn);}catch(e){status.textContent='تعذر إرسال المرفق: '+e.message;}};
+window.sendChatAttachment=async function(event){const f=event.target.files?.[0];event.target.value='';if(f)await sendChatMedia(f);};
+window.toggleVoiceRecording=async function(){const btn=document.getElementById('voiceRecordBtn');if(chatRecorder&&chatRecorder.state==='recording'){chatRecorder.stop();btn.classList.remove('recording');btn.textContent='🎙️';return;}try{chatRecordingStream=await navigator.mediaDevices.getUserMedia({audio:true});chatChunks=[];chatRecorder=new MediaRecorder(chatRecordingStream);chatRecorder.ondataavailable=e=>{if(e.data.size)chatChunks.push(e.data)};chatRecorder.onstop=async()=>{const blob=new Blob(chatChunks,{type:chatRecorder.mimeType||'audio/webm'});chatRecordingStream?.getTracks().forEach(t=>t.stop());if(blob.size>0)await sendChatMedia(new File([blob],'voice.webm',{type:blob.type}));};chatRecorder.start();btn.classList.add('recording');btn.textContent='⏹️';toast('🎙️ التسجيل جارٍ، اضغط مرة أخرى للإرسال');}catch(e){toast('تعذر استخدام الميكروفون: '+e.message);}};
 window.deleteMail = async function(id){
   const mail=state.mails.find(m=>m.id===id);
   if(!mail || mail.by!==MY_ROLE)return;
@@ -792,7 +875,7 @@ async function boot(){
   }
   setInterval(updateCountdown, 1000);
   setInterval(updateGreet, 60000);
-  setInterval(()=>{ checkReadyItems(); renderMails(); }, 20000);
+  setInterval(()=>{ checkReadyItems(); updateChatPresence(); }, 3000);
   setTimeout(handleDeepLink,1200);
   window.addEventListener('pageshow', handleDeepLink);
   window.addEventListener('popstate', handleDeepLink);
