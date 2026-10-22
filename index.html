@@ -570,7 +570,7 @@ window.openModal = function(html){
   document.getElementById('modalContent').innerHTML = '<button type="button" class="v10-close" aria-label="إغلاق" onclick="window.forceCloseModal()">✕</button>' + html;
   document.getElementById('modalBg').classList.add('show');
 };
-function closeModal(){ if(modalLocked) return; document.getElementById('modalBg').classList.remove('show'); if(window._activeGameUnsub){window._activeGameUnsub();window._activeGameUnsub=null;} if(window._activeChatUnsub){window._activeChatUnsub();window._activeChatUnsub=null;} }
+function closeModal(){ if(modalLocked) return; if(typeof v10ActivityListeners!=="undefined"){Object.values(v10ActivityListeners).forEach(fn=>fn());v10ActivityListeners={};} document.getElementById('modalBg').classList.remove('show'); if(window._activeGameUnsub){window._activeGameUnsub();window._activeGameUnsub=null;} if(window._activeChatUnsub){window._activeChatUnsub();window._activeChatUnsub=null;} }
 window.closeModal = closeModal;
 window.forceCloseModal = () => { modalLocked=false; document.getElementById('modalBg').classList.remove('show'); };
 
@@ -960,125 +960,48 @@ window.resetXOGame = async function(){
   toast('🔄 جولة جديدة!');
 };
 
-/* ================= 4. Draw ================= */
-const DRAW_WORDS = ["شمس ☀️", "قلب 💖", "قطة 🐱", "فنجان قهوة ☕", "سيارة 🚗", "وردة 🌹", "قمر 🌙", "بيت 🏡", "تاج 👑", "نظارة 👓"].concat(window.GAME_EXTRAS?.draw||[]);
-window.openDrawGame = function(){
-  if(!db) return toast('جاري الاتصال...');
-  const drawRef = ref(db, 'games/draw');
-  if(window._activeGameUnsub) window._activeGameUnsub();
-  window.openModal(`
-    <h3>🎨 ارسم وخمّن</h3>
-    <div id="drawStatus" class="v9-panel" style="text-align:center;font-weight:bold;">جاري التحميل...</div>
-    <div id="drawCanvasArea">
-      <canvas id="drawCanvas" width="280" height="210" style="border:2px dashed var(--primary);border-radius:14px;background:#fff;cursor:crosshair;touch-action:none;display:block;margin:0 auto;"></canvas>
-      <div id="drawPalette" style="display:flex;gap:6px;justify-content:center;margin:8px 0;">
-        <button class="btn btn-soft" style="padding:4px 10px;" onclick="window.setDrawColor('#d81b60')">💗</button>
-        <button class="btn btn-soft" style="padding:4px 10px;" onclick="window.setDrawColor('#7b1fa2')">💜</button>
-        <button class="btn btn-soft" style="padding:4px 10px;" onclick="window.setDrawColor('#ffb300')">💛</button>
-        <button class="btn btn-soft" style="padding:4px 10px;" onclick="window.setDrawColor('#212121')">🖤</button>
-        <button class="btn btn-soft" style="padding:4px 10px;" onclick="window.clearDrawCanvas()">🧹</button>
-      </div>
-      <button id="sendDrawingBtn" class="btn btn-primary btn-full" onclick="window.submitDrawData()">📤 إرسال الرسمة</button>
-    </div>
-    <div id="guessArea" style="display:none;margin-top:10px;">
-      <img id="receivedDrawImg" style="width:100%;max-height:200px;object-fit:contain;border:2px dashed #f2d9e4;border-radius:14px;background:#fff;margin-bottom:8px;">
-      <input id="userGuessWordInput" placeholder="خمّن: ما الذي رسمه شريكك؟" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);">
-      <button id="drawGuessBtn" class="btn btn-primary btn-full" style="margin-top:6px;" onclick="window.submitUserGuess()">🎯 إرسال التخمين</button>
-      <div id="drawResult" class="v9-panel" style="display:none;text-align:center;margin-top:10px"></div>
-      <button id="drawNextBtn" class="btn btn-primary btn-full" style="display:none;margin-top:8px" onclick="window.nextDrawRound()">🎨 الآن دورك للرسم</button>
-    </div>
-    ${window.renderGameChatUI('games/draw')}
-    <div style="margin-top:10px;"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
-  `);
-  window.listenGameInlineChat('games/draw');
-  window._activeGameUnsub = onValue(drawRef, async snap => {
-    let d = snap.val();
-    if(!d || !d.word){
-      const w = DRAW_WORDS[Math.floor(Math.random() * DRAW_WORDS.length)];
-      d = { drawer: 'me', word: w, drawing: null, guessed: false, phase: 'drawing', round: 1, lastMsg: null };
-      await set(drawRef, d); return;
-    }
-    const status = document.getElementById('drawStatus');
-    const canvasArea = document.getElementById('drawCanvasArea');
-    const guessArea = document.getElementById('guessArea');
-    const recvImg = document.getElementById('receivedDrawImg');
-    if(!status) return;
-    const isDrawer = (d.drawer === MY_ROLE);
-    const result = document.getElementById('drawResult');
-    const nextBtn = document.getElementById('drawNextBtn');
-    const guessBtn = document.getElementById('drawGuessBtn');
-    const guessInput = document.getElementById('userGuessWordInput');
-    if(result) result.style.display='none';
-    if(nextBtn) nextBtn.style.display='none';
-    if(guessBtn) guessBtn.style.display='block';
-    if(guessInput) guessInput.disabled=false;
-    if(d.phase === 'result'){
-      canvasArea.style.display='none'; recvArea.style.display='block';
-      if(d.drawing) recvImg.src=d.drawing;
-      const correct = d.correct === true;
-      status.innerHTML = `🎯 انتهى التخمين — ${correct?'✅ إجابة صحيحة!':'❌ إجابة خاطئة!'}`;
-      if(result){result.style.display='block';result.innerHTML=`<b>${correct?'🎉 أحسنت!':'💗 فرصة أجمل في الجولة القادمة!'}</b><br>إجابة ${escapeHtml(senderName(d.guesser||otherRole()))}: ${escapeHtml(d.answer||'—')}<br>✅ الرسمة الصحيحة هي: <b>${escapeHtml(d.word)}</b>`;}
-      if(guessBtn)guessBtn.style.display='none';
-      if(guessInput)guessInput.disabled=true;
-      if(nextBtn && d.guesser===MY_ROLE)nextBtn.style.display='block';
-    }else if(isDrawer){
-      canvasArea.style.display='block'; recvArea.style.display='none';
-      status.innerHTML = d.drawing ? '⏳ أرسلت رسمتك، انتظر تخمين الطرف الآخر 💕' : `🎨 <b>دورك!</b> ارسم: <span style="color:#d81b60;font-size:1.15rem;">[${escapeHtml(d.word)}]</span>`;
-      const sendBtn=document.getElementById('sendDrawingBtn');if(sendBtn)sendBtn.disabled=!!d.drawing;
-      if(!d.drawing && window._drawCanvasRound!==d.round){window._drawCanvasRound=d.round;setTimeout(initDrawingCanvas,150);}
-    }else{
-      canvasArea.style.display='none'; recvArea.style.display='block';
-      if(d.drawing){ recvImg.src=d.drawing; status.innerHTML = '🔍 <b>دورك في التخمين!</b> لديك محاولة واحدة فقط 💕'; }
-      else { recvImg.removeAttribute('src'); status.innerHTML = `⏳ <b>${senderName(d.drawer)}</b> يرسم لك...`; }
-      if(guessBtn)guessBtn.disabled=!d.drawing;
-      if(guessInput)guessInput.disabled=!d.drawing;
-    }
-  });
+/* ================= 4. Draw: one guess, then swap ================= */
+const DRAW_WORDS = ["شمس ☀️","قلب 💖","قطة 🐱","سيارة 🚗","وردة 🌹","قمر 🌙","بيت 🏡"].concat(window.GAME_EXTRAS?.draw||[]);
+const nextDrawWord=()=>DRAW_WORDS[Math.floor(Math.random()*DRAW_WORDS.length)];
+let drawCtx=null,isDrawing=false,drawColor='#d81b60',drawRoundId=null;
+window.openDrawGame=function(){
+ if(!db)return toast('تحقق من الاتصال');
+ if(window._activeGameUnsub)window._activeGameUnsub();
+ window.openModal(`<h3>🎨 ارسم وخمّن</h3><div id="drawStatus" class="v9-panel" style="text-align:center;font-weight:bold;">⏳ جارٍ الاتصال...</div>
+ <div id="drawCanvasArea" style="display:none"><canvas id="drawCanvas" width="280" height="210" style="border:2px dashed var(--primary);border-radius:14px;background:#fff;touch-action:none;display:block;margin:0 auto;"></canvas>
+ <div style="display:flex;gap:6px;justify-content:center;margin:8px 0;"><button class="btn btn-soft" onclick="setDrawColor('#d81b60')">💗</button><button class="btn btn-soft" onclick="setDrawColor('#212121')">🖤</button><button class="btn btn-soft" onclick="setDrawColor('#ffb300')">💛</button><button class="btn btn-soft" onclick="clearDrawCanvas()">🧹</button></div><button id="sendDrawingBtn" class="btn btn-primary btn-full" onclick="submitDrawData()">📤 إرسال الرسمة</button></div>
+ <div id="guessArea" style="display:none;margin-top:10px;"><img id="receivedDrawImg" alt="الرسمة المرسلة" style="display:none;width:100%;max-height:240px;object-fit:contain;border:2px dashed #f2d9e4;border-radius:14px;background:#fff;margin-bottom:8px;"><div id="drawWaiting">⏳ انتظر الرسمة...</div><div id="drawGuessControls" style="display:none"><input id="userGuessWordInput" placeholder="ما الذي رسمه شريكك؟" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);"><button class="btn btn-primary btn-full" onclick="submitUserGuess()">🎯 تخمين واحد</button></div></div>
+ <div id="drawResult"></div>${window.renderGameChatUI('games/draw')}<button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button>`);
+ window.listenGameInlineChat('games/draw');
+ const drawRef=ref(db,'games/draw');
+ window._activeGameUnsub=onValue(drawRef,async snap=>{
+  let d=snap.val();if(!d){try{await set(drawRef,{drawer:'me',word:nextDrawWord(),roundId:Date.now(),phase:'drawing'});}catch(e){document.getElementById('drawStatus').textContent='تعذر بدء اللعبة: '+e.message;}return;}
+  const status=document.getElementById('drawStatus');if(!status)return;
+  const mine=d.drawer===MY_ROLE,phase=d.phase||(d.drawing?'guessing':'drawing');
+  const canvas=document.getElementById('drawCanvasArea'),guess=document.getElementById('guessArea'),result=document.getElementById('drawResult');
+  canvas.style.display=mine&&phase==='drawing'?'block':'none';guess.style.display=!mine?'block':'none';
+  const img=document.getElementById('receivedDrawImg');if(img){img.style.display=d.drawing?'block':'none';if(d.drawing&&img.src!==d.drawing)img.src=d.drawing;}
+  const controls=document.getElementById('drawGuessControls'),waiting=document.getElementById('drawWaiting');
+  if(controls)controls.style.display=!mine&&phase==='guessing'?'block':'none';
+  if(waiting)waiting.style.display=!mine&&phase==='drawing'?'block':'none';
+  result.innerHTML='';
+  if(phase==='finished'){
+   const correct=d.correct?'✅ إجابة صحيحة!':'❌ إجابة خاطئة!';
+   status.textContent=correct;
+   result.innerHTML=`<div class="v9-panel">${correct}<br>الإجابة الصحيحة: <b>${escapeHtml(d.word)}</b><br>التخمين: ${escapeHtml(d.guess||'—')}</div>`+(d.guesser===MY_ROLE?'<button class="btn btn-primary btn-full" onclick="nextDrawTurn()">🎨 الآن دوري للرسم</button>':'<p class="v9-soft">⏳ بانتظار الطرف الآخر ليبدأ الرسم...</p>');
+  }else if(mine){status.innerHTML=phase==='drawing'?`🎨 ارسم: <b>${escapeHtml(d.word)}</b>`:'📨 أرسلت الرسمة، انتظر التخمين';if(phase==='drawing'&&drawRoundId!==d.roundId){drawRoundId=d.roundId;setTimeout(initDrawingCanvas,50);}}
+  else status.textContent=phase==='drawing'?'⏳ الطرف الآخر يرسم الآن...':'🔍 شاهد الرسمة وخمّن مرة واحدة';
+ },err=>{const el=document.getElementById('drawStatus');if(el)el.textContent='❌ تعذر تحميل اللعبة: '+err.message;});
 };
-
-let drawCtx = null, isDrawing = false, drawColor = '#d81b60';
-function initDrawingCanvas(){
-  const canvas = document.getElementById('drawCanvas');
-  if(!canvas) return;
-  drawCtx = canvas.getContext('2d');
-  drawCtx.lineWidth = 4; drawCtx.lineCap = 'round'; drawCtx.strokeStyle = drawColor;
-  const getPos = e => { const rect = canvas.getBoundingClientRect(); const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: cx - rect.left, y: cy - rect.top }; };
-  canvas.onmousedown = e => { isDrawing = true; const p = getPos(e); drawCtx.beginPath(); drawCtx.moveTo(p.x, p.y); e.preventDefault(); };
-  canvas.onmousemove = e => { if(!isDrawing) return; const p = getPos(e); drawCtx.lineTo(p.x, p.y); drawCtx.stroke(); e.preventDefault(); };
-  window.onmouseup = () => { isDrawing = false; };
-  canvas.ontouchstart = e => { isDrawing = true; const p = getPos(e); drawCtx.beginPath(); drawCtx.moveTo(p.x, p.y); e.preventDefault(); };
-  canvas.ontouchmove = e => { if(!isDrawing) return; const p = getPos(e); drawCtx.lineTo(p.x, p.y); drawCtx.stroke(); e.preventDefault(); };
-  window.ontouchend = () => { isDrawing = false; };
+function initDrawingCanvas(){const c=document.getElementById('drawCanvas');if(!c)return;drawCtx=c.getContext('2d');drawCtx.clearRect(0,0,c.width,c.height);drawCtx.lineWidth=4;drawCtx.lineCap='round';drawCtx.strokeStyle=drawColor;
+ const pos=e=>{const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}};
+ c.onpointerdown=e=>{isDrawing=true;c.setPointerCapture(e.pointerId);const p=pos(e);drawCtx.beginPath();drawCtx.moveTo(p.x,p.y);e.preventDefault()};c.onpointermove=e=>{if(!isDrawing)return;const p=pos(e);drawCtx.lineTo(p.x,p.y);drawCtx.stroke();e.preventDefault()};c.onpointerup=c.onpointercancel=()=>isDrawing=false;
 }
-window.setDrawColor = function(c){ drawColor = c; if(drawCtx) drawCtx.strokeStyle = c; };
-window.clearDrawCanvas = function(){ const c = document.getElementById('drawCanvas'); if(c&&drawCtx) drawCtx.clearRect(0,0,c.width,c.height); };
-window.submitDrawData = async function(){
-  const c=document.getElementById('drawCanvas');if(!c)return;
-  const gameRef=ref(db,'games/draw'),snap=await get(gameRef),d=snap.val();
-  if(!d||d.drawer!==MY_ROLE||d.drawing||d.phase==='result')return toast('ليست مرحلة إرسال الرسم');
-  await update(gameRef,{drawing:c.toDataURL('image/png'),phase:'guessing'});
-  toast('📤 أُرسلت الرسمة!');playEventSound('game');
-  addNotification('🎨 أرسلت لك رسمة!',`${senderName(MY_ROLE)} رسم لك رسماً، ادخل وخمّن!`,'game','draw');
-};
-window.submitUserGuess = async function(){
-  const input=document.getElementById('userGuessWordInput');const answer=input?.value.trim();
-  if(!answer)return toast('اكتب تخمينك');
-  const gameRef=ref(db,'games/draw'),snap=await get(gameRef),d=snap.val();
-  if(!d||d.drawer===MY_ROLE||!d.drawing||d.phase==='result')return toast('لا يمكنك التخمين الآن');
-  const normalize=t=>String(t||'').normalize('NFKC').replace(/[\u064B-\u065F\u0670]/g,'').replace(/[إأآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[^\u0621-\u064Aa-z0-9 ]/gi,' ').trim().toLowerCase().replace(/\s+/g,' ');
-  const correct=normalize(answer)===normalize(d.word)||normalize(answer)===normalize(d.word.replace(/[^\u0621-\u064Aa-z0-9 ]/gi,''));
-  await update(gameRef,{phase:'result',guesser:MY_ROLE,answer,correct,guessed:true});
-  if(correct){burstHearts();addSharedHearts(15);toast('🎉 إجابة صحيحة!');}
-  else {toast('❌ إجابة خاطئة! ستظهر الإجابة الصحيحة');playEventSound('ping');}
-  addNotification('🎯 نتيجة الرسم والتخمين',`${senderName(MY_ROLE)} ${correct?'أجاب إجابة صحيحة':'لم يصب الإجابة'}، وحان دوره في الرسم!`,'game','draw');
-};
-window.nextDrawRound=async function(){
-  const gameRef=ref(db,'games/draw'),snap=await get(gameRef),d=snap.val();
-  if(!d||d.phase!=='result'||d.guesser!==MY_ROLE)return toast('انتظر دورك');
-  const nextWord=DRAW_WORDS[Math.floor(Math.random()*DRAW_WORDS.length)];
-  await update(gameRef,{drawer:MY_ROLE,word:nextWord,drawing:null,guessed:false,phase:'drawing',round:(d.round||1)+1,guesser:null,answer:null,correct:null});
-  toast('🎨 الآن دورك في الرسم!');
-};
+window.setDrawColor=c=>{drawColor=c;if(drawCtx)drawCtx.strokeStyle=c};window.clearDrawCanvas=()=>{const c=document.getElementById('drawCanvas');if(c&&drawCtx)drawCtx.clearRect(0,0,c.width,c.height)};
+window.submitDrawData=async()=>{const c=document.getElementById('drawCanvas');if(!c)return;try{const data=c.toDataURL('image/jpeg',.65);await update(ref(db,'games/draw'),{drawing:data,phase:'guessing'});toast('📤 وصلت الرسمة إلى اللعبة');addNotification('🎨 رسمة جديدة','افتح ارسم وخمّن لتجيب','game','draw')}catch(e){toast('تعذر إرسال الرسمة: '+e.message)}};
+const normalizeDraw=s=>String(s||'').replace(/[\u064B-\u065F\u0670]/g,'').replace(/[إأآ]/g,'ا').replace(/ة/g,'ه').replace(/[^\u0621-\u064A]/g,'').trim().toLowerCase();
+window.submitUserGuess=async()=>{const guess=document.getElementById('userGuessWordInput')?.value.trim();if(!guess)return toast('اكتب التخمين');try{const r=ref(db,'games/draw'),d=(await get(r)).val();if(!d||d.drawer===MY_ROLE||d.phase!=='guessing')return toast('انتهى دور التخمين');const correct=normalizeDraw(guess)===normalizeDraw(d.word);await update(r,{phase:'finished',guess,guesser:MY_ROLE,correct});if(correct)addSharedHearts(15);toast(correct?'✅ صحيح!':'❌ خطأ، ظهرت الإجابة الصحيحة')}catch(e){toast('تعذر حفظ التخمين: '+e.message)}};
+window.nextDrawTurn=async()=>{try{const r=ref(db,'games/draw'),d=(await get(r)).val();if(!d||d.phase!=='finished'||d.guesser!==MY_ROLE)return toast('ليس دورك');await set(r,{drawer:MY_ROLE,word:nextDrawWord(),roundId:Date.now(),phase:'drawing'});}catch(e){toast('تعذر بدء الجولة: '+e.message)}};
 
 /* ================= 5. Guess Number ================= */
 window.openGuessNumGame = function(){
@@ -1906,42 +1829,29 @@ window.saveDailyAnswer=async function(){
   finally{if(btn)btn.disabled=false;}
 };
 
-const v9Questions=[...DEFAULT_QUESTIONS,...(window.AYOUSHA_RANDOM_QUESTIONS||[])];
+const v9Questions=[...DEFAULT_QUESTIONS];
 let v10Activities={};
-const v10QuizQuestions=window.AYOUSHA_KNOW_ME_QUESTIONS||[];
-function v10ActivityKey(kind){return getTodayKey()+'_'+kind;}
+const v10QuizQuestions=['ما اللون الذي يفضله الطرف الآخر؟','ما الطعام المفضل لديه؟'];
+let v10ActivityListeners={};
+function v10ActivityKey(kind){return kind;}
 function v10ActivityModal(kind){
-  const key=v10ActivityKey(kind),obj=v10Activities[key]||{};
-  const title=kind==='random'?'🎲 سؤال عشوائي':'🧠 كم تعرفني؟';
-  const q=obj.q;
-  const mine=obj.answers?.[MY_ROLE],other=obj.answers?.[otherRole()];
-  let html=`<h3>${title}</h3>`;
-  if(!q){html+=`<p>اضغط لإنشاء سؤال مشترك لكما اليوم.</p><button class="btn btn-primary btn-full" onclick="v10StartActivity('${kind}')">✨ إنشاء سؤال</button>`;}
-  else{
-    html+=`<div class="v9-panel">${escapeHtml(q)}</div>`;
-    if(mine?.a&&other?.a){html+=`<div class="v9-entry"><b>💗 ${senderName(MY_ROLE)}</b><p>${escapeHtml(mine.a)}</p></div><div class="v9-entry"><b>💜 ${senderName(otherRole())}</b><p>${escapeHtml(other.a)}</p></div>`;}
-    else if(mine?.a){html+='<div class="v9-panel">🔒 حُفظت إجابتك، ستظهر الإجابتان بعد إجابة الطرف الآخر.</div>';}
-    else{html+=`<textarea id="v10ActivityAnswer" placeholder="اكتب إجابتك هنا" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);"></textarea><button class="btn btn-primary btn-full" onclick="v10SaveActivity('${kind}')">💾 حفظ الإجابة</button><p class="v9-soft">🔒 لن تظهر الإجابات حتى يجيب الطرفان.</p>`;}
-  }
-  openModal(html);
+ const title=kind==='random'?'🎲 سؤال عشوائي':'🧠 كم تعرفني؟';
+ openModal(`<h3>${title}</h3><div id="v10ActivityBody" class="v9-panel">⏳ جارٍ تحميل السؤال...</div>`);
+ if(v10ActivityListeners[kind])v10ActivityListeners[kind]();
+ v10ActivityListeners[kind]=onValue(ref(db,'app/v10Activities/'+kind),snap=>{v10Activities[kind]=snap.val()||{};v10RenderActivity(kind)},err=>{const el=document.getElementById('v10ActivityBody');if(el)el.textContent='تعذر تحميل الأسئلة: '+err.message});
 }
-window.v9RandomQuestion=()=>v10ActivityModal('random');
-window.v9Quiz=()=>v10ActivityModal('quiz');
-window.v10StartActivity=async function(kind){
-  if(!db)return toast('تحقق من الاتصال');
-  const key=v10ActivityKey(kind),old=v10Activities[key];
-  if(old?.q)return v10ActivityModal(kind);
-  const list=kind==='random'?v9Questions:v10QuizQuestions;
-  const q=list[Math.floor(Math.random()*list.length)];
-  try{await set(ref(db,'app/v10Activities/'+key+'/q'),q);await addNotification(kind==='random'?'🎲 سؤال عشوائي جديد':'🧠 سؤال كم تعرفني؟','افتح سؤال اليوم','answer');v10ActivityModal(kind);}catch(e){toast('تعذر الإنشاء');}
-};
-window.v10SaveActivity=async function(kind){
-  const a=document.getElementById('v10ActivityAnswer')?.value.trim();
-  if(!a)return toast('اكتب إجابتك');
-  if(!db)return toast('لا يوجد اتصال');
-  const key=v10ActivityKey(kind);
-  try{await set(ref(db,'app/v10Activities/'+key+'/answers/'+MY_ROLE),{a,t:new Date().toISOString()});await addNotification(kind==='random'?'🎲 إجابة السؤال':'🧠 إجابة كم تعرفني؟','تمت الإجابة','answer');playEventSound('answer',true);toast('💗 حُفظت');v10ActivityModal(kind);}catch(e){toast('تعذر الحفظ');}
-};
+function v10RenderActivity(kind){const el=document.getElementById('v10ActivityBody');if(!el)return;const obj=v10Activities[kind]||{},q=obj.q,mine=obj.answers?.[MY_ROLE],other=obj.answers?.[otherRole()];
+ let html='';if(!q)html=`<p>اضغط لإنشاء سؤال جديد.</p><button class="btn btn-primary btn-full" onclick="v10StartActivity('${kind}')">✨ إنشاء سؤال</button>`;
+ else{html=`<div class="v9-panel">${escapeHtml(q)}</div>`;
+ if(mine?.a&&other?.a)html+=`<div class="v9-entry">💗 ${senderName(MY_ROLE)}: ${escapeHtml(mine.a)}</div><div class="v9-entry">💜 ${senderName(otherRole())}: ${escapeHtml(other.a)}</div>`;
+ else if(mine?.a)html+='<p>🔒 تم حفظ إجابتك، بانتظار الطرف الآخر.</p>';
+ else html+=`<textarea id="v10ActivityAnswer" placeholder="اكتب إجابتك" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border)"></textarea><button class="btn btn-primary btn-full" onclick="v10SaveActivity('${kind}')">💾 حفظ الإجابة</button>`;
+ html+=`<button class="btn btn-soft btn-full" style="margin-top:12px" onclick="v10StartActivity('${kind}')">🔄 سؤال جديد</button>`;}
+ el.innerHTML=html;
+}
+window.v9RandomQuestion=()=>v10ActivityModal('random');window.v9Quiz=()=>v10ActivityModal('quiz');
+window.v10StartActivity=async kind=>{if(!db)return toast('تحقق من الاتصال');const list=kind==='random'?(window.AYOUSHA_RANDOM_QUESTIONS||v9Questions):(window.AYOUSHA_KNOW_ME_QUESTIONS||v10QuizQuestions);const q=list[Math.floor(Math.random()*list.length)];try{await set(ref(db,'app/v10Activities/'+kind),{q,createdAt:Date.now(),by:MY_ROLE,answers:{}});toast('✨ تم إنشاء السؤال');addNotification('💗 سؤال جديد','افتح الأسئلة للإجابة','answer')}catch(e){toast('تعذر الإنشاء: '+e.message)}};
+window.v10SaveActivity=async kind=>{const a=document.getElementById('v10ActivityAnswer')?.value.trim();if(!a)return toast('اكتب إجابتك');try{await set(ref(db,'app/v10Activities/'+kind+'/answers/'+MY_ROLE),{a,t:Date.now()});toast('💗 حُفظت الإجابة')}catch(e){toast('تعذر الحفظ: '+e.message)}};
 window.v9QuestionHistory=function(){
   const days=Object.entries(v9Daily).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,35);
   openModal('<h3>📅 أرشيف الأسئلة</h3>'+(days.map(([k,v])=>`<div class="v9-entry"><b>${escapeHtml(k)}</b><p>${escapeHtml(v.me?.q||v.her?.q||'سؤال اليوم')}</p><small>${v.me?.a&&v.her?.a?'💞 أجبتما معًا':'⏳ لم تكتمل الإجابات'}</small></div>`).join('')||'<p>لا توجد إجابات بعد</p>'));
