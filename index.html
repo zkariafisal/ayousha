@@ -12,6 +12,8 @@
 <script src="./trivia-questions.js"></script>
 <script src="./story-questions.js"></script>
 <script src="./draw-questions.js"></script>
+<script src="./random-questions.js"></script>
+<script src="./know-me-questions.js"></script>
 <script src="./cards-questions.js"></script>
 <script src="./puzzle-questions.js"></script>
 <script src="./telepathy-questions.js"></script>
@@ -981,7 +983,9 @@ window.openDrawGame = function(){
     <div id="guessArea" style="display:none;margin-top:10px;">
       <img id="receivedDrawImg" style="width:100%;max-height:200px;object-fit:contain;border:2px dashed #f2d9e4;border-radius:14px;background:#fff;margin-bottom:8px;">
       <input id="userGuessWordInput" placeholder="خمّن: ما الذي رسمه شريكك؟" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);">
-      <button class="btn btn-primary btn-full" style="margin-top:6px;" onclick="window.submitUserGuess()">🎯 إرسال التخمين</button>
+      <button id="drawGuessBtn" class="btn btn-primary btn-full" style="margin-top:6px;" onclick="window.submitUserGuess()">🎯 إرسال التخمين</button>
+      <div id="drawResult" class="v9-panel" style="display:none;text-align:center;margin-top:10px"></div>
+      <button id="drawNextBtn" class="btn btn-primary btn-full" style="display:none;margin-top:8px" onclick="window.nextDrawRound()">🎨 الآن دورك للرسم</button>
     </div>
     ${window.renderGameChatUI('games/draw')}
     <div style="margin-top:10px;"><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button></div>
@@ -991,7 +995,7 @@ window.openDrawGame = function(){
     let d = snap.val();
     if(!d || !d.word){
       const w = DRAW_WORDS[Math.floor(Math.random() * DRAW_WORDS.length)];
-      d = { drawer: 'me', word: w, drawing: null, guessed: false, lastMsg: null };
+      d = { drawer: 'me', word: w, drawing: null, guessed: false, phase: 'drawing', round: 1, lastMsg: null };
       await set(drawRef, d); return;
     }
     const status = document.getElementById('drawStatus');
@@ -1000,16 +1004,34 @@ window.openDrawGame = function(){
     const recvImg = document.getElementById('receivedDrawImg');
     if(!status) return;
     const isDrawer = (d.drawer === MY_ROLE);
-    if(isDrawer){
-      canvasArea.style.display = 'block';
-      guessArea.style.display = 'none';
-      status.innerHTML = `🎨 <b>دورك!</b> ارسم: <span style="color:#d81b60;font-size:1.15rem;">[${escapeHtml(d.word)}]</span>`;
-      setTimeout(initDrawingCanvas, 150);
-    } else {
-      canvasArea.style.display = 'none';
-      guessArea.style.display = 'block';
-      if(d.drawing){ recvImg.src = d.drawing; status.innerHTML = `🔍 <b>دورك في التخمين!</b> انظر للرسمة 💕`; }
-      else { recvImg.src = ''; status.innerHTML = `⏳ <b>${senderName(d.drawer)}</b> يرسم لك...`; }
+    const result = document.getElementById('drawResult');
+    const nextBtn = document.getElementById('drawNextBtn');
+    const guessBtn = document.getElementById('drawGuessBtn');
+    const guessInput = document.getElementById('userGuessWordInput');
+    if(result) result.style.display='none';
+    if(nextBtn) nextBtn.style.display='none';
+    if(guessBtn) guessBtn.style.display='block';
+    if(guessInput) guessInput.disabled=false;
+    if(d.phase === 'result'){
+      canvasArea.style.display='none'; recvArea.style.display='block';
+      if(d.drawing) recvImg.src=d.drawing;
+      const correct = d.correct === true;
+      status.innerHTML = `🎯 انتهى التخمين — ${correct?'✅ إجابة صحيحة!':'❌ إجابة خاطئة!'}`;
+      if(result){result.style.display='block';result.innerHTML=`<b>${correct?'🎉 أحسنت!':'💗 فرصة أجمل في الجولة القادمة!'}</b><br>إجابة ${escapeHtml(senderName(d.guesser||otherRole()))}: ${escapeHtml(d.answer||'—')}<br>✅ الرسمة الصحيحة هي: <b>${escapeHtml(d.word)}</b>`;}
+      if(guessBtn)guessBtn.style.display='none';
+      if(guessInput)guessInput.disabled=true;
+      if(nextBtn && d.guesser===MY_ROLE)nextBtn.style.display='block';
+    }else if(isDrawer){
+      canvasArea.style.display='block'; recvArea.style.display='none';
+      status.innerHTML = d.drawing ? '⏳ أرسلت رسمتك، انتظر تخمين الطرف الآخر 💕' : `🎨 <b>دورك!</b> ارسم: <span style="color:#d81b60;font-size:1.15rem;">[${escapeHtml(d.word)}]</span>`;
+      const sendBtn=document.getElementById('sendDrawingBtn');if(sendBtn)sendBtn.disabled=!!d.drawing;
+      if(!d.drawing && window._drawCanvasRound!==d.round){window._drawCanvasRound=d.round;setTimeout(initDrawingCanvas,150);}
+    }else{
+      canvasArea.style.display='none'; recvArea.style.display='block';
+      if(d.drawing){ recvImg.src=d.drawing; status.innerHTML = '🔍 <b>دورك في التخمين!</b> لديك محاولة واحدة فقط 💕'; }
+      else { recvImg.removeAttribute('src'); status.innerHTML = `⏳ <b>${senderName(d.drawer)}</b> يرسم لك...`; }
+      if(guessBtn)guessBtn.disabled=!d.drawing;
+      if(guessInput)guessInput.disabled=!d.drawing;
     }
   });
 };
@@ -1030,20 +1052,32 @@ function initDrawingCanvas(){
 }
 window.setDrawColor = function(c){ drawColor = c; if(drawCtx) drawCtx.strokeStyle = c; };
 window.clearDrawCanvas = function(){ const c = document.getElementById('drawCanvas'); if(c&&drawCtx) drawCtx.clearRect(0,0,c.width,c.height); };
-window.submitDrawData = async function(){ const c = document.getElementById('drawCanvas'); if(!c) return; await update(ref(db, 'games/draw'), { drawing: c.toDataURL('image/png') }); toast('📤 أُرسلت الرسمة!'); playEventSound('game'); addNotification('🎨 أرسلت لك رسمة!', `${senderName(MY_ROLE)} رسم لك رسماً، ادخل وخمّن!`, 'game', 'draw'); };
+window.submitDrawData = async function(){
+  const c=document.getElementById('drawCanvas');if(!c)return;
+  const gameRef=ref(db,'games/draw'),snap=await get(gameRef),d=snap.val();
+  if(!d||d.drawer!==MY_ROLE||d.drawing||d.phase==='result')return toast('ليست مرحلة إرسال الرسم');
+  await update(gameRef,{drawing:c.toDataURL('image/png'),phase:'guessing'});
+  toast('📤 أُرسلت الرسمة!');playEventSound('game');
+  addNotification('🎨 أرسلت لك رسمة!',`${senderName(MY_ROLE)} رسم لك رسماً، ادخل وخمّن!`,'game','draw');
+};
 window.submitUserGuess = async function(){
-  const input = document.getElementById('userGuessWordInput');
-  const text = input?.value.trim().toLowerCase();
-  if(!text) return toast('اكتب تخمينك');
-  const snap = await get(ref(db, 'games/draw'));
-  const d = snap.val();
-  const rawWord = d.word.replace(/[^\u0621-\u064A]/g, '').trim().toLowerCase();
-  if(text.includes(rawWord) || rawWord.includes(text)){
-    burstHearts(); addSharedHearts(15); toast('🎉 تخمين صحيح!');
-    const nextWord = DRAW_WORDS[Math.floor(Math.random() * DRAW_WORDS.length)];
-    await set(ref(db, 'games/draw'), { drawer: otherRole(), word: nextWord, drawing: null, guessed: true, lastMsg: null });
-    addNotification('🎉 تخمينك صحيح!', `خمن ${senderName(MY_ROLE)} الرسمة، حان دوره في الرسم!`, 'game', 'draw');
-  } else { toast('❌ حاول ثانية!'); playEventSound('ping'); }
+  const input=document.getElementById('userGuessWordInput');const answer=input?.value.trim();
+  if(!answer)return toast('اكتب تخمينك');
+  const gameRef=ref(db,'games/draw'),snap=await get(gameRef),d=snap.val();
+  if(!d||d.drawer===MY_ROLE||!d.drawing||d.phase==='result')return toast('لا يمكنك التخمين الآن');
+  const normalize=t=>String(t||'').normalize('NFKC').replace(/[\u064B-\u065F\u0670]/g,'').replace(/[إأآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[^\u0621-\u064Aa-z0-9 ]/gi,' ').trim().toLowerCase().replace(/\s+/g,' ');
+  const correct=normalize(answer)===normalize(d.word)||normalize(answer)===normalize(d.word.replace(/[^\u0621-\u064Aa-z0-9 ]/gi,''));
+  await update(gameRef,{phase:'result',guesser:MY_ROLE,answer,correct,guessed:true});
+  if(correct){burstHearts();addSharedHearts(15);toast('🎉 إجابة صحيحة!');}
+  else {toast('❌ إجابة خاطئة! ستظهر الإجابة الصحيحة');playEventSound('ping');}
+  addNotification('🎯 نتيجة الرسم والتخمين',`${senderName(MY_ROLE)} ${correct?'أجاب إجابة صحيحة':'لم يصب الإجابة'}، وحان دوره في الرسم!`,'game','draw');
+};
+window.nextDrawRound=async function(){
+  const gameRef=ref(db,'games/draw'),snap=await get(gameRef),d=snap.val();
+  if(!d||d.phase!=='result'||d.guesser!==MY_ROLE)return toast('انتظر دورك');
+  const nextWord=DRAW_WORDS[Math.floor(Math.random()*DRAW_WORDS.length)];
+  await update(gameRef,{drawer:MY_ROLE,word:nextWord,drawing:null,guessed:false,phase:'drawing',round:(d.round||1)+1,guesser:null,answer:null,correct:null});
+  toast('🎨 الآن دورك في الرسم!');
 };
 
 /* ================= 5. Guess Number ================= */
@@ -1872,9 +1906,9 @@ window.saveDailyAnswer=async function(){
   finally{if(btn)btn.disabled=false;}
 };
 
-const v9Questions=[...DEFAULT_QUESTIONS,'ما الذكرى التي تريد أن نعيشها من جديد؟','ما الشيء الذي يجعل يومك أجمل؟','لو أرسلنا رسالة لأنفسنا بعد سنة ماذا نقول؟'];
+const v9Questions=[...DEFAULT_QUESTIONS,...(window.AYOUSHA_RANDOM_QUESTIONS||[])];
 let v10Activities={};
-const v10QuizQuestions=['ما اللون الذي يفضله الطرف الآخر؟','ما الطعام المفضل لديه؟','ما المكان الذي يتمنى زيارته؟','ما أكثر شيء يجعله يضحك؟'];
+const v10QuizQuestions=window.AYOUSHA_KNOW_ME_QUESTIONS||[];
 function v10ActivityKey(kind){return getTodayKey()+'_'+kind;}
 function v10ActivityModal(kind){
   const key=v10ActivityKey(kind),obj=v10Activities[key]||{};
