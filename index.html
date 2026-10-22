@@ -10,6 +10,14 @@
 <title>عيون عيوشة 🌸</title>
 
 <script src="./trivia-questions.js"></script>
+<script src="./story-questions.js"></script>
+<script src="./draw-questions.js"></script>
+<script src="./cards-questions.js"></script>
+<script src="./puzzle-questions.js"></script>
+<script src="./telepathy-questions.js"></script>
+<script src="./spin-questions.js"></script>
+<script src="./xo-questions.js"></script>
+<script src="./guessNum-questions.js"></script>
 
 <link rel="manifest" href='data:application/manifest+json,{"name":"عيون عيوشة","short_name":"عيوشة","start_url":"./","display":"standalone","background_color":"%23fdf6f9","theme_color":"%23d81b60","orientation":"portrait","icons":[{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"512x512","type":"image/png","purpose":"any"}]}'>
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png">
@@ -250,7 +258,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('xo')">❌⭕ لعبة XO (شات ذاتي الحذف 5 ثوانٍ)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('draw')">🎨 ارسم وخمّن (رسم حي + تخمين الشريك بالتبادل)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('guessNum')">🔢 خمن الرقم السري (مبارزة تخمين بالدور)</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('doors')">🎁 افتح الباب الصحيح (تناوب فتح الأبواب + شات)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('cards')">💌 اختر رقمًا واكتشف رسالتك (تناوب فتح القلوب)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('puzzle')">🧩 حل اللغز قبلي (حل سري + كشف الجوابين)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('telepathy')">⚡ تخاطر القلوب (تطابق الاختيارات)</button>
@@ -276,7 +283,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
         <input type="file" id="chatAttachment" style="display:none" onchange="window.sendChatAttachment(event)">
         <button type="button" class="chat-attach" onclick="document.getElementById('chatAttachment').click()" title="مرفق">📎</button>
         <textarea id="instantMailText" rows="1" maxlength="5000" placeholder="اكتب رسالة..." oninput="window.resizeChatInput(this);window.chatTypingInput()"></textarea>
-        <button id="voiceRecordBtn" type="button" class="chat-attach" onclick="window.toggleVoiceRecording()" title="تسجيل صوتي">🎙️</button>
         <button id="instantMailSend" type="submit" aria-label="إرسال">➤</button>
       </form>
       <div id="instantMailStatus" class="messenger-status"></div>
@@ -403,7 +409,7 @@ let state = {
 };
 
 let chatPresence={}, chatTyping={}, chatReplyId=null;
-let chatRecorder=null, chatChunks=[], chatRecordingStream=null;
+
 let lastTypingWrite=0, lastReadWrite=0;
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('show'),3200);}
@@ -644,17 +650,12 @@ window.openTriviaGame = function(){
           <label style="font-weight:bold;font-size:.85rem;">اختر الفئة:</label>
           <select id="trivCatSelect" style="margin-top:4px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);">
             <option value="الكل">كل الفئات المتنوعة 🌍</option>
-            <option value="غرائب">غرائب ومعلومات عجيبة 😲</option>
-            <option value="تاريخ">تاريخ وحضارات 📜</option>
-            <option value="علوم">علوم وطبيعة 🔬</option>
-            <option value="جغرافيا">جغرافيا ودول 🗺️</option>
-            <option value="حيوانات">كائنات وحيوانات 🐾</option>
-            <option value="أكلات وثقافات">أكلات وثقافات 🍕</option>
-            <option value="رياضة">رياضة وأرقام قياسية ⚽</option>
-            <option value="فنون">فنون وثقافة 🎨</option>
+            ${[...new Set((window.TRIVIA_BANK||[]).map(q=>q.cat))].map(cat=>`<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`).join('')}
           </select>
         </div>
-        <button class="btn btn-primary btn-full" onclick="window.startTriviaRound()">🚀 بدء اللعبة وتوليد السؤال</button>
+        <label>عدد الأسئلة في المباراة:</label><select id="trivCountSelect" style="width:100%;padding:10px;border-radius:12px;margin:8px 0;"><option>5</option><option>10</option><option>15</option><option>20</option><option>30</option><option>50</option></select>
+        <p class="muted">${t?.nextStarter && t.nextStarter!==MY_ROLE?'⏳ هذه المرة يبدأ '+senderName(t.nextStarter):'💗 حان دورك لبدء المباراة'}</p>
+        <button class="btn btn-primary btn-full" ${t?.nextStarter && t.nextStarter!==MY_ROLE?'disabled':''} onclick="window.startTriviaRound()">🚀 بدء مباراة جديدة</button>
       `;
       return;
     }
@@ -723,23 +724,26 @@ window.openTriviaGame = function(){
             <div style="margin-top:8px;font-weight:bold;color:#ad1457;">📊 النقاط: ${t.scores?.me||0} - ${t.scores?.her||0}</div>
           </div>
         </div>
-        <button class="btn btn-primary btn-full" onclick="window.nextTriviaQuestion()">🎯 السؤال التالي</button>
+        <div class="v9-panel">السؤال ${t.round} من ${t.totalRounds||5}</div>
+        <button class="btn btn-primary btn-full" ${t.round>=(t.totalRounds||5)&&t.starter!==MY_ROLE?'disabled':''} onclick="window.nextTriviaQuestion()">${t.round >= (t.totalRounds||5)?'🏁 إنهاء المباراة وتسليم البدء للطرف الآخر':'🎯 السؤال التالي'}</button>
       `;
     }
   });
 };
 
-window.resetTriviaGame = async function(){ await set(ref(db, 'games/trivia'), { status: 'setup' }); toast('🔄 تم تصفير غرفة اللعبة'); };
+window.resetTriviaGame = async function(){ const old=(await get(ref(db,'games/trivia'))).val()||{}; await set(ref(db,'games/trivia'),{status:'setup',nextStarter:old.starter===MY_ROLE?otherRole():MY_ROLE}); toast('تم إنهاء المباراة'); };
 window.startTriviaRound = async function(){
   const bank = (window.TRIVIA_BANK && window.TRIVIA_BANK.length) ? window.TRIVIA_BANK : [
     { id: 1, cat: "غرائب", q: "ما هو الحيوان الثديي الوحيد الذي لا يستطيع القفز نهائياً؟", real: "الفيل", decoy: "فرس النهر" }
   ];
+  const previous=(await get(ref(db,'games/trivia'))).val()||{}; if(previous.nextStarter && previous.nextStarter!==MY_ROLE)return toast('الدور للشخص الآخر');
+  const totalRounds=Number(document.getElementById('trivCountSelect')?.value||5);
   const cat = document.getElementById('trivCatSelect')?.value || 'الكل';
   let filtered = cat === 'الكل' ? bank : bank.filter(q => q.cat === cat);
   if(!filtered.length) filtered = bank;
   const picked = filtered[Math.floor(Math.random() * filtered.length)];
   await set(ref(db, 'games/trivia'), {
-    status: 'faking', currentQ: picked, fakeAnswers: {}, guesses: {}, scores: { me: 0, her: 0 }, round: 1
+    status: 'faking', currentQ: picked, selectedCat:cat, totalRounds, starter:MY_ROLE, nextStarter:otherRole(), usedQuestions:[picked.id||picked.q], fakeAnswers: {}, guesses: {}, scores: { me: 0, her: 0 }, round: 1
   });
   playEventSound('game');
   addNotification('🧠 بدأت لعبة الترفيه والخداع!', `سؤال جديد في فئة [${picked.cat}]! ادخل واكتب تمويهك!`, 'game', 'trivia');
@@ -783,12 +787,15 @@ window.nextTriviaQuestion = async function(){
   const bank = (window.TRIVIA_BANK && window.TRIVIA_BANK.length) ? window.TRIVIA_BANK : [];
   const snap = await get(ref(db, 'games/trivia'));
   const data = snap.val() || {};
-  const currentCat = data.currentQ?.cat;
+  if(data.round >= (data.totalRounds||5)){await set(ref(db,'games/trivia'),{status:'setup',nextStarter:otherRole()===data.starter?otherRole():data.starter===MY_ROLE?otherRole():MY_ROLE,previousScores:data.scores});toast('🏁 انتهت المباراة، يبدأ الطرف الآخر');return;}
+  const currentCat = data.selectedCat==='الكل'?null:data.selectedCat;
   let filtered = bank;
   if(currentCat && bank.some(q => q.cat === currentCat)) filtered = bank.filter(q => q.cat === currentCat);
-  const picked = filtered[Math.floor(Math.random() * filtered.length)] || bank[0];
+  const unused=filtered.filter(q=>!(data.usedQuestions||[]).includes(q.id||q.q));
+  const choices=unused.length?unused:filtered;
+  const picked = choices[Math.floor(Math.random() * choices.length)] || bank[0];
   await update(ref(db, 'games/trivia'), {
-    status: 'faking', currentQ: picked, fakeAnswers: {}, guesses: {}, shuffledOptions: [], round: (data.round || 1) + 1
+    status: 'faking', currentQ: picked, usedQuestions:[...(data.usedQuestions||[]),picked.id||picked.q], fakeAnswers: {}, guesses: {}, shuffledOptions: [], round: (data.round || 1) + 1
   });
   playEventSound('game'); toast('🎲 جولة جديدة بدأت!');
   addNotification('🎲 جولة جديدة!', 'سؤال جديد ينتظرك، ادخل واكتب تمويهك!', 'game', 'trivia');
@@ -801,7 +808,7 @@ const STORY_STARTERS = [
   "استيقظ زكريا صباحاً فوجد على المرآة رسالة سرية مكتوبة بروج عيوشة تقول: ابحث عني في...",
   "كنا نمشي على شاطئ البحر في ليلة مقمرة، وفجأة لمحت عيوشة زجاجة عائمة بداخلها خريطة كنز قديمة...",
   "في يوم استثنائي مليء بالمفاجآت، وجدنا بوابة سرية خلف حديقة بيتنا تؤدي إلى عالم ساحر..."
-];
+].concat(window.GAME_EXTRAS?.story||[]);
 
 window.openStoryGame = function(){
   if(!db) return toast('جاري الاتصال...');
@@ -952,7 +959,7 @@ window.resetXOGame = async function(){
 };
 
 /* ================= 4. Draw ================= */
-const DRAW_WORDS = ["شمس ☀️", "قلب 💖", "قطة 🐱", "فنجان قهوة ☕", "سيارة 🚗", "وردة 🌹", "قمر 🌙", "بيت 🏡", "تاج 👑", "نظارة 👓"];
+const DRAW_WORDS = ["شمس ☀️", "قلب 💖", "قطة 🐱", "فنجان قهوة ☕", "سيارة 🚗", "وردة 🌹", "قمر 🌙", "بيت 🏡", "تاج 👑", "نظارة 👓"].concat(window.GAME_EXTRAS?.draw||[]);
 window.openDrawGame = function(){
   if(!db) return toast('جاري الاتصال...');
   const drawRef = ref(db, 'games/draw');
@@ -1181,7 +1188,9 @@ window.pickSharedCard = async function(n){
   const snap = await get(ref(db, 'games/cards'));
   const d = snap.val();
   if(d.turn !== MY_ROLE) return toast('انتظر دور شريكك');
-  const msg = CARD_MESSAGES[n] || "كل القلوب تحبك 💕";
+  const extras = window.CARD_EXTRA_MESSAGES?.[n] || [];
+  const choices = [CARD_MESSAGES[n], ...extras].filter(Boolean);
+  const msg = choices.length ? choices[Math.floor(Math.random()*choices.length)] : "كل القلوب تحبك 💕";
   burstHearts(); addSharedHearts(5); playEventSound('win');
   await update(ref(db, 'games/cards'), { turn: otherRole(), lastCard: { num: n, msg, by: MY_ROLE, at: Date.now() } });
   addNotification('💌 قلب جديد!', `فتح ${senderName(MY_ROLE)} الكرت [${n}]: "${msg.slice(0,30)}..."`, 'game', 'cards');
@@ -1193,12 +1202,13 @@ const PUZZLES_POOL = [
   { q: "ما هو الشيء الذي ينبض بدون قلب ويبكي بدون عينين؟", a: ["السحاب", "المطر", "السحابة"] },
   { q: "أنا ابن الماء وإذا تركوني في الماء متّ، فمن أنا؟", a: ["الثلج", "ثلج"] },
   { q: "شيء تملكه أنت ولكن يستخدمه الناس أكثر منك، ما هو؟", a: ["اسمك", "الاسم"] }
-];
+].concat(window.GAME_EXTRAS?.puzzle||[]);
 window.openPuzzleGame = function(){
   if(!db) return toast('جاري الاتصال...');
   const puzzleRef = ref(db, 'games/puzzle');
   if(window._activeGameUnsub) window._activeGameUnsub();
   window.openModal(`
+    ${window.renderGameChatUI('games/puzzle')}
     <h3>🧩 تحدي حل اللغز قبلي</h3>
     <div id="puzzleQuestionBox" class="v9-panel" style="font-weight:600;font-size:1.05rem;">جاري التحميل...</div>
     <div id="puzzleStatusArea"></div>
@@ -1256,12 +1266,13 @@ window.nextPuzzleRound = async function(){
 const TELEPATHY_QUESTIONS = [
   { q: "لو طلبنا عشاء الليلة، ماذا نختار؟", options: ["بيتزا إيطالية 🍕", "برجر ولغوصة 🍔", "مشاوي وشاورما 🥙", "حلى وقهوة بس ☕"] },
   { q: "وجهتنا المفضلة للسفر القادم؟", options: ["بحر وأجواء استرخاء 🏖️", "طبيعة وجبال خضراء 🌲", "مدينة وتسوق وصخب 🏙️", "ملاذ ريفي هادئ 🏡"] }
-];
+].concat(window.GAME_EXTRAS?.telepathy||[]);
 window.openTelepathyGame = function(){
   if(!db) return toast('جاري الاتصال...');
   const telRef = ref(db, 'games/telepathy');
   if(window._activeGameUnsub) window._activeGameUnsub();
   window.openModal(`
+    ${window.renderGameChatUI('games/telepathy')}
     <h3>⚡ تخاطر القلوب</h3>
     <div id="telQuestion" class="v9-panel" style="font-weight:bold;font-size:1.05rem;">جاري التحميل...</div>
     <div id="telOptions" style="display:flex;flex-direction:column;gap:8px;margin:12px 0;"></div>
@@ -1307,9 +1318,10 @@ const SPIN_WHEEL_TASKS = [
   "وعد بتقديم مساج أو تحضير مشروب دافئ للطرف الآخر ☕",
   "اطلب أمنية واحدة ويجب على الطرف الآخر تنفيذها 👑",
   "ابتسم الآن وصور ابتسامتك أو أرسل قبلة طائرة 💋"
-];
+].concat(window.GAME_EXTRAS?.spin||[]);
 window.openSpinGame = function(){
   window.openModal(`
+    ${window.renderGameChatUI('games/spin')}
     <h3>🎡 عجلة التحديات والرومانسية</h3>
     <div id="spinResultBox" class="v9-panel" style="font-size:1.1rem;font-weight:bold;text-align:center;min-height:70px;display:grid;place-items:center;">اضغط للف العجلة 🎡</div>
     <button class="btn btn-primary btn-full" style="height:50px;font-size:1.1rem;" onclick="window.spinTheWheel()">🎲 تدوير العجلة</button>
@@ -1362,7 +1374,6 @@ window.launchGameModal = function(type){
   else if(type === 'xo') window.openXOGame();
   else if(type === 'draw') window.openDrawGame();
   else if(type === 'guessNum') window.openGuessNumGame();
-  else if(type === 'doors') window.openDoorsGame();
   else if(type === 'cards') window.openCardsGame();
   else if(type === 'puzzle') window.openPuzzleGame();
   else if(type === 'telepathy') window.openTelepathyGame();
@@ -1548,24 +1559,7 @@ window.sendChatAttachment=async function(event){
   const f=event.target.files?.[0];event.target.value='';
   if(f)await sendChatMedia(f);
 };
-window.toggleVoiceRecording=async function(){
-  const btn=document.getElementById('voiceRecordBtn');
-  if(chatRecorder&&chatRecorder.state==='recording'){chatRecorder.stop();btn.classList.remove('recording');btn.textContent='🎙️';return;}
-  try{
-    chatRecordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
-    chatChunks=[];
-    chatRecorder=new MediaRecorder(chatRecordingStream);
-    chatRecorder.ondataavailable=e=>{if(e.data.size)chatChunks.push(e.data)};
-    chatRecorder.onstop=async()=>{
-      const blob=new Blob(chatChunks,{type:chatRecorder.mimeType||'audio/webm'});
-      chatRecordingStream?.getTracks().forEach(t=>t.stop());
-      if(blob.size>0)await sendChatMedia(new File([blob],'voice.webm',{type:blob.type}));
-    };
-    chatRecorder.start();
-    btn.classList.add('recording');btn.textContent='⏹️';
-    toast('🎙️ التسجيل جارٍ، اضغط مرة أخرى للإرسال');
-  }catch(e){toast('تعذر استخدام الميكروفون: '+e.message);}
-};
+
 
 /* ============================================================
    عالمنا / الذكريات (مطوّر)
