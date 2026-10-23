@@ -1,6 +1,8 @@
 /* عيون عيوشة — ألعاب المجتمع الثنائية. يعتمد على ayoushaRealtime الموجود في index.html. */
 (function(){
 'use strict';
+const previousLaunchGameModal = window.launchGameModal;
+const NEW_GAME_IDS = new Set(['balderdash','fibbage','codenames','werewolf','resistance']);
 const GAMES={
  balderdash:{title:'🌀 خمنها — Balderdash',how:'تظهر كلمة أو أداة غريبة. اكتب تعريفاً وهمياً مقنعاً، ثم انتظر إجابة الطرف الآخر. بعد اكتمال الإجابتين تُعرض الخيارات بترتيب عشوائي. اختر التعريف الحقيقي؛ تحصل على نقطتين للصواب ونقطة عن كل شخص خدعته بإجابتك الوهمية.'},
  fibbage:{title:'🤥 كذبة مقنعة — Fibbage',how:'اقرأ السؤال الغريب واكتب إجابة تبدو حقيقية. بعد إرسال الإجابتين، تُخلط الإجابات الوهمية مع الإجابة الصحيحة. يصوّت كل لاعب سراً، ثم تكشفان النتيجة وتُضاف النقاط تلقائياً.'},
@@ -19,15 +21,17 @@ const dailyKey=()=>dateKey();
 const dailyQuestion=()=>{const qs=window.AYOUSHA_DAILY_QUESTIONS||[];if(!qs.length)return 'لا توجد أسئلة في البنك.';const day=Math.floor(Date.UTC(...dailyKey().split('-').map((n,i)=>i===1?Number(n)-1:Number(n)))/86400000);return qs[((day%qs.length)+qs.length)%qs.length]};
 function status(msg){const e=document.getElementById('cg-status');if(e)e.textContent=msg;}
 function setUnsub(fn){if(window._activeGameUnsub)try{window._activeGameUnsub()}catch{}window._activeGameUnsub=fn||null;}
-function open(t){if(!GAMES[t])return;const a=api();const item=bank(t)[0]||{};const intro=`<div class="v9-panel"><b>📘 طريقة اللعب</b><p>${GAMES[t].how}</p></div>`;let content='';
+function open(t){if(!GAMES[t]){if(typeof previousLaunchGameModal==='function')return previousLaunchGameModal(t);console.error('Unknown game:',t);return;}const a=api();const item=bank(t)[0]||{};const intro=`<div class="v9-panel"><b>📘 طريقة اللعب</b><p>${GAMES[t].how}</p></div>`;let content='';
  if(t==='balderdash'||t==='fibbage')content=`<div id="cg-question" class="v9-panel">جارٍ تحميل الجولة…</div><label for="cg-answer">إجابتك الوهمية</label><textarea id="cg-answer" class="answer-input" rows="3" maxlength="500" placeholder="اكتب إجابة مقنعة"></textarea><button id="cg-submit" class="btn btn-primary btn-full">إرسال الإجابة</button><div id="cg-voting" class="v9-panel"></div><div id="cg-result" class="v9-panel"></div><button id="cg-new" class="btn btn-soft btn-full">بدء جولة جديدة</button>`;
  else if(t==='codenames')content=`<div id="cg-code" class="v9-panel">جارٍ تحميل اللوحة…</div><div id="cg-code-board" style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px"></div><div id="cg-code-actions" class="v9-panel"></div><button id="cg-new" class="btn btn-soft btn-full">جولة جديدة / تبديل القائد</button>`;
  else content=`<div id="cg-scenario" class="v9-panel">${esc(item.scenario||item.mission||'')}</div><div id="cg-role" class="v9-panel">جارٍ تحميل الدور السري…</div><div id="cg-actions" class="v9-panel"></div><div id="cg-result" class="v9-panel"></div><button id="cg-new" class="btn btn-soft btn-full">بدء جولة جديدة</button>`;
  window.openModal(`<h3>${GAMES[t].title}</h3>${intro}<p class="muted">حالة اللعبة تُزامن عبر Firebase بين حسابَي «me» و«her» عند توافر الاتصال والصلاحيات.</p>${content}<p id="cg-status" class="v9-panel"></p><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button>`);
  if(!a?.ready?.()){status('قاعدة البيانات غير متاحة. افتح المشروع من الاستضافة وتحقق من اتصال Firebase.');return;}
- if(t==='balderdash'||t==='fibbage')textGame(t,item);
- if(t==='codenames')codeGame(item);
- if(t==='werewolf'||t==='resistance')roleGame(t,item);
+ try {
+  if(t==='balderdash'||t==='fibbage')textGame(t,item).catch(e=>{console.error(e);status('تعذر تشغيل اللعبة: '+(e?.message||e));});
+  if(t==='codenames')codeGame(item).catch(e=>{console.error(e);status('تعذر تشغيل اللعبة: '+(e?.message||e));});
+  if(t==='werewolf'||t==='resistance')roleGame(t,item).catch(e=>{console.error(e);status('تعذر تشغيل اللعبة: '+(e?.message||e));});
+ } catch(e) { console.error(e); status('حدث خطأ أثناء فتح اللعبة: '+(e?.message||e)); }
 }
 function shuffled(arr){const x=[...arr];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;}
 async function getOrCreate(path,create){const a=api();let d=await a.read(path);if(!d||d.version!==2){d=create();d.version=2;await a.write(path,d);d=await a.read(path)||d;}return d;}
@@ -54,6 +58,9 @@ async function roleGame(t,seed){const a=api(),path=roomPath(t);const itemBank=ba
  act.querySelectorAll('[data-cg-mission]').forEach(b=>b.onclick=async()=>{const n=await a.read(path);if(n.actions?.[role()]||n.status==='finished')return;const value=b.dataset.cgMission;if(value==='fail'&&n.roles?.[role()]!=='مخرّب')return;await a.patch(path+'/actions',{[role()]:value});const x=await a.read(path);if(x.actions?.me&&x.actions?.her){const failed=x.actions.me==='fail'||x.actions.her==='fail';const score={...(x.scores||{me:0,her:0})};if(failed){if(x.roles.me==='مخرّب')score.me+=2;else score.her+=2;}else{if(x.roles.me==='مقاومة')score.me+=1;else score.her+=1;}await a.patch(path,{status:'finished',scores:score,result:failed?'فشلت المهمة — تم تسجيل النتيجة دون كشف صاحب التخريب.':'نجحت المهمة — فازت المقاومة بهذه المهمة.'});}});
  };
  setUnsub(a.listen(path,render));render(d0);document.getElementById('cg-new').onclick=async()=>{const old=await a.read(path)||d0;await a.write(path,create(old));status('بدأت جولة جديدة. تذكّروا إبقاء الأدوار سرية.');};}
-window.launchGameModal=open;
+window.launchCommunityGame=open;
+// Keep all original games working; route only the five new games to this module.
+window.launchGameModal=function(type){ if(NEW_GAME_IDS.has(type)) return open(type); if(typeof previousLaunchGameModal==='function') return previousLaunchGameModal(type); return open(type); };
+window.addEventListener('error',e=>{const st=document.getElementById('cg-status');if(st)st.textContent='خطأ JavaScript: '+(e.message||'غير معروف');});
 window.openDailySharedQuestion=async function(){const a=api(),key=dailyKey(),q=dailyQuestion(),path=`app/dailyShared/${key}`;let saved={};try{saved=await a?.read(path)||{};}catch{}const mine=saved.answers?.[role()]||'';window.openModal(`<h3>🌟 سؤال اليوم المشترك</h3><div class="v9-panel"><small>${key}</small><h3>${esc(q)}</h3><p>السؤال نفسه للطرفين طوال اليوم؛ أرسل إجابتك لتظهر حالة المزامنة.</p></div><textarea id="dailySharedAnswer" class="answer-input" rows="3" maxlength="1000" placeholder="اكتب إجابتك">${esc(mine)}</textarea><button id="dailySharedSave" class="btn btn-primary btn-full">حفظ ومزامنة إجابتي</button><div id="dailySharedStatus" class="v9-panel">جارٍ الاتصال…</div><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button>`);if(!a?.ready?.()){document.getElementById('dailySharedStatus').textContent='قاعدة البيانات غير متاحة.';return;}setUnsub(a.listen(path,d=>{const e=document.getElementById('dailySharedStatus');if(e)e.innerHTML=`أنت: ${d?.answers?.[role()]?'✅ تم الحفظ':'لم تحفظ بعد'}<br>الشريك: ${d?.answers?.[other()]?'✅ تم الحفظ':'⏳ بانتظار الإجابة'}`;}));document.getElementById('dailySharedSave').onclick=async()=>{const answer=document.getElementById('dailySharedAnswer').value.trim();if(!answer)return;const old=await a.read(path)||{date:key,question:q,answers:{}};await a.patch(path+'/answers',{[role()]:answer});status('تم حفظ إجابتك.');};};
 })();
