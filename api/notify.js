@@ -23,7 +23,11 @@ export default async function handler(req, res) {
     const response = await admin.messaging().send({
       token: token,
       data: { title: String(title), body: String(body || ''), type: String(type), itemId: String(itemId), role: String(role) },
-      webpush: { headers: { Urgency: 'high' } },
+      webpush: {
+        headers: { Urgency: 'high', TTL: '86400' },
+        // Data-only push: the service worker creates exactly one notification.
+        // High urgency requests immediate delivery, but Android may still defer it.
+      },
       android: { priority: 'high', notification: { sound: 'default' } },
       apns: { payload: { aps: { sound: 'default' } } }
     });
