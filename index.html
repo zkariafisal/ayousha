@@ -2100,78 +2100,7 @@ async function boot(){
 boot();
 </script>
 
-<script>
-(function(){
-const cfg={
- balderdash:{title:'🌀 خمنها',how:'يكتب كل لاعب تعريفاً مقنعاً للكلمة. تُجمع الإجابتان مع التعريف الصحيح، ثم يصوّت كل لاعب لإجابة يظنها صحيحة. نقطة لمن يختار الصحيح ونقطة لصاحب كل تعريف مزيف يخدع الآخر.'},
- fibbage:{title:'🤥 كذبة مقنعة',how:'اكتب إجابة تبدو حقيقية للموقف الغريب. بعد إرسال الإجابتين، تظهران مع الإجابة الصحيحة بترتيب عشوائي. اختاروا الإجابة الصحيحة؛ تكسبون نقاطاً عند التخمين الصحيح أو خداع الطرف الآخر.'},
- codenames:{title:'🕵️ كلمات سرية',how:'يظهر تلميح وعدد الكلمات المستهدفة. اختاروا الكلمات التي ترتبط بالتلميح ثم اكشفوا النتيجة. تجنبوا الكلمات غير المستهدفة؛ الكلمة القاتلة تنهي الجولة بخسارة فورية.'},
- werewolf:{title:'🐺 ليلة الذئب',how:'ابدأوا جولة لتوزيع دور سري لكل لاعب. لا تكشفوا دوركم. ناقشوا السيناريو ثم صوّت كل لاعب على المشتبه به. تُكشف الأدوار وتُحسب نتيجة الجولة.'},
- resistance:{title:'🎭 المهمة السرية',how:'ابدأوا جولة؛ لكل لاعب دور سري (مقاومة أو مخرب). اختاروا معاً نجاح المهمة أو تخريبها سراً بحسب دوركم. إذا ظهر تخريب تفشل المهمة، ثم اكشفوا الأدوار.'}
-};
-const esc=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
-const bank=t=>(window.AYOUSHA_GAME_BANKS||{})[t]||[];
-const api=()=>window.ayoushaRealtime;
-const role=()=>api()?.role()||'me';
-const roleName=r=>r==='me'?'أنت':'الشريك';
-const todayKey=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
-function status(s){const el=document.getElementById('ng-status');if(el)el.textContent=s;}
-function show(t){
- if(!cfg[t])return;
- const item=bank(t)[Math.floor(Math.random()*bank(t).length)]||{};
- const id=t+'-'+todayKey();
- const instructions=`<div class="v9-panel"><b>📘 طريقة اللعب</b><p>${cfg[t].how}</p></div>`;
- let body='';
- if(t==='balderdash'||t==='fibbage') body=`<div class="v9-panel"><b>${esc(item.q||'لا يوجد سؤال في البنك')}</b><p id="ng-real" hidden><b>الإجابة الصحيحة:</b> ${esc(item.answer)}</p></div><label>إجابتك الوهمية</label><textarea id="ng-answer" class="answer-input" rows="3" placeholder="اكتب إجابة مقنعة"></textarea><button class="btn btn-primary btn-full" id="ng-submit">إرسال الإجابة</button><div id="ng-answers" class="v9-panel">جارٍ تحميل الجولة…</div><div id="ng-votearea"></div><button class="btn btn-soft btn-full" id="ng-reveal">كشف الإجابة الصحيحة</button>`;
- else if(t==='codenames') body=`<div class="v9-panel"><h3>التلميح: ${esc(item.clue||'فضاء')}</h3><p>اختروا الكلمات التي تعتقدون أنها مرتبطة بالتلميح.</p><div id="ng-words" style="display:flex;gap:8px;flex-wrap:wrap">${(item.words||[]).map(w=>`<button class="btn btn-soft" data-ng-word="${esc(w)}">${esc(w)}</button>`).join('')}</div><p id="ng-code-status"></p><button class="btn btn-primary btn-full" id="ng-code-submit">إرسال اختياراتي</button><div id="ng-code-results"></div></div>`;
- else body=`<div class="v9-panel"><b>${esc(item.scenario||item.mission||'')}</b><p>${esc(item.task||'ناقشوا ثم اتخذوا قراراً.')}</p></div><div id="ng-role" class="v9-panel">اضغط بدء الجولة لتوزيع الأدوار السرية.</div><button class="btn btn-primary btn-full" id="ng-start">بدء جولة جديدة</button><div id="ng-actions"></div><div id="ng-results" class="v9-panel"></div>`;
- window.openModal(`<h3>${cfg[t].title}</h3>${instructions}<p class="muted">تُحفظ حالة الجولة في Firebase لتظهر للطرفين.</p>${body}<p id="ng-status" class="v9-panel"></p><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button>`);
- if(!api()?.ready()){status('تعذر الاتصال بقاعدة البيانات. تأكد من الإنترنت ثم أعد المحاولة.');return;}
- if(t==='balderdash'||t==='fibbage') setupTextGame(t,item,id);
- if(t==='codenames') setupCodeGame(item,id);
- if(t==='werewolf'||t==='resistance') setupRoleGame(t,item,id);
-}
-async function setupTextGame(t,item,id){
- const a=api(), path='games/community/'+t+'/'+id;
- let data=await a.read(path);
- if(!data){data={question:item.q,answer:item.answer,fake:item.fake||[],submissions:{},votes:{},createdAt:Date.now(),status:'writing',roundId:id};await a.write(path,data)}
- const input=document.getElementById('ng-answer');if(input)input.value=data.submissions?.[role()]||'';
- const stop=a.listen(path,d=>{
-  if(!d)return;const mine=d.submissions?.[role()];if(input&&document.activeElement!==input&&mine)input.value=mine;
-  const other=d.submissions?.[a.otherRole()];
-  const answers=document.getElementById('ng-answers');if(answers)answers.innerHTML=`<p>إجابتك: ${mine?'✅ أُرسلت':'بانتظارك'}</p><p>إجابة الشريك: ${other?'✅ وصلت':'⏳ بانتظار الشريك'}</p><p>الحالة: ${d.status==='voting'?'التصويت مفتوح':d.status==='finished'?'انتهت الجولة':'إرسال الإجابات'}</p>`;
-  const va=document.getElementById('ng-votearea');if(va){if(d.status==='voting'||d.status==='finished'){const opts=[...(d.fake||[]),d.answer,...(Object.values(d.submissions||{}).filter(Boolean))].filter(Boolean).sort();va.innerHTML='<b>اختاروا الإجابة الصحيحة:</b><div>'+opts.map((x,i)=>`<button class="btn btn-soft btn-full" data-ng-vote="${esc(x)}">${esc(x)}</button>`).join('')+'</div><p>تصويتك: '+esc(d.votes?.[role()]||'لم تصوّت')+'</p>';va.querySelectorAll('[data-ng-vote]').forEach(b=>b.onclick=async()=>{await a.patch(path+'/votes',{[role()]:b.dataset.ngVote});const latest=await a.read(path);if(latest?.votes?.me&&latest?.votes?.her)await a.patch(path,{status:'finished'});});}}
- });
- document.getElementById('ng-submit').onclick=async()=>{const val=input.value.trim();if(!val)return status('اكتب إجابتك أولاً.');await a.patch(path+'/submissions',{[role()]:val});const d=await a.read(path);if(d?.submissions?.me&&d?.submissions?.her)await a.patch(path,{status:'voting'});status('تم إرسال الإجابة ومزامنتها.');};
- document.getElementById('ng-reveal').onclick=async()=>{const d=await a.read(path);const real=document.getElementById('ng-real');if(real)real.hidden=false;if(d?.votes?.me&&d?.votes?.her){const score={me:0,her:0};for(const r of ['me','her']){if(d.votes[r]===d.answer)score[r]+=2;const opponent=r==='me'?'her':'me';if(d.votes[opponent]===d.submissions?.[r])score[r]+=1;}await a.patch(path,{status:'finished',scores:score,revealed:true});status(`النتيجة: أنت ${score.me||0} — الشريك ${score.her||0}`);}else status('كُشفت الإجابة. أكملوا التصويت ثم اضغطوا كشف الإجابة مرة أخرى لاحتساب النتيجة.');};
- window._activeGameUnsub=stop;
-}
-async function setupCodeGame(item,id){
- const a=api(),path='games/community/codenames/'+id;let data=await a.read(path);if(!data){data={clue:item.clue,words:item.words||[],targets:item.targets||[],assassin:(item.words||[]).find(w=>!(item.targets||[]).includes(w)),choices:{},status:'playing'};await a.write(path,data)}
- let chosen=[];document.querySelectorAll('[data-ng-word]').forEach(b=>b.onclick=()=>{const w=b.dataset.ngWord;if(chosen.includes(w)){chosen=chosen.filter(x=>x!==w);b.style.opacity='1'}else{chosen.push(w);b.style.opacity='.5'}document.getElementById('ng-code-status').textContent='اختياراتك: '+chosen.join('، ')});
- document.getElementById('ng-code-submit').onclick=async()=>{await a.patch(path+'/choices',{[role()]:chosen});const d=await a.read(path);if(d.choices?.me&&d.choices?.her)await a.patch(path,{status:'finished'});status('تم إرسال اختياراتك للطرف الآخر.');};
- window._activeGameUnsub=a.listen(path,d=>{const el=document.getElementById('ng-code-results');if(el&&d){el.innerHTML=`<p>اختياراتك: ${esc((d.choices?.[role()]||[]).join('، '))}</p><p>اختيارات الشريك: ${d.choices?.[a.otherRole()]?'وصلت':'بانتظار الشريك'}</p>`;if(d.status==='finished')el.innerHTML+=`<p><b>الكلمات المستهدفة:</b> ${esc((d.targets||[]).join('، '))}</p><p>الكلمة القاتلة: ${esc(d.assassin||'—')}</p>`;}});
-}
-async function setupRoleGame(t,item,id){
- const a=api(),path='games/community/'+t+'/'+id;let data=await a.read(path);if(!data){data={scenario:item.scenario||item.mission,task:item.task,roles:{},votes:{},actions:{},status:'setup',roundId:id};await a.write(path,data)}
- const render=d=>{const mine=d?.roles?.[role()];const roleEl=document.getElementById('ng-role');if(roleEl)roleEl.innerHTML=mine?`دورك السري: <b>${esc(mine)}</b>`:'لم توزّع الأدوار بعد.';const act=document.getElementById('ng-actions');if(act){if(t==='resistance'&&mine)act.innerHTML=`<p>اختر قرارك السري:</p><button class="btn btn-primary" id="ng-success">نجاح المهمة</button><button class="btn btn-soft" id="ng-fail">تخريب المهمة</button>`;else if(t==='werewolf'&&d?.status==='discussion')act.innerHTML=`<p>صوّت على المشتبه به:</p><button class="btn btn-soft" id="ng-vote-me">أنت مشتبه به</button><button class="btn btn-soft" id="ng-vote-her">الشريك مشتبه به</button>`;else act.innerHTML='';
-  if(document.getElementById('ng-success'))document.getElementById('ng-success').onclick=()=>sendAction('success');if(document.getElementById('ng-fail'))document.getElementById('ng-fail').onclick=()=>sendAction('fail');if(document.getElementById('ng-vote-me'))document.getElementById('ng-vote-me').onclick=()=>sendAction('me');if(document.getElementById('ng-vote-her'))document.getElementById('ng-vote-her').onclick=()=>sendAction('her');}
- const res=document.getElementById('ng-results');if(res){const actions=d?.actions||{};res.innerHTML=`حالتها: ${esc(d?.status||'—')}<br>قرارك: ${esc(actions[role()]||'لم ترسل') }<br>قرار الشريك: ${actions[a.otherRole()]?'تم الإرسال':'بانتظار الشريك'}`;if(d?.status==='finished')res.innerHTML+=`<hr>الأدوار: أنت ${esc(d.roles?.[role()]||'—')}، الشريك ${esc(d.roles?.[a.otherRole()]||'—')}<br>النتيجة: ${esc(d.result||'انتهت الجولة')}`;}}
- async function sendAction(value){await a.patch(path+'/actions',{[role()]:value});const d=await a.read(path);if(d?.actions?.me&&d?.actions?.her){let result='';if(t==='resistance')result=(d.actions.me==='fail'||d.actions.her==='fail')?'فشلت المهمة بسبب التخريب':'نجحت المهمة';else {const votes=d.actions;result=votes.me===votes.her?'تم الاتفاق على المشتبه به: '+votes.me:'انقسم التصويت؛ ناقشوا الأدلة مجدداً';}await a.patch(path,{status:'finished',result});}}
- document.getElementById('ng-start').onclick=async()=>{const roles=t==='werewolf'?['قروي','ذئب']:['مقاوم','مخرّب'];const shuffled=Math.random()<.5?roles:[...roles].reverse();await a.write(path,{scenario:item.scenario||item.mission,task:item.task,roles:{me:shuffled[0],her:shuffled[1]},votes:{},actions:{},status:t==='werewolf'?'discussion':'mission',roundId:Date.now()});status('بدأت الجولة. كل لاعب يرى دوره الخاص في واجهة اللعبة.');};
- window._activeGameUnsub=a.listen(path,d=>{if(d)render(d)});
-}
-window.launchGameModal=show;
-window.openDailySharedQuestion=async function(){
- const qs=window.AYOUSHA_DAILY_QUESTIONS||[];if(!qs.length)return window.openModal('لم يتم تحميل بنك أسئلة اليوم.');
- const key=todayKey(),idx=Math.floor(Date.UTC(...key.split('-').map((n,i)=>i===1?Number(n)-1:Number(n)))/86400000)%qs.length,q=qs[(idx+qs.length)%qs.length],a=api(),path='app/dailyShared/'+key;
- let saved=await a?.read(path);const mine=saved?.answers?.[role()]||'';
- window.openModal(`<h3>🌟 سؤال اليوم المشترك</h3><div class="v9-panel"><small>${key}</small><h3>${esc(q)}</h3><p>السؤال نفسه لكما طوال اليوم، والإجابات متزامنة عبر الإنترنت.</p></div><textarea id="dailySharedAnswer" class="answer-input" rows="3" placeholder="اكتب إجابتك">${esc(mine)}</textarea><button class="btn btn-primary btn-full" id="dailySharedSave">حفظ ومزامنة إجابتي</button><div id="dailySharedStatus" class="v9-panel"></div><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button>`);
- const stop=a?.listen(path,d=>{const el=document.getElementById('dailySharedStatus');if(el)el.innerHTML=`أنت: ${d?.answers?.[role()]?'تم الحفظ':'لم تحفظ بعد'}<br>الشريك: ${d?.answers?.[a.otherRole()]?'تم الحفظ':'بانتظار الإجابة'}`;});window._activeGameUnsub=stop;
- document.getElementById('dailySharedSave').onclick=async()=>{const answer=document.getElementById('dailySharedAnswer').value.trim();if(!answer)return;const d=await a.read(path)||{date:key,question:q,answers:{}};await a.patch(path+'/answers',{[role()]:answer});status('');const el=document.getElementById('dailySharedStatus');if(el)el.textContent='تم حفظ إجابتك ومزامنتها عبر Firebase 💗';};
-};
-})();
-</script>
+<script src="./community-games.js"></script>
 
 </body>
 </html>
