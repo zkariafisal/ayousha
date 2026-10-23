@@ -3,7 +3,8 @@
  * Balderdash (خمنها), Fibbage (كذبة مقنعة), Codenames (كلمات سرية),
  * Werewolf (ليلة الذئب), Resistance (المهمة السرية)
  *
- * تصميم متكامل 100% بنفس تنسيقات وثيم برنامج عيون عيوشة 🌸
+ * السياق التفاعلي: التحدي حصري بين زكريا وعيوشة 💕
+ * باقي شخصيات اللعبة وقرائن السيناريو والتمويهات الإضافية يقدمها النظام الذكي 🤖
  */
 
 (function () {
@@ -17,51 +18,56 @@
       id: 'balderdash',
       title: '🌀 خمنها — Balderdash',
       shortTitle: 'خمنها',
-      badge: 'تعريفات وخداع',
+      badge: 'بيني وبين عيوشة 💗',
       icon: '🌀',
-      how: 'تظهر كلمة أو أداة غريبة نادرة. يكتب كل لاعب سراً تعريفاً وهمياً يبدو مقنعاً، ثم تُخلط الإجابات مع التعريف الحقيقي. يصوّت كل منكما لاكتشاف الحقيقة! تحصل على نقطتين (+2) إذا اخترت التعريف الحقيقي، ونقطة (+1) عن كل لاعب انخدع بتعريفك الوهمي.',
-      desc: 'لعبة الخداع والذكاء اللغوي'
+      sub: 'مبارزة التمويه اللغوي بين زكريا وعيوشة مع خيارات النظام',
+      how: 'تظهر كلمة أو أداة غريبة نادرة. يكتب كل من زكريا وعيوشة سراً تعريفاً خيالياً مقنعاً، ويضيف النظام خياراته الذكية لإكمال الخيارات مع التعريف الحقيقي. يصوّت كل منكما لاكتشاف الحقيقة! تحصل على نقطتين (+2) لاكتشاف الحقيقة، ونقطة (+1) عن كل شخص انخدع بتعريفك.',
+      context: 'المبارزة ثنائية بين زكريا وعيوشة؛ وباقي الخيارات التمويهية الذكية من النظام لإثراء المنافسة 🤖'
     },
     fibbage: {
       id: 'fibbage',
       title: '🤥 كذبة مقنعة — Fibbage',
       shortTitle: 'كذبة مقنعة',
-      badge: 'حقائق وكذبات',
+      badge: 'بيني وبين عيوشة 💗',
       icon: '🤥',
-      how: 'يُعرض سؤال أو حقيقة واقعية غريبة تحتوي فراغاً. يكتب كل لاعب كذبة مقنعة لتعبئة الفراغ. بعد ذلك، تُعرض كل الخيارات عشوائياً بما فيها الإجابة الحقيقية الصادمة! صوّت للحق واخدع شريكك لكسب النقاط.',
-      desc: 'أغرب الحقائق وأذكى الكذبات'
+      sub: 'أغرب الحقائق والخدع الذكية بين قلبينا',
+      how: 'حقيقة واقعية غريبة من النظام تحتوي فراغاً ناقصاً. يبتكر كل من زكريا وعيوشة كذبة مقنعة لتعبئة الفراغ، بينما يضيف النظام تمويهاته الخاصة. بعد ذلك، تُعرض كل الخيارات عشوائياً بما فيها الحقيقة الصادمة! صوّت للحق واخدع شريكك لكسب النقاط.',
+      context: 'التحدي بين زكريا وعيوشة، مع تمويهات داعمة من النظام لاكتمال جولة التخمين 🌟'
     },
     codenames: {
       id: 'codenames',
       title: '🕵️ كلمات سرية — Codenames',
       shortTitle: 'كلمات سرية',
-      badge: 'أسماء رمزية',
+      badge: 'تناوب وتنسيق 🔍',
       icon: '🕵️',
-      how: 'لوحة من 25 كلمة غامضة. في كل جولة يكون أحدكما القائد (Spymaster) والآخر المخمّن (Operative). القائد يرى الألوان السرية ويعطي تلميحاً من كلمة واحدة ورقماً يدل على عدد كلماته. المخمّن يضغط الكلمات المستهدفة! احذروا الكلمة القاتلة 💀!',
-      desc: 'تنسيق سري وتخمين ذكي'
+      sub: 'شفرات وأسماء رمزية بين زكريا وعيوشة',
+      how: 'لوحة 25 كلمة غامضة. يتناوب زكريا وعيوشة دور القائد (Spymaster) والمخمّن (Operative)، ويدير النظام اللوحة السريّة بدقة. يرسل القائد تلميحاً وعدد الكلمات، ويضغط المخمّن الكلمات المستهدفة! احذروا الكلمة القاتلة 💀!',
+      context: 'فريق عمل ثنائي بين زكريا وعيوشة، والنظام يعمل كحَكَم اللوحة السري وموزع الكلمات 🎲'
     },
     werewolf: {
       id: 'werewolf',
       title: '🐺 ليلة الذئب — Werewolf',
       shortTitle: 'ليلة الذئب',
-      badge: 'كشف المخادع',
+      badge: 'غموض ومحاكمة 🕯️',
       icon: '🐺',
-      how: 'يوزع النظام الأدوار سراً (ذئب مخادع 🐺 مقابل قروي/محقق بريء 🔍). اقرؤوا السيناريو الغامض وناقشوا التفاصيل عبر الشات، ثم صوّتوا لتحديد من هو الذئب. يكسب المحقق إذا كشف الذئب، ويكسب الذئب إذا أفلت من الاتهام!',
-      desc: 'غموض، شكوك، ومحاكمة سرية'
+      sub: 'لغز القرية: شهادات من النظام والمشتبه به بين زكريا وعيوشة',
+      how: 'يقدم النظام سيناريو اللغز مع شهادات شخصيات القرية الافتراضية (العمدة، الحارس، الشاهد). يوزع النظام الدور السري بين زكريا وعيوشة (أحدكما الذئب المخادع 🐺 والآخر المحقق/القروي 🔍)! ناقشا القرائن عبر الشات وصوّتا لتحديد من هو الذئب.',
+      context: 'شخصيات القرية والقرائن تأتي من النظام؛ والدور السري والمواجهة بين زكريا وعيوشة حصرياً!'
     },
     resistance: {
       id: 'resistance',
       title: '🎭 المهمة السرية — Resistance',
       shortTitle: 'المهمة السرية',
-      badge: 'المقاومة والجاسوس',
+      badge: 'مهمة سرية 🛡️',
       icon: '🎭',
-      how: 'يوزع دور المقاومة 🛡️ والمخرّب 🦹 سراً. يقترح القائد تنفيذ المهمة ويصوّت اللاعبان بالموافقة أو الرفض. إذا قُبلت المهمة، يختار كل منكما سراً نتيجتها (نجاح أو تخريب). المخرّب وحده يستطيع التخريب، وتُكشف النتيجة النهائية دون كشف صاحب القرار!',
-      desc: 'مهام سرية وشكوك ولع وفوز حاسم'
+      sub: 'أوامر القيادة من النظام وفريق العمليات: زكريا وعيوشة',
+      how: 'تصدر قيادة المقاومة (شخصيات النظام 🏛️) أمر المهمة وتكلف زكريا وعيوشة بالتنفيذ. يوزع النظام دور المقاومة 🛡️ ودور المخرّب 🦹 سراً بينكما. يصوّت الطرفان لقبول المهمة، ثم يختار كل لاعب سراً بطاقة (نجاح أو تخريب) وتُعلن النتيجة مجهولة الفاعل!',
+      context: 'أوامر العمليات من قيادة النظام؛ وفريق المهمة والولاء بين زكريا وعيوشة!'
     }
   };
 
   // ==========================================
-  // 2. دوال مساعدة والأدوار
+  // 2. دوال مساعدة وحساب الأدوار
   // ==========================================
   const esc = (v) => {
     return String(v ?? '')
@@ -90,7 +96,7 @@
         if (name) return name;
       } catch {}
     }
-    const myName = window.state?.settings?.myName || 'أنا';
+    const myName = window.state?.settings?.myName || 'حبيبي (زكريا)';
     const herName = window.state?.settings?.wifeName || 'عيوشة';
     return r === 'me' ? myName : herName;
   };
@@ -119,7 +125,7 @@
         window.addNotification(title, body, 'game', gameId);
       }
       if (window.ayoushaRealtime?.notify) {
-        window.ayoushaRealtime.notify(title, body);
+        window.ayoushaRealtime.notify(title, body, gameId);
       }
     } catch {}
   };
@@ -147,7 +153,6 @@
   const roomPath = (t) => 'games/community/' + t + '/room';
 
   const readState = async (type) => {
-    // 1. Try Firebase Realtime Database
     try {
       if (window.ayoushaRealtime?.ready?.()) {
         const data = await window.ayoushaRealtime.read(roomPath(type));
@@ -156,7 +161,6 @@
     } catch (e) {
       console.warn('Realtime DB read fallback to local state:', e);
     }
-    // 2. Fallback to localStorage
     try {
       const local = localStorage.getItem(storageKey(type));
       if (local) return JSON.parse(local);
@@ -165,7 +169,6 @@
   };
 
   const writeState = async (type, data) => {
-    // 1. LocalStorage + BroadcastChannel for instant local tab sync
     try {
       localStorage.setItem(storageKey(type), JSON.stringify(data));
       if (syncChannel) {
@@ -173,7 +176,6 @@
       }
     } catch {}
 
-    // 2. Firebase Realtime Database
     try {
       if (window.ayoushaRealtime?.ready?.()) {
         await window.ayoushaRealtime.write(roomPath(type), data);
@@ -262,6 +264,14 @@
     return bank[((Math.max(1, roundNum) - 1) % bank.length)];
   }
 
+  // شهادات وقرائن داعمة من شخصيات النظام لليلة الذئب
+  const SYSTEM_VILLAGE_WITNESSES = [
+    { title: 'عمدة القرية (النظام 🏛️)', text: 'سمعت حركة غير معتادة قرب الساحة بعد انطفاء الأنوار، وأحد الشريكين فقط لم يكن في مكانه!' },
+    { title: 'حارس البوابة (النظام 🛡️)', text: 'رأيت ظلاً مسرعاً باتجاه برج الساعة، وتطابقت آثاره مع اتجاه أحدكما!' },
+    { title: 'طبيب القرية (النظام 🩺)', text: 'فحصت مكان الحادث؛ هناك عطر لطيف يشير إلى أن أحدكما مرّ من هنا بالتأكيد!' },
+    { title: 'ساعي البريد (النظام 📬)', text: 'وصلتني رسالة مجهولة تشير إلى أن الذئب يحاول تغيير مجرى الحديث وإلصاق التهمة بالطرف الآخر!' }
+  ];
+
   function createInitialState(type, cfg, existingState = null) {
     const round = (existingState?.round || 0) + 1;
     const scores = existingState?.scores || { me: 0, her: 0 };
@@ -272,7 +282,7 @@
       const item = pickQuestion(type, round, mode) || {
         q: type === 'balderdash' ? 'ما معنى كلمة «بَرهَف»؟' : 'لماذا مُنع شخص من دخول المكتبة؟',
         answer: 'إجابة نموذجية حقيقية',
-        fake: ['احتمال تمويهي أول', 'احتمال تمويهي ثاني']
+        fake: ['احتمال تمويهي ذكي من النظام', 'احتمال تمويهي آخر من النظام']
       };
       return {
         game: type,
@@ -342,6 +352,7 @@
         task: 'ناقشوا السيناريو وتعرفوا على الذئب المخادع.'
       };
       const rolesList = shuffled(['ذئب', 'قروي']);
+      const witness = SYSTEM_VILLAGE_WITNESSES[(round - 1) % SYSTEM_VILLAGE_WITNESSES.length];
       return {
         game: 'werewolf',
         round,
@@ -349,6 +360,8 @@
         mode,
         scenario: item.scenario,
         task: item.task,
+        witnessTitle: witness.title,
+        witnessText: witness.text,
         roles: { me: rolesList[0], her: rolesList[1] },
         status: 'discussion',
         votes: {},
@@ -371,6 +384,7 @@
         mode,
         mission: item.mission,
         task: item.task,
+        commandHQ: 'أمر عسكري رسمي من قيادة المقاومة (النظام 🏛️): تم تعيين زكريا وعيوشة كفريق ميداني لتنفيذ العملية!',
         roles: { me: rolesList[0], her: rolesList[1] },
         leader: round % 2 === 1 ? 'me' : 'her',
         phase: 'proposal',
@@ -397,7 +411,7 @@
     const otherName = getRoleName(otherRole);
 
     return `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <h3 style="margin:0;font-size:1.15rem;color:var(--primary);display:flex;align-items:center;gap:6px;">
             <span>${meta.icon}</span> <span>${meta.title}</span>
@@ -409,6 +423,10 @@
         </div>
       </div>
 
+      <div style="font-size:.76rem;color:#887581;margin-bottom:8px;">
+        ✨ <b>المبارزة بين:</b> <span style="color:#d81b60;font-weight:bold;">زكريا</span> و <span style="color:#ad1457;font-weight:bold;">عيوشة</span> 💕 <span style="color:#9e9e9e;">(وباقي الأدوار وقرائن السيناريو من النظام 🤖)</span>
+      </div>
+
       <!-- شريط معلومات الجولة والنقاط وتحديد الدور -->
       <div style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,rgba(216,27,96,0.06),rgba(212,175,117,0.12));border:1px solid var(--border);border-radius:14px;padding:8px 12px;margin-bottom:12px;font-size:.82rem;flex-wrap:wrap;gap:6px;">
         <div>
@@ -418,7 +436,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
           <span>🎯 الجولة <b>${state?.round || 1}</b> / ${state?.maxRounds || 5}</span>
-          <button class="btn btn-soft" style="padding:2px 7px;font-size:.72rem;background:#fff;" onclick="window.toggleCommunityRole('${type}')" title="تبديل هوية الجهاز لأغراض التجربة">
+          <button class="btn btn-soft" style="padding:2px 7px;font-size:.72rem;background:#fff;" onclick="window.toggleCommunityRole('${type}')" title="تبديل هوية الجهاز للتجربة السريعة">
             👤 ${myName} (بدّل)
           </button>
         </div>
@@ -441,8 +459,9 @@
     if (!meta) return '';
     return `
       <details class="v9-panel" style="margin:8px 0;padding:8px 12px;cursor:pointer;">
-        <summary style="font-weight:bold;color:var(--primary);font-size:.85rem;">📘 طريقة اللعب وقواعد النقاط</summary>
+        <summary style="font-weight:bold;color:var(--primary);font-size:.85rem;">📘 طريقة اللعب وسياق المباراة الثنائية</summary>
         <p style="margin-top:6px;font-size:.84rem;line-height:1.7;color:var(--text);">${esc(meta.how)}</p>
+        <p style="margin-top:4px;font-size:.78rem;color:#887581;">💡 ${esc(meta.context)}</p>
       </details>
     `;
   }
@@ -471,15 +490,15 @@
       if (!mySub) {
         body = `
           <div class="v9-panel" style="text-align:center;">
-            <div style="font-size:.82rem;color:var(--muted);margin-bottom:4px;">${type === 'balderdash' ? 'الكلمة أو الأداة الغامضة:' : 'السؤال / الحقيقة الغريبة:'}</div>
+            <div style="font-size:.82rem;color:var(--muted);margin-bottom:4px;">${type === 'balderdash' ? 'الكلمة أو الأداة الغامضة:' : 'السؤال / الحقيقة الغريبة من النظام:'}</div>
             <div style="font-size:1.15rem;font-weight:bold;color:#ad1457;">${esc(state.question)}</div>
           </div>
           <div style="margin:14px 0;">
             <label style="font-size:.85rem;font-weight:600;display:block;margin-bottom:6px;">
-              🎭 ${type === 'balderdash' ? 'اكتب تعريفاً خيالياً يبدو حقيقياً ومقنعاً:' : 'اكتب إجابة كاذبة تبدو مقنعة لخداع ' + otherName + ':'}
+              🎭 ${type === 'balderdash' ? 'اكتب تعريفاً خيالياً ذكياً لخداع ' + otherName + ':' : 'ابتكر كذبة مقنعة تخدع بها ' + otherName + ' قبل كشف الحقيقة:'}
             </label>
-            <textarea id="cgTextInput" class="answer-input" rows="3" maxlength="350" placeholder="${type === 'balderdash' ? 'مثال: أداة قديمة لقياس رطوبة الهواء...' : 'مثال: لأنه أحضر قطة صغيرة معه...'}" style="width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);font-family:inherit;font-size:.95rem;"></textarea>
-            <button id="cgSubmitBtn" class="btn btn-primary btn-full" style="margin-top:10px;">🚀 إرسال التمويه الذكي</button>
+            <textarea id="cgTextInput" class="answer-input" rows="3" maxlength="350" placeholder="${type === 'balderdash' ? 'مثال: أداة خيالية قديمة لقياس سرعة الرياح الخفيفة...' : 'مثال: لأنه أحضر قطة صغيرة لتقرأ معه...'}" style="width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);font-family:inherit;font-size:.95rem;"></textarea>
+            <button id="cgSubmitBtn" class="btn btn-primary btn-full" style="margin-top:10px;">🚀 إرسال التمويه السري</button>
           </div>
         `;
       } else {
@@ -489,10 +508,10 @@
             <div style="font-size:1.15rem;font-weight:bold;color:#ad1457;">${esc(state.question)}</div>
           </div>
           <div class="v9-panel" style="background:#fff8e1;border-color:#ffe082;color:#6d4c41;text-align:center;padding:16px;">
-            <div style="font-size:1.2rem;margin-bottom:6px;">🔒 تم إرسال تمويهك بنجاح!</div>
+            <div style="font-size:1.2rem;margin-bottom:6px;">🔒 تم حفظ تمويهك السري!</div>
             <p style="margin:0;font-size:.92rem;">"<b>${esc(mySub)}</b>"</p>
             <div style="margin-top:10px;font-size:.84rem;color:#8d6e63;">
-              ${otherSub ? '✅ الطرف الآخر أرسل تمويهه أيضاً! جارٍ تجهيز الخيارات...' : '⏳ بانتظار أن يكتب <b>' + otherName + '</b> تمويهه لاكتمال مرحلة التصويت...'}
+              ${otherSub ? '✅ الطرف الآخر أرسل تمويهه أيضاً! والنظام يجهز الخيارات الأربعة...' : '⏳ بانتظار أن يكتب <b>' + otherName + '</b> تمويهه لاكتمال خيارات التصويت مع النظام...'}
             </div>
           </div>
         `;
@@ -501,12 +520,12 @@
       const opts = state.options || [];
       body = `
         <div class="v9-panel" style="text-align:center;">
-          <div style="font-size:.82rem;color:var(--muted);">${type === 'balderdash' ? 'الكلمة المطلوبة:' : 'السؤال:'}</div>
+          <div style="font-size:.82rem;color:var(--muted);">${type === 'balderdash' ? 'الكلمة المطلوبة:' : 'السؤال المطلوب:'}</div>
           <div style="font-size:1.1rem;font-weight:bold;color:#ad1457;">${esc(state.question)}</div>
         </div>
 
         <p style="font-size:.88rem;color:var(--muted);margin:8px 0 10px;">
-          🎯 <b>اختر الإجابة التي تعتقد أنها الحقيقة:</b>
+          🎯 <b>اختر الإجابة التي تعتقد أنها الحقيقة الصادمة:</b>
         </p>
 
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
@@ -517,7 +536,7 @@
             if (isSelected) btnStyle += 'background:linear-gradient(135deg,#d81b60,#ad1457);color:#fff;border-color:transparent;';
             return `
               <button class="btn btn-soft" style="${btnStyle}" data-cg-vote="${idx}" ${isMine || myVote !== undefined ? 'disabled' : ''}>
-                ${isMine ? '🔒 (تمويهك) ' : isSelected ? '👉 ' : '🔘 '} ${esc(opt.text)}
+                ${isMine ? '🔒 (تمويهك السري) ' : isSelected ? '👉 ' : '🔘 '} ${esc(opt.text)}
               </button>
             `;
           }).join('')}
@@ -526,7 +545,7 @@
         <div class="v9-panel" style="font-size:.84rem;text-align:center;">
           <span>تصويتك: ${myVote !== undefined ? '✅ تم الاختيار' : '⏳ لم تختر بعد'}</span>
           <span style="margin:0 8px;">·</span>
-          <span>${otherName}: ${otherVote !== undefined ? '✅ صوّت' : '⏳ بانتظاره'}</span>
+          <span>${otherName}: ${otherVote !== undefined ? '✅ صوّت' : '⏳ يفكر ويختار'}</span>
         </div>
       `;
     } else if (state.status === 'finished') {
@@ -540,16 +559,17 @@
       const otherWasCorrect = otherChoice?.correct;
       const otherTrickedByMe = (otherChoice?.owner === myRole);
       const iWasTrickedByOther = (myChoice?.owner === otherRole);
+      const iWasTrickedBySystem = (myChoice?.owner === 'system');
 
       body = `
         <div class="v9-panel" style="background:#f1f8e9;border-color:#c8e6c9;color:#2e7d32;text-align:center;">
-          <div style="font-size:1.15rem;font-weight:bold;margin-bottom:4px;">🌟 الحقيقة الصحيحة:</div>
+          <div style="font-size:1.15rem;font-weight:bold;margin-bottom:4px;">🌟 الحقيقة الصحيحة الكاملة:</div>
           <div style="font-size:1rem;color:#1b5e20;">"<b>${esc(state.answer)}</b>"</div>
         </div>
 
         <div class="v9-panel" style="font-size:.88rem;line-height:1.8;">
-          <div><b>نتيجة اختيارك:</b> ${iWasCorrect ? '🎉 أصبت الحقيقة! (+2 نقطة)' : iWasTrickedByOther ? '😅 انخدعت بتمويه ' + otherName + '!' : 'لم تختر الإجابة الصحيحة.'}</div>
-          <div><b>نتيجة تمويهك:</b> ${otherTrickedByMe ? '🎭 رائع! انخدع ' + otherName + ' بتمويهك الذكي (+1 نقطة)' : 'لم ينخدع الشريك بتمويهك هذه المرة.'}</div>
+          <div><b>نتيجة اختيارك:</b> ${iWasCorrect ? '🎉 أصبت الحقيقة! (+2 نقطة)' : iWasTrickedByOther ? '😅 وقعت في فخ تمويه ' + otherName + '!' : iWasTrickedBySystem ? '🤖 وقعت في فخ تمويه النظام!' : 'لم تصب الحقيقة.'}</div>
+          <div><b>نتيجة تمويهك:</b> ${otherTrickedByMe ? '🎭 رائع! انخدع ' + otherName + ' بتمويهك الذكي (+1 نقطة لك)' : 'لم ينخدع الطرف الآخر بتمويهك في هذه الجولة.'}</div>
         </div>
 
         <div style="display:flex;gap:8px;margin-top:12px;">
@@ -584,25 +604,25 @@
       if (isSpymaster) {
         actionsHtml = `
           <div class="v9-panel" style="background:#fff3e0;border-color:#ffe0b2;color:#e65100;font-size:.86rem;">
-            <b>🕵️ أنت القائد (Spymaster) في هذه الجولة:</b><br>
-            الألوان السرية ظاهرة لك وحدك في الأسفل:
-            <span style="color:#c62828;">● أحمر (كلماتكم المستهدفة)</span> ·
-            <span style="color:#1565c0;">● أزرق (الخصم)</span> ·
-            <span style="color:#212121;">● أسود (القاتلة 💀)</span>.<br>
+            <b>🕵️ أنت القائد (Spymaster) في هذه الجولة يا ${myName}:</b><br>
+            حكم النظام يظهر لك وحدك الكلمات السرية:
+            <span style="color:#c62828;">● أحمر (كلمات فريقكما)</span> ·
+            <span style="color:#1565c0;">● أزرق (الخصم الافتراضي)</span> ·
+            <span style="color:#212121;">● أسود (الكلمة القاتلة 💀)</span>.<br>
             أرسل تلميحاً وعدد الكلمات لـ <b>${otherName}</b>:
           </div>
           <div style="display:flex;gap:8px;margin:10px 0;">
             <input id="cgClueInput" placeholder="التلميح (مثال: فضاء)" value="${esc(state.clue || '')}" style="flex:2;padding:9px 12px;border-radius:12px;border:1px solid var(--border);font-family:inherit;">
             <input id="cgNumInput" type="number" min="1" max="9" value="${state.number || 2}" style="flex:1;padding:9px 12px;border-radius:12px;border:1px solid var(--border);font-family:inherit;">
-            <button id="cgUpdateClueBtn" class="btn btn-primary" style="flex:2;">📢 إرسال</button>
+            <button id="cgUpdateClueBtn" class="btn btn-primary" style="flex:2;">📢 إرسال التلميح</button>
           </div>
         `;
       } else {
         actionsHtml = `
           <div class="v9-panel" style="background:#e8eaf6;border-color:#c5cae9;color:#283593;font-size:.88rem;text-align:center;">
-            <b>🔍 أنت المخمّن (Operative):</b><br>
-            تلميح القائد: <b style="font-size:1.1rem;color:#1a237e;">"${esc(state.clue || 'بانتظار التلميح')}"</b> (العدد: <b>${state.number || 0}</b>)<br>
-            اضغط الكلمات المرتبطة بالتلميح. احذر من الكلمة القاتلة!
+            <b>🔍 أنت المخمّن (Operative) يا ${myName}:</b><br>
+            تلميح الشريك (${otherName}): <b style="font-size:1.1rem;color:#1a237e;">"${esc(state.clue || 'بانتظار التلميح')}"</b> (العدد المستهدف: <b>${state.number || 0}</b>)<br>
+            اضغط الكلمات التي تعتقد أنها ترتبط بالتلميح، واحذر الكلمة القاتلة!
           </div>
         `;
       }
@@ -672,13 +692,19 @@
     if (state.status === 'discussion') {
       content = `
         <div class="v9-panel" style="text-align:center;">
-          <div style="font-size:.82rem;color:var(--muted);margin-bottom:4px;">📜 سيناريو اللغز في القرية:</div>
+          <div style="font-size:.82rem;color:var(--muted);margin-bottom:4px;">📜 سيناريو الحادثة في قرية الحكايات:</div>
           <div style="font-size:1.05rem;font-weight:bold;color:#ad1457;line-height:1.7;">${esc(state.scenario)}</div>
+        </div>
+
+        <!-- شهادة شخصيات النظام -->
+        <div class="v9-panel" style="background:#f3e5f5;border-color:#e1bee7;color:#4a148c;font-size:.84rem;">
+          <b>${esc(state.witnessTitle || 'شهادة من النظام 🤖')}:</b>
+          <p style="margin:4px 0 0;line-height:1.6;">"${esc(state.witnessText || 'أحدكما شوهد قريباً من مكان الحادث...')}"</p>
         </div>
 
         <!-- بطاقة الدور السري مع خاصية الحماية البصرية -->
         <div class="v9-panel" style="background:#263238;color:#eceff1;text-align:center;padding:14px;border-radius:18px;">
-          <div style="font-size:.82rem;color:#b0bec5;margin-bottom:6px;">🔐 دورك السري لهذه الجولة (احفظه سراً):</div>
+          <div style="font-size:.82rem;color:#b0bec5;margin-bottom:6px;">🔐 دورك السري في هذه الجولة (احفظه سراً):</div>
           <div id="cgSecretRoleBox" onclick="this.classList.toggle('revealed')" style="cursor:pointer;padding:10px;background:rgba(255,255,255,0.08);border-radius:12px;user-select:none;">
             <span class="role-blur" style="font-size:1.25rem;font-weight:bold;color:${isWolf ? '#ff5252' : '#69f0ae'};">
               ${isWolf ? '🐺 أنت الذئب المخادع' : '🔍 أنت القروي / المحقق'}
@@ -686,23 +712,23 @@
             <div style="font-size:.76rem;color:#90a4ae;margin-top:4px;">(انقر لإخفاء / إظهار الدور)</div>
           </div>
           <p style="font-size:.82rem;margin-top:8px;color:#cfd8dc;">
-            ${isWolf ? 'هدفك: تضليل ' + otherName + ' وإقناعه ببراءتك دون أن يكتشفك!' : 'هدفك: كشف التناقضات ومعرفة إن كان ' + otherName + ' هو الذئب!'}
+            ${isWolf ? 'هدفك: تضليل ' + otherName + ' وإقناعه ببراءتك استناداً لقرائن النظام!' : 'هدفك: مناقشة قرائن النظام مع ' + otherName + ' واكتشاف إن كان هو الذئب!'}
           </p>
         </div>
 
         <!-- التصويت السري -->
         <div style="margin:14px 0;">
-          <p style="font-size:.88rem;font-weight:600;margin-bottom:8px;">🗳️ صوّت سراً: من تعتقد أنه الذئب؟</p>
+          <p style="font-size:.88rem;font-weight:600;margin-bottom:8px;">🗳️ صوّت سراً: من تعتقد أنه الذئب في هذه الجولة؟</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <button class="btn btn-soft" data-cg-wolf="me" ${myVote ? 'disabled' : ''} style="${myVote === 'me' ? 'background:var(--primary);color:#fff;' : ''}">
-              أنا هو الذئب
+              أنا الذئب 🐺
             </button>
             <button class="btn btn-soft" data-cg-wolf="her" ${myVote ? 'disabled' : ''} style="${myVote === 'her' ? 'background:var(--primary);color:#fff;' : ''}">
-              ${otherName} هو الذئب
+              ${otherName} هو الذئب 🐺
             </button>
           </div>
           <div class="v9-panel" style="font-size:.82rem;text-align:center;margin-top:10px;">
-            تصويتك: ${myVote ? '✅ تم الإرسال' : '⏳ بانتظار تصويتك'} · ${otherName}: ${otherVote ? '✅ صوّت' : '⏳ يناقش'}
+            تصويتك: ${myVote ? '✅ تم الإرسال' : '⏳ بانتظار تصويتك'} · ${otherName}: ${otherVote ? '✅ صوّت' : '⏳ يناقش ويقرر'}
           </div>
         </div>
       `;
@@ -712,7 +738,7 @@
           <div style="font-size:1.2rem;font-weight:bold;margin-bottom:6px;">🏁 كشف الأدوار والنتيجة</div>
           <p style="font-size:.95rem;margin:6px 0;">${esc(state.result)}</p>
           <div style="font-size:.86rem;color:#795548;margin-top:8px;">
-            أنت كنت: <b>${state.roles?.me || ''}</b> · ${otherName} كان: <b>${state.roles?.her || ''}</b>
+            ${myName} كان: <b>${state.roles?.[myRole] || ''}</b> · ${otherName} كان: <b>${state.roles?.[otherRole] || ''}</b>
           </div>
         </div>
         <button id="cgNextRoundBtn" class="btn btn-primary btn-full" style="margin-top:10px;">
@@ -749,17 +775,17 @@
     if (state.status === 'playing') {
       content = `
         <div class="v9-panel" style="text-align:center;">
-          <div style="font-size:.82rem;color:var(--muted);margin-bottom:4px;">🎯 المهمة المقترحة:</div>
+          <div style="font-size:.82rem;color:var(--muted);margin-bottom:4px;">🎯 أمر العمليات من قيادة المقاومة (النظام 🏛️):</div>
           <div style="font-size:1.05rem;font-weight:bold;color:#ad1457;">${esc(state.mission)}</div>
-          <div style="font-size:.84rem;margin-top:6px;">قائد المهمة الحالي: <b>${isLeader ? 'أنت (' + myName + ')' : otherName}</b></div>
+          <div style="font-size:.84rem;margin-top:6px;">قائد فريق العملية الحالي: <b>${isLeader ? 'أنت (' + myName + ')' : otherName}</b></div>
         </div>
 
         <!-- كرت الدور السري -->
         <div class="v9-panel" style="background:#1a237e;color:#e8eaf6;text-align:center;padding:12px;border-radius:18px;">
-          <div style="font-size:.8rem;color:#9fa8da;margin-bottom:4px;">🔐 دورك السري:</div>
+          <div style="font-size:.8rem;color:#9fa8da;margin-bottom:4px;">🔐 دورك السري في فريق المقاومة:</div>
           <div id="cgSecretRoleBox" onclick="this.classList.toggle('revealed')" style="cursor:pointer;padding:8px;background:rgba(255,255,255,0.08);border-radius:12px;">
             <span class="role-blur" style="font-size:1.2rem;font-weight:bold;color:${isSpy ? '#ff8a80' : '#80d8ff'};">
-              ${isSpy ? '🦹 أنت المخرّب (الجاسوس)' : '🛡️ أنت عميل المقاومة الصالح'}
+              ${isSpy ? '🦹 أنت المخرّب المندس (الجاسوس)' : '🛡️ أنت عميل المقاومة الصالح'}
             </span>
             <div style="font-size:.74rem;color:#c5cae9;margin-top:4px;">(انقر لإظهار / إخفاء الدور)</div>
           </div>
@@ -769,7 +795,7 @@
       if (state.phase === 'proposal') {
         content += `
           <div style="margin:14px 0;">
-            <p style="font-size:.88rem;font-weight:600;margin-bottom:8px;">🗳️ المرحلة 1: التصويت على قبول فريق المهمة</p>
+            <p style="font-size:.88rem;font-weight:600;margin-bottom:8px;">🗳️ المرحلة 1: التصويت على اعتماد فريق المهمة</p>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
               <button class="btn btn-primary" data-cg-approve="yes" ${myVote ? 'disabled' : ''}>
                 ✅ قبول الفريق
@@ -804,7 +830,7 @@
     } else {
       content = `
         <div class="v9-panel" style="background:#ede7f6;border-color:#d1c4e9;color:#4a148c;text-align:center;padding:16px;">
-          <div style="font-size:1.2rem;font-weight:bold;margin-bottom:6px;">🏁 نتيجة المهمة</div>
+          <div style="font-size:1.2rem;font-weight:bold;margin-bottom:6px;">🏁 تقرير القيادة ونتيجة المهمة</div>
           <p style="font-size:.95rem;margin:6px 0;">${esc(state.result)}</p>
         </div>
         <button id="cgNextRoundBtn" class="btn btn-primary btn-full" style="margin-top:10px;">
@@ -851,18 +877,17 @@
         if (subs.me && subs.her) {
           nextStatus = 'voting';
           const rawOptions = [
-            { text: current.answer, correct: true, owner: null },
+            { text: current.answer, correct: true, owner: 'real' },
             { text: subs.me, correct: false, owner: 'me' },
             { text: subs.her, correct: false, owner: 'her' },
-            ...(current.defaultFakes || []).slice(0, 1).map(t => ({ text: t, correct: false, owner: null }))
+            ...(current.defaultFakes || []).slice(0, 1).map(t => ({ text: t, correct: false, owner: 'system' }))
           ];
-          // Remove duplicate text and shuffle
           options = shuffled(rawOptions.filter((item, idx, self) => idx === self.findIndex(t => t.text === item.text)));
         }
 
         await patchState(type, { submissions: subs, status: nextStatus, options, votes: {} });
         triggerPing();
-        notifyPartner('🎭 إجابة جديدة في ' + (GAMES[type]?.shortTitle || ''), 'أرسل الشريك إجابته التمويهية!', type);
+        notifyPartner('🎭 دورك في ' + (GAMES[type]?.shortTitle || ''), 'أرسل الشريك إجابته التمويهية!', type);
       };
     }
 
@@ -877,7 +902,6 @@
         let nextStatus = current.status;
         let scores = { ...(current.scores || { me: 0, her: 0 }) };
 
-        // If both voted, calculate scores and finish round
         if (votes.me !== undefined && votes.her !== undefined) {
           nextStatus = 'finished';
           for (const r of ['me', 'her']) {
@@ -887,8 +911,10 @@
             if (current.options[votes[opp]]?.owner === r) scores[r] = (scores[r] || 0) + 1;
           }
           triggerCelebration();
+          notifyPartner('🌟 اكتمل التصويت في ' + (GAMES[type]?.shortTitle || ''), 'صوّت الطرفان! ادخل لمعرفة الحقيقة والدرجات 🏆', type);
         } else {
           triggerPing();
+          notifyPartner('🎯 دورك في التصويت — ' + (GAMES[type]?.shortTitle || ''), 'صوّت الشريك على الإجابة الحقيقية! دورك لتصوّت وتكشف النتيجة 🌟', type);
         }
 
         await patchState(type, { votes, status: nextStatus, scores });
@@ -907,7 +933,7 @@
         }
         await patchState('codenames', { clue, number: num });
         triggerPing();
-        notifyPartner('🕵️ تلميح جديد في كلمات سرية!', `أرسل القائد تلميح: "${clue}" (${num})`, 'codenames');
+        notifyPartner('🕵️ تلميح جديد في كلمات سرية!', `أرسل القائد تلميح: "${clue}" (${num}) — دورك للتخمين! 🔍`, 'codenames');
       };
     }
 
@@ -927,6 +953,7 @@
           status = 'finished';
           result = '💀 اخترتم الكلمة القاتلة! انتهت الجولة بالخسارة.';
           triggerPing();
+          notifyPartner('💀 كلمات سرية — الكلمة القاتلة!', 'تم اختيار الكلمة القاتلة! انتهت الجولة.', 'codenames');
         } else if (kind === 'red') {
           const redFound = Object.keys(revealed).filter(w => current.key[w] === 'red').length;
           scores[myRole] = (scores[myRole] || 0) + 1;
@@ -934,17 +961,21 @@
             status = 'finished';
             result = '🎉 فوز رائع! كشفتم جميع الكلمات المستهدفة بنجاح!';
             triggerCelebration();
+            notifyPartner('🎉 فوز في كلمات سرية!', 'كشفتم جميع الكلمات المستهدفة بنجاح! 🏆', 'codenames');
           } else {
             triggerPing();
+            notifyPartner('🕵️ تخمين صائب في كلمات سرية!', `تم كشف كلمة صحيحة: "${word}" 🔍`, 'codenames');
           }
         } else if (kind === 'blue') {
           status = 'finished';
           result = 'اخترتم كلمة الفريق الخصم؛ انتهت محاولات التخمين.';
           triggerPing();
+          notifyPartner('🕵️ انتهت محاولات التخمين', `تم اختيار كلمة غير مستهدفة: "${word}"`, 'codenames');
         } else {
           status = 'finished';
           result = 'كلمة محايدة؛ انتهت محاولة التخمين لهذه الجولة.';
           triggerPing();
+          notifyPartner('🕵️ كلمة محايدة', `تم كشف كلمة محايدة: "${word}"`, 'codenames');
         }
 
         await patchState('codenames', { revealed, status, result, scores });
@@ -972,17 +1003,18 @@
           if (myCorrect) scores.me = (scores.me || 0) + 2;
           if (otherCorrect) scores.her = (scores.her || 0) + 2;
 
-          // If wolf wasn't caught by the villager
           const villagerRole = (wolfRole === 'me' ? 'her' : 'me');
           if (votes[villagerRole] !== wolfRole) {
             scores[wolfRole] = (scores[wolfRole] || 0) + 1;
           }
 
           const wolfName = getRoleName(wolfRole);
-          result = `الذئب الحقيقي كان: ${wolfName}! ${myCorrect || otherCorrect ? 'تم كشف المخادع واحتساب النقاط.' : 'أفلت الذئب من الاتهام!'}`;
+          result = `الذئب الحقيقي في القرية كان: ${wolfName}! ${myCorrect || otherCorrect ? 'تم كشف المخادع واحتساب النقاط.' : 'أفلت الذئب من الاتهام!'}`;
           triggerCelebration();
+          notifyPartner('🏁 نتيجة ليلة الذئب!', `صوّت الطرفان! ادخل لمعرفة من كان الذئب الحقيقي 🐺`, 'werewolf');
         } else {
           triggerPing();
+          notifyPartner('🐺 ليلة الذئب — دورك في التصويت!', 'صوّت الشريك لكشف المشتبه به، دورك للتصويت الآن! 🕯️', 'werewolf');
         }
 
         await patchState('werewolf', { votes, status, result, scores });
@@ -1004,11 +1036,16 @@
         if (votes.me && votes.her) {
           if (votes.me === 'yes' && votes.her === 'yes') {
             phase = 'mission';
+            notifyPartner('🛡️ قُبل فريق المهمة!', 'وافق الطرفان على الفريق؛ حان دورك لاختيار بطاقتك السرية 🎭', 'resistance');
           } else {
             status = 'finished';
             result = 'رُفض فريق المهمة؛ تتقدم اللعبة إلى الجولة التالية دون تنفيذ.';
+            notifyPartner('❌ رُفضت المهمة', 'لم يجمع الفريق على القبول؛ ادخل للجولة التالية.', 'resistance');
           }
           triggerPing();
+        } else {
+          triggerPing();
+          notifyPartner('🎭 المهمة السرية — دورك!', 'صوّت الشريك على قبول المهمة! دورك للتصويت الآن 🛡️', 'resistance');
         }
 
         await patchState('resistance', { votes, phase, status, result });
@@ -1039,8 +1076,10 @@
             if (current.roles?.her === 'مقاومة') scores.her = (scores.her || 0) + 1;
             triggerCelebration();
           }
+          notifyPartner('🏁 نتيجة المهمة السرية!', result, 'resistance');
         } else {
           triggerPing();
+          notifyPartner('🎭 المهمة السرية — دورك الآن!', 'وضع الشريك بطاقته في الصندوق السري! دورك لوضع بطاقتك 🛡️', 'resistance');
         }
 
         await patchState('resistance', { actions, status, result, scores });
@@ -1064,21 +1103,25 @@
     }
   }
 
+  const getCachedState = (type) => {
+    try {
+      const local = localStorage.getItem(storageKey(type));
+      if (local) return JSON.parse(local);
+    } catch {}
+    return null;
+  };
+
   // ==========================================
-  // 8. الدالة الرئيسية لفتح الألعاب
+  // 8. الدالة الرئيسية لفتح الألعاب - فتح فوري مباشر في 0ms
   // ==========================================
-  window.openCommunityGame = async function (type) {
+  window.openCommunityGame = function (type) {
     if (!GAMES[type]) {
       console.warn('Unknown community game type:', type);
       return;
     }
 
     const cfg = getSettings(type);
-    let state = await readState(type);
-    if (!state || !state.game || state.game !== type) {
-      state = createInitialState(type, cfg, null);
-      await writeState(type, state);
-    }
+    const meta = GAMES[type];
 
     const render = (currentState) => {
       let html = '';
@@ -1101,8 +1144,42 @@
       }
     };
 
-    render(state);
-    listenState(type, render);
+    // 1. فتح نافذة اللعبة فوراً دون انتظار أي طلب شبكة (تماماً مثل لعبة الرسم)
+    const cached = getCachedState(type);
+    if (cached && cached.game === type) {
+      render(cached);
+    } else {
+      if (window.openModal) {
+        window.openModal(`
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <div style="font-size:1.8rem;">${meta.icon}</div>
+            <div>
+              <h3 style="margin:0;color:var(--primary);">${meta.title}</h3>
+              <small style="color:#887581;">غرفة اللعبة المباشرة بينك وبين عيوشة</small>
+            </div>
+          </div>
+          <div class="v9-panel" style="text-align:center;padding:25px 15px;">
+            <div style="font-size:2rem;margin-bottom:8px;">⏳</div>
+            <p style="margin:0;font-weight:bold;color:var(--primary);">جارٍ الدخول إلى دورك في اللعبة...</p>
+          </div>
+        `);
+      }
+    }
+
+    // 2. مزامنة الحالة اللحظية من قاعدة البيانات والاشتراك في التحديثات المباشرة
+    (async () => {
+      try {
+        let state = await readState(type);
+        if (!state || !state.game || state.game !== type) {
+          state = createInitialState(type, cfg, null);
+          await writeState(type, state);
+        }
+        render(state);
+        listenState(type, render);
+      } catch (err) {
+        console.warn('Game sync error:', err);
+      }
+    })();
   };
 
   // Alias for compatibility

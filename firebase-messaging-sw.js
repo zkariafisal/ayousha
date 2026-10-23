@@ -1,58 +1,126 @@
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
+
 firebase.initializeApp({
-  apiKey:'AIzaSyA5srAIJRXItE5uT9OKpRq0gHeEUeatDp0',
-  authDomain:'ayousha.firebaseapp.com',
-  databaseURL:'https://ayousha-default-rtdb.firebaseio.com',
-  projectId:'ayousha',
-  storageBucket:'ayousha.firebasestorage.app',
-  messagingSenderId:'68680035248',
-  appId:'1:68680035248:web:212c41987a40628969c475'
+  apiKey: 'AIzaSyA5srAIJRXItE5uT9OKpRq0gHeEUeatDp0',
+  authDomain: 'ayousha.firebaseapp.com',
+  databaseURL: 'https://ayousha-default-rtdb.firebaseio.com',
+  projectId: 'ayousha',
+  storageBucket: 'ayousha.firebasestorage.app',
+  messagingSenderId: '68680035248',
+  appId: '1:68680035248:web:212c41987a40628969c475'
 });
-const messaging=firebase.messaging();
-// Push notifications are handled by the service worker even when no app tab is open.
-// The OS, not JavaScript audio, supplies the background notification sound.
-const symbols={mail:'💌',surprise:'🎁',memory:'📸',ping:'💗',mood:'🌙',answer:'📝',quiz:'🧠',random:'🎲'};
-messaging.onBackgroundMessage(payload=>{
- const d=payload.data||{};
- const type=d.type||'notification';
- const url=new URL('/index.html',self.location.origin);
- url.searchParams.set('for',d.role==='her'?'her':'me');
- url.searchParams.set('open',type);
- if(d.itemId)url.searchParams.set('item',d.itemId);
- return self.registration.showNotification((symbols[type]||'🔔')+' '+(d.title||'رسالة جديدة'),{
-  body:d.body||'افتح التطبيق للاطلاع',
-  icon:'/icon.png',badge:'/icon.png',
-  tag:'ayousha-'+type+'-'+(d.itemId||Date.now()),
-  vibrate:[180,90,180],silent:false,requireInteraction:false,
-  renotify:true, timestamp:Date.now(),
-  data:{url:url.href,type,itemId:d.itemId||''}
- });
+
+const messaging = firebase.messaging();
+
+const symbols = {
+  mail: '💌',
+  game: '🎮',
+  surprise: '🎁',
+  memory: '📸',
+  ping: '💗',
+  mood: '🌙',
+  answer: '📝',
+  quiz: '🧠',
+  dailyShared: '🌟',
+  random: '🎲'
+};
+
+// استقبال الإشعارات في الخلفية وتوجيه الرابط بدقة
+messaging.onBackgroundMessage(payload => {
+  const d = payload.data || {};
+  const type = d.type || 'game';
+  const itemId = d.itemId || '';
+  const role = d.role === 'her' ? 'her' : 'me';
+
+  const base = self.registration.scope || self.location.origin + '/';
+  const url = new URL(base);
+  if (url.pathname.endsWith('/')) {
+    url.pathname += 'index.html';
+  }
+  url.searchParams.set('for', role);
+  url.searchParams.set('open', type);
+  if (itemId) url.searchParams.set('item', itemId);
+
+  const icon = symbols[type] || '🔔';
+  const title = (d.title || 'عيون عيوشة 🌸').startsWith(icon) ? d.title : `${icon} ${d.title || 'رسالة جديدة'}`;
+
+  return self.registration.showNotification(title, {
+    body: d.body || 'اضغط هنا للفتح والدخول المباشر',
+    icon: '/icon.png',
+    badge: '/icon.png',
+    tag: `ayousha-${type}-${itemId || Date.now()}`,
+    vibrate: [200, 100, 200, 100, 200],
+    silent: false,
+    requireInteraction: true,
+    renotify: true,
+    timestamp: Date.now(),
+    data: {
+      url: url.href,
+      type,
+      itemId,
+      role
+    }
+  });
 });
+
+// عند نقر المستخدم على الإشعار من شاشة القفل أو مركز إشعارات الهاتف
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const details = event.notification.data || {};
-  let target;
+  const openType = details.type || 'game';
+  const itemId = details.itemId || '';
+  const role = details.role || 'me';
+
+  // بناء الرابط المقصود بدقة
+  let targetUrl;
   try {
-    target = new URL(details.url || '/index.html', self.location.origin);
-    // Always use the deployed site's entry point; prevent 404 on unknown paths.
-    if (target.origin !== self.location.origin) target = new URL('/index.html', self.location.origin);
-    target.pathname = '/index.html';
-  } catch (_) { target = new URL('/index.html', self.location.origin); }
-  event.waitUntil((async () => {
-    const pages = await clients.matchAll({ type:'window', includeUncontrolled:true });
-    for (const page of pages) {
-      if (new URL(page.url).origin !== target.origin) continue;
-      try {
-        if ('navigate' in page) {
-          const navigated = await page.navigate(target.href);
-          if (navigated) { await navigated.focus(); return; }
-        }
-        await page.focus();
-        page.postMessage({ type:'OPEN_AYOUSHA', url:target.href });
-        return;
-      } catch (error) { console.warn('Notification navigation:',error); }
+    const base = self.registration.scope || self.location.origin + '/';
+    const u = new URL(base);
+    if (u.pathname.endsWith('/')) {
+      u.pathname += 'index.html';
     }
-    await clients.openWindow(target.href);
+    if (details.url) {
+      try {
+        const parsed = new URL(details.url, self.location.origin);
+        u.pathname = parsed.pathname;
+        parsed.searchParams.forEach((val, key) => u.searchParams.set(key, val));
+      } catch (_) {}
+    }
+    u.searchParams.set('for', role);
+    u.searchParams.set('open', openType);
+    if (itemId) u.searchParams.set('item', itemId);
+    targetUrl = u.href;
+  } catch (_) {
+    targetUrl = details.url || self.registration.scope || '/index.html';
+  }
+
+  event.waitUntil((async () => {
+    const windowClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+
+    // إذا كان التطبيق مفتوحاً في الخلفية
+    for (const client of windowClients) {
+      try {
+        if ('focus' in client) await client.focus();
+        if ('navigate' in client && client.url !== targetUrl) {
+          await client.navigate(targetUrl);
+        }
+        client.postMessage({
+          type: 'OPEN_AYOUSHA_DESTINATION',
+          open: openType,
+          item: itemId,
+          role,
+          url: targetUrl
+        });
+        return;
+      } catch (err) {
+        console.warn('Focus existing client error:', err);
+      }
+    }
+
+    // إذا كان التطبيق مقفلاً تماماً، افتح نافذة جديدة مباشرة بالرابط والوجهة المحددة
+    if (clients.openWindow) {
+      await clients.openWindow(targetUrl);
+    }
   })());
 });

@@ -182,14 +182,176 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
 .mem-del{position:absolute;top:6px;left:6px;background:rgba(255,255,255,.92);border-radius:50%;width:26px;height:26px;display:grid;place-items:center;color:#c62828;font-size:.9rem;box-shadow:0 2px 6px rgba(0,0,0,.08)}
 .notif-item{background:#fff;padding:12px;border-radius:14px;border:1px solid #f2d9e4;margin-bottom:8px;cursor:pointer;transition:transform .15s}
 .notif-item:active{transform:scale(.98)}
+
+/* إشعار عائم تفاعلي فوري عند وصول أي رسالة أو دور داخل التطبيق */
+.interactive-notif-banner {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  max-width: 520px;
+  margin: 0 auto;
+  z-index: 99999;
+  background: linear-gradient(135deg, #d81b60, #ad1457);
+  color: #fff;
+  border-radius: 20px;
+  padding: 12px 16px;
+  box-shadow: 0 12px 36px rgba(173,20,87,0.38);
+  border: 2px solid rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  transform: translateY(-120%);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  user-select: none;
+}
+.interactive-notif-banner.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+.notif-banner-badge {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: .75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* شبكة عرض الألعاب الاحترافية */
+.game-pro-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin: 12px 0 16px;
+}
+@media (max-width: 600px) {
+  .game-pro-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+.game-pro-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.game-pro-card:active {
+  transform: scale(0.975);
+}
+.game-pro-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(216,27,96,0.12);
+}
+.game-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.game-card-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.game-card-tag {
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 10px;
+  background: #fce4ec;
+  color: #ad1457;
+}
+.game-card-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--primary-2);
+  margin-top: 2px;
+}
+.game-card-desc {
+  font-size: .82rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.game-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid #f9e9f2;
+  font-size: .75rem;
+  color: #795548;
+}
+.game-card-btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: .8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 </style>
 </head>
 <body>
+<div id="interactiveNotifBanner" class="interactive-notif-banner" onclick="window.onInteractiveBannerClick()">
+  <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
+    <div id="notifBannerIcon" style="font-size:1.6rem;flex-shrink:0;">🔔</div>
+    <div style="min-width:0;flex:1;">
+      <h4 id="notifBannerTitle" style="margin:0;font-size:.92rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">إشعار جديد</h4>
+      <p id="notifBannerBody" style="margin:2px 0 0;font-size:.78rem;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">اضغط هنا للفتح والدخول</p>
+    </div>
+  </div>
+  <div class="notif-banner-badge">
+    <span>فتح الآن</span> <span>➔</span>
+  </div>
+</div>
 
 <div id="splashScreen">
   <img src="https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Za.png" alt="عيون عيوشة">
   <div class="spinner"></div>
 </div>
+<script>
+(function(){
+  var dismiss = function() {
+    var s = document.getElementById("splashScreen");
+    if (s && !s._dismissed) {
+      s._dismissed = true;
+      s.style.opacity = "0";
+      s.style.pointerEvents = "none";
+      setTimeout(function(){ if (s && s.parentNode) s.remove(); }, 500);
+    }
+  };
+  setTimeout(dismiss, 1100);
+  window.addEventListener("DOMContentLoaded", function(){ setTimeout(dismiss, 700); });
+  window.addEventListener("load", function(){ setTimeout(dismiss, 300); });
+})();
+</script>
 
 <header>
   <div class="brand"><div class="brand-logo">🌸</div><div><h1>عيون عيوشة</h1><small>ألعاب مشتركة وتنبيهات فورية بيننا</small></div></div>
@@ -234,17 +396,18 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
     </div>
   </section>
 
-  <section id="view-games" class="view">
+    <section id="view-games" class="view">
     <div class="greet" style="background:linear-gradient(135deg,#7b1fa2,#4a148c);margin-bottom:16px;">
       <h2>🎮 عالمنا نلعب</h2>
       <p>ألعاب ثنائية تفاعلية بالتناوب المباشر بين قلبينا 💕</p>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-gold" onclick="window.launchGameModal('trivia')">🧠 لعبة الترفيه والخداع (4 خيارات)</button>
-        <button class="btn btn-soft" style="background:rgba(255,255,255,.2);color:#fff;" onclick="window.launchGameModal('story')">📖 قصة نكتبها معًا</button>
+        <button class="btn btn-soft" style="background:rgba(255,255,255,.2);color:#fff;" onclick="window.openDailySharedQuestion()">🌟 سؤال اليوم المشترك</button>
       </div>
     </div>
 
-    <div class="card">
+    <!-- رصيد القلوب والأوسمة -->
+    <div class="card" style="margin-bottom:14px;">
       <div class="card-title"><span>💎</span> رصيد القلوب والإنجازات المشتركة</div>
       <div class="v9-panel" style="text-align:center;font-weight:bold;font-size:1.15rem;color:#ad1457;">
         💗 قلوبنا المشتركة: <span id="sharedHeartsCount">0</span> قلبًا | 🏆 الأوسمة: <span id="sharedBadgesCount">4</span> أوسمة
@@ -255,34 +418,208 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title"><span>💞</span> أقسام التحديات بيننا</div>
-      <div class="v9-actions">
-        <button class="btn btn-soft" onclick="window.openGameCat('hearts')">💗 ألعاب القلوب والرسائل</button>
-        <button class="btn btn-soft" onclick="window.openGameCat('smart')">🧠 الترفيه والخداع والذكاء</button>
-        <button class="btn btn-soft" onclick="window.openGameCat('fun')">🎨 الرسم والتخمين</button>
-        <button class="btn btn-soft" onclick="window.openGameCat('vs')">⚔️ التحدي والمبارزة</button>
+    <!-- قسم مميز: الألعاب الخمس الحصرية بين زكريا وعيوشة -->
+    <div class="card" style="margin-bottom:14px;border:2px solid #f2bbd5;">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <div><span>✨</span> الألعاب الخمس الحصرية — بيني وبين عيوشة 💕</div>
+        <span class="text-xs" style="background:#fce4ec;color:#ad1457;font-size:.72rem;padding:2px 8px;border-radius:8px;font-weight:bold;">باقي الأدوار من النظام 🤖</span>
+      </div>
+      <p style="font-size:.82rem;color:var(--muted);margin:4px 0 10px;">
+        تم تصميم هذه الألعاب خصيصاً للمبارزة الثنائية بين زكريا وعيوشة؛ وتتولى شخصيات وقرائن النظام الذكي ملء سياق الجولة والشهادات والتمويهات!
+      </p>
+
+      <div class="game-pro-grid">
+        <!-- 1. خمنها -->
+        <div class="game-pro-card" onclick="window.launchGameModal('balderdash')">
+          <div>
+            <div class="game-card-head">
+              <div class="game-card-icon-wrap" style="background:linear-gradient(135deg,#ffebee,#fce4ec);color:#d81b60;">🌀</div>
+              <span class="game-card-tag">بيني وبين عيوشة 💗</span>
+            </div>
+            <div class="game-card-title">خمنها — Balderdash</div>
+            <p class="game-card-desc">تحدي الذكاء اللغوي والتمويه: يبتكر كل طرف تعريفاً وهمياً مقنعاً، ويضيف النظام خياراته الذكية لإكمال الخيارات مع التعريف الحقيقي!</p>
+          </div>
+          <div class="game-card-foot">
+            <span>👥 مبارزة ثنائية + النظام</span>
+            <span class="game-card-btn">العب الآن ▶</span>
+          </div>
+        </div>
+
+        <!-- 2. كذبة مقنعة -->
+        <div class="game-pro-card" onclick="window.launchGameModal('fibbage')">
+          <div>
+            <div class="game-card-head">
+              <div class="game-card-icon-wrap" style="background:linear-gradient(135deg,#fff8e1,#ffe0b2);color:#e65100;">🤥</div>
+              <span class="game-card-tag">بيني وبين عيوشة 💗</span>
+            </div>
+            <div class="game-card-title">كذبة مقنعة — Fibbage</div>
+            <p class="game-card-desc">أغرب الحقائق والطرائف: اقرأ الواقعة الحقيقية الناقصة، وابتكر كذبة مقنعة لخداع الشريك، ثم صوّتوا لكشف الحقيقة الصادمة!</p>
+          </div>
+          <div class="game-card-foot">
+            <span>🎭 كذب وتمويه ذكي</span>
+            <span class="game-card-btn">العب الآن ▶</span>
+          </div>
+        </div>
+
+        <!-- 3. كلمات سرية -->
+        <div class="game-pro-card" onclick="window.launchGameModal('codenames')">
+          <div>
+            <div class="game-card-head">
+              <div class="game-card-icon-wrap" style="background:linear-gradient(135deg,#ede7f6,#d1c4e9);color:#512da8;">🕵️</div>
+              <span class="game-card-tag">تناوب وتنسيق 🔍</span>
+            </div>
+            <div class="game-card-title">كلمات سرية — Codenames</div>
+            <p class="game-card-desc">لوحة 25 كلمة وشفرات القائد: يتناوب زكريا وعيوشة دور القائد والمخمّن، مع تحذير من الكلمة القاتلة 💀 بمساعدة حَكَم النظام.</p>
+          </div>
+          <div class="game-card-foot">
+            <span>🕵️ قائد ومخمّن</span>
+            <span class="game-card-btn">العب الآن ▶</span>
+          </div>
+        </div>
+
+        <!-- 4. ليلة الذئب -->
+        <div class="game-pro-card" onclick="window.launchGameModal('werewolf')">
+          <div>
+            <div class="game-card-head">
+              <div class="game-card-icon-wrap" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0);color:#ad1457;">🐺</div>
+              <span class="game-card-tag">غموض ومحاكمة 🕯️</span>
+            </div>
+            <div class="game-card-title">ليلة الذئب — Werewolf</div>
+            <p class="game-card-desc">سيناريو الحادثة وشهادات أهل القرية تأتي من النظام؛ والدور السري موزع بين زكريا وعيوشة فقط (ذئب مخادع 🐺 مقابل محقق/قروي 🔍)!</p>
+          </div>
+          <div class="game-card-foot">
+            <span>📜 قرائن النظام + دور سري</span>
+            <span class="game-card-btn">العب الآن ▶</span>
+          </div>
+        </div>
+
+        <!-- 5. المهمة السرية -->
+        <div class="game-pro-card" onclick="window.launchGameModal('resistance')">
+          <div>
+            <div class="game-card-head">
+              <div class="game-card-icon-wrap" style="background:linear-gradient(135deg,#e8eaf6,#c5cae9);color:#1a237e;">🎭</div>
+              <span class="game-card-tag">المقاومة والجاسوس 🛡️</span>
+            </div>
+            <div class="game-card-title">المهمة السرية — Resistance</div>
+            <p class="game-card-desc">أمر العمليات من قيادة المقاومة (النظام 🏛️): زكريا وعيوشة هما فريق المهمة (أحدكما مقاوم والآخر مخرّب مندس) صوّتا ونفّذا سراً!</p>
+          </div>
+          <div class="game-card-foot">
+            <span>⚡ نجاح أو تخريب سري</span>
+            <span class="game-card-btn">العب الآن ▶</span>
+          </div>
+        </div>
+
+        <!-- 6. سؤال اليوم المشترك -->
+        <div class="game-pro-card" style="background:linear-gradient(135deg,#fffbf0,#fff5d9);border-color:#f8dfa0;" onclick="window.openDailySharedQuestion()">
+          <div>
+            <div class="game-card-head">
+              <div class="game-card-icon-wrap" style="background:linear-gradient(135deg,#fff3e0,#ffe082);color:#b78103;">🌟</div>
+              <span class="game-card-tag" style="background:#fff0c7;color:#936500;">سؤال يومي موحد 📅</span>
+            </div>
+            <div class="game-card-title" style="color:#936500;">سؤال اليوم المشترك</div>
+            <p class="game-card-desc">سؤال رومانسي موحد للطرفين طوال اليوم يتجدد تلقائياً بحسب التاريخ؛ أرسل إجابتك لتكشف الإجابتين معاً عند اكتمالهما!</p>
+          </div>
+          <div class="game-card-foot" style="border-top-color:#fae8b8;">
+            <span>💞 إجابة مشتركة كل يوم</span>
+            <span class="game-card-btn" style="background:linear-gradient(135deg,#d4af75,#b38e52);">افتح السؤال 🌟</span>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- قائمة باقي الألعاب التفاعلية الممتعة والتناوب -->
     <div class="card">
-      <div class="card-title"><span>⭐</span> قائمة الألعاب الثنائية المشتركة</div>
-      <div style="display:flex;flex-direction:column;gap:11px;margin-top:8px;">
-        <button class="btn btn-primary btn-full" style="background:linear-gradient(135deg,#9c27b0,#e91e63);" onclick="window.launchGameModal('trivia')">🧠 لعبة الترفيه والخداع (نظام 4 خيارات + نقاط التمويه)</button>
-        <button class="btn btn-primary btn-full" onclick="window.launchGameModal('story')">📖 قصة نكتبها معًا (جملة البداية من النظام + تناوب)</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('xo')">❌⭕ لعبة XO (شات ذاتي الحذف 5 ثوانٍ)</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('draw')">🎨 ارسم وخمّن (رسم حي + تخمين الشريك بالتبادل)</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('guessNum')">🔢 خمن الرقم السري (مبارزة تخمين بالدور)</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('cards')">💌 اختر رقمًا واكتشف رسالتك (تناوب فتح القلوب)</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('puzzle')">🧩 حل اللغز قبلي (حل سري + كشف الجوابين)</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('telepathy')">⚡ تخاطر القلوب (تطابق الاختيارات)</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('spin')">🎡 عجلة التحديات والرومانسية</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('balderdash')">🌀 خمنها — تعريفات وخداع</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('fibbage')">🤥 كذبة مقنعة — Fibbage</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('codenames')">🕵️ كلمات سرية — أسماء رمزية</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('werewolf')">🐺 ليلة الذئب — كشف المخادع</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('resistance')">🎭 المهمة السرية — المقاومة</button>
-        <button class="btn btn-gold btn-full" onclick="window.openDailySharedQuestion()">🌟 سؤال اليوم المشترك</button>
+      <div class="card-title"><span>🎲</span> ألعاب التناوب المباشر والترفيه الكلاسيكي</div>
+      <div class="game-pro-grid">
+        <div class="game-pro-card" onclick="window.launchGameModal('trivia')">
+          <div class="game-card-head">
+            <div class="game-card-icon-wrap" style="background:#f3e5f5;color:#7b1fa2;">🧠</div>
+            <span class="game-card-tag">نظام 4 خيارات</span>
+          </div>
+          <div class="game-card-title">لعبة الترفيه والخداع (تريفيا)</div>
+          <p class="game-card-desc">سؤال عام بـ 4 خيارات: تمويهك، تمويه شريكك، الإجابة الحقيقية، وتمويه الجهاز.</p>
+          <div class="game-card-foot"><span class="game-card-btn">العب الآن ▶</span></div>
+        </div>
+
+        <div class="game-pro-card" onclick="window.launchGameModal('draw')">
+          <div class="game-card-head">
+            <div class="game-card-icon-wrap" style="background:#e0f7fa;color:#0097a7;">🎨</div>
+            <span class="game-card-tag">رسم وتخمين حي</span>
+          </div>
+          <div class="game-card-title">ارسم وخمّن (Pictionary)</div>
+          <p class="game-card-desc">يرسم أحدكما الكلمة السرية على اللوحة الحية، ويخمن الطرف الآخر في شات اللعبة الفوري!</p>
+          <div class="game-card-foot"><span class="game-card-btn">العب الآن ▶</span></div>
+        </div>
+
+        <div class="game-pro-card" onclick="window.launchGameModal('guessNum')">
+          <div class="game-card-head">
+            <div class="game-card-icon-wrap" style="background:#e8f5e9;color:#2e7d32;">🔢</div>
+            <span class="game-card-tag">مبارزة ذكاء</span>
+          </div>
+          <div class="game-card-title">خمن الرقم السري (1-100)</div>
+          <p class="game-card-desc">مبارزة تخمين بالدور مع إشارات (أكبر / أصغر) وإشعار فوري للطرف الآخر عند التخمين.</p>
+          <div class="game-card-foot"><span class="game-card-btn">العب الآن ▶</span></div>
+        </div>
+
+        <div class="game-pro-card" onclick="window.launchGameModal('cards')">
+          <div class="game-card-head">
+            <div class="game-card-icon-wrap" style="background:#fce4ec;color:#c2185b;">💌</div>
+            <span class="game-card-tag">رسائل ورومانسية</span>
+          </div>
+          <div class="game-card-title">اختر رقمًا واكتشف رسالتك</div>
+          <p class="game-card-desc">تناوب اختيار كروت القلوب التسعة لاكتشاف رسائل حب ومفاجآت خاصة.</p>
+          <div class="game-card-foot"><span class="game-card-btn">العب الآن ▶</span></div>
+        </div>
+
+        <div class="game-pro-card" onclick="window.launchGameModal('telepathy')">
+          <div class="game-card-head">
+            <div class="game-card-icon-wrap" style="background:#fffde7;color:#fbc02d;">⚡</div>
+            <span class="game-card-tag">تخاطر قلوب</span>
+          </div>
+          <div class="game-card-title">تخاطر القلوب (تطابق الاختيارات)</div>
+          <p class="game-card-desc">سؤال رومانسي يومي مشترك لاختبار مدى تطابق تفكيركما واختياراتكما المفضلة.</p>
+          <div class="game-card-foot"><span class="game-card-btn">العب الآن ▶</span></div>
+        </div>
+
+        <div class="game-pro-card" onclick="window.launchGameModal('puzzle')">
+          <div class="game-card-head">
+            <div class="game-card-icon-wrap" style="background:#ede7f6;color:#673ab7;">🧩</div>
+            <span class="game-card-tag">حل اللغز قبلي</span>
+          </div>
+          <div class="game-card-title">حل اللغز قبلي (سباق الأذكياء)</div>
+          <p class="game-card-desc">لغز غامض يتنافس الطرفان على حله أولاً بإجابة سرية ثم كشف الجوابين معاً.</p>
+          <div class="game-card-foot"><span class="game-card-btn">العب الآن ▶</span></div>
+        </div>
+
+        <div class="game-pro-card" onclick="window.launchGameModal('xo')">
+          <div class="game-card-head">
+            <div class="game-card-icon-wrap" style="background:#fbe9e7;color:#d84315;">❌⭕</div>
+            <span class="game-card-tag">لعبة XO</span>
+          </div>
+          <div class="game-card-title">لعبة إكس أو (XO المباشرة)</div>
+          <p class="game-card-desc">تحدي XO كلاسيكي سريع مع شات التحدي العائم المؤقت (5 ثوانٍ).</p>
+          <div class="game-card-foot"><span class="game-card-btn">العب الآن ▶</span></div>
+        </div>
+
+        <div class="game-pro-card" onclick="window.launchGameModal('story')">
+          <div class="game-card-head">
+            <div class="game-card-icon-wrap" style="background:#f3e5f5;color:#8e24aa;">📖</div>
+            <span class="game-card-tag">قصة مشتركة</span>
+          </div>
+          <div class="game-card-title">قصة نكتبها معًا</div>
+          <p class="game-card-desc">يقدم النظام جملة البداية المشوقة، ويكمل كل طرف سطراً بالتناوب حتى تكتمل روايتنا.</p>
+          <div class="game-card-foot"><span class="game-card-btn">العب الآن ▶</span></div>
+        </div>
+
+        <div class="game-pro-card" onclick="window.launchGameModal('spin')">
+          <div class="game-card-head">
+            <div class="game-card-icon-wrap" style="background:#fff3e0;color:#ef6c00;">🎡</div>
+            <span class="game-card-tag">عجلة الحظ</span>
+          </div>
+          <div class="game-card-title">عجلة التحديات والرومانسية</div>
+          <p class="game-card-desc">دوّر العجلة واكتشف التحدي أو الطلب الرومانسي الذي يجب على الشريك تنفيذه حالاً!</p>
+          <div class="game-card-foot"><span class="game-card-btn">العب الآن ▶</span></div>
+        </div>
       </div>
     </div>
   </section>
@@ -513,22 +850,66 @@ async function sendFCM(toRole, title, body, type='game', itemId=''){
   } catch(e){}
 }
 
-function showAppNotification(title, body, type='notification', itemId=''){
+// الإشعار التفاعلي العائم داخل التطبيق
+let _bannerTimer = null;
+let _bannerPayload = null;
+
+function showInteractiveInAppBanner(title, body, type, itemId, role){
+  const banner = document.getElementById('interactiveNotifBanner');
+  if(!banner) return;
+  const iconEl = document.getElementById('notifBannerIcon');
+  const titleEl = document.getElementById('notifBannerTitle');
+  const bodyEl = document.getElementById('notifBannerBody');
+
+  const symbols = {
+    mail:'💌', game:'🎮', surprise:'🎁', memory:'📸', ping:'💗', mood:'🌙', answer:'📝', quiz:'🧠', dailyShared:'🌟',
+    balderdash:'🌀', fibbage:'🤥', codenames:'🕵️', werewolf:'🐺', resistance:'🎭', xo:'❌⭕', story:'📖', trivia:'🧠', puzzle:'🧩', telepathy:'💞', spin:'🎡', draw:'🎨', guessNum:'🔢', cards:'💌', doors:'🚪'
+  };
+  if(iconEl) iconEl.textContent = symbols[itemId] || symbols[type] || '🔔';
+  if(titleEl) titleEl.textContent = title || 'إشعار جديد';
+  if(bodyEl) bodyEl.textContent = body || 'اضغط هنا للفتح والدخول المباشر للعب';
+
+  _bannerPayload = { type, itemId, role: role || otherRole(), title, body };
+  banner.classList.add('show');
+  clearTimeout(_bannerTimer);
+  _bannerTimer = setTimeout(() => {
+    banner.classList.remove('show');
+  }, 7500);
+}
+
+window.onInteractiveBannerClick = function(){
+  const banner = document.getElementById('interactiveNotifBanner');
+  if(banner) banner.classList.remove('show');
+  if(_bannerPayload && _bannerPayload.type){
+    window.openEventDestination(_bannerPayload.type, _bannerPayload.itemId, _bannerPayload.role, _bannerPayload.title, _bannerPayload.body);
+  }
+};
+
+function showAppNotification(title, body, type='notification', itemId='', targetRole=''){
+  const toRole = targetRole || otherRole();
   playEventSound(type);
   if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-  toast('🔔 ' + title + (body ? ': ' + body : ''));
+  
+  // 1. عرض إشعار عائم تفاعلي فوري داخل التطبيق
+  showInteractiveInAppBanner(title, body, type, itemId, toRole);
+
+  // 2. إرسال إشعار للمتصفح إذا كان مسموحاً
   if('Notification' in window && Notification.permission === 'granted'){
     try {
       navigator.serviceWorker.ready.then(reg => {
+        const u = new URL(location.href);
+        u.searchParams.set('for', toRole);
+        u.searchParams.set('open', type);
+        if(itemId) u.searchParams.set('item', itemId);
         reg.showNotification(title, {
-          body: body || '',
+          body: body || 'اضغط هنا للدخول واللعب فوراً',
           icon: ICON_URL,
           badge: ICON_URL,
-          tag: 'ayousha-fg-' + Date.now(),
+          tag: 'ayousha-fg-' + type + '-' + (itemId || Date.now()),
           vibrate: [200, 100, 200, 100, 200],
           data: {
-            url: `${location.origin}/index.html?for=${MY_ROLE}&open=${encodeURIComponent(type)}&item=${encodeURIComponent(itemId)}`,
-            type, itemId
+            url: u.href,
+            type, itemId, role: toRole
           }
         });
       });
@@ -536,54 +917,269 @@ function showAppNotification(title, body, type='notification', itemId=''){
   }
 }
 
-let receivedEventIds = new Set(), eventsPrimed = false;
-function processIncomingNotifications(items){
-  const incoming = items.filter(n => n.to === MY_ROLE);
-  if(eventsPrimed){
-    for(const n of incoming){
-      if(!receivedEventIds.has(n.id)){
-        showAppNotification(n.title, n.body, n.type, n.itemId || '');
-      }
-    }
+let _seenNotifIds = new Set();
+let _initialNotifsLoaded = false;
+
+function processIncomingNotifications(notifs){
+  if(!Array.isArray(notifs)) return;
+  if(!_initialNotifsLoaded){
+    notifs.forEach(n => { if(n.id) _seenNotifIds.add(n.id); });
+    _initialNotifsLoaded = true;
+    return;
   }
-  receivedEventIds = new Set(incoming.map(n => n.id));
-  eventsPrimed = true;
+  const myNew = notifs.filter(n => n.to === MY_ROLE && !n.read && n.id && !_seenNotifIds.has(n.id));
+  myNew.forEach(n => {
+    _seenNotifIds.add(n.id);
+    showAppNotification(n.title, n.body, n.type, n.itemId, n.to);
+  });
 }
 
-window.openEventDestination = function(type, id){
-  if(type === 'game'){
+// التوجيه المباشر لأي وجهة في التطبيق مع مزامنة دور المستلم للدخول واللعب فوراً
+window.openEventDestination = function(type, id, targetRole, notifTitle='', notifBody=''){
+  // 1. ضبط ومزامنة دور المستلم حتى يكون جاهزاً للعب دوره فوراً
+  if(targetRole && (targetRole === 'me' || targetRole === 'her')){
+    MY_ROLE = targetRole;
+    try { localStorage.setItem('ayousha_role', targetRole); } catch(e){}
+    if(typeof window.currentMailRole !== 'undefined') window.currentMailRole = targetRole;
+    const p = document.getElementById('chatPartnerName');
+    if(p && state?.settings) p.textContent = MY_ROLE === 'me' ? state.settings.wifeName : state.settings.myName;
+  }
+
+  // 2. الكشف الذكي الشامل عن اللعبة المحددة
+  const allKnownGames = ['balderdash', 'fibbage', 'codenames', 'werewolf', 'resistance', 'xo', 'story', 'trivia', 'puzzle', 'telepathy', 'spin', 'cards', 'draw', 'guessNum', 'doors', 'dailyShared'];
+
+  let targetGame = null;
+  if(allKnownGames.includes(id)) {
+    targetGame = id;
+  } else if(allKnownGames.includes(type)) {
+    targetGame = type;
+  } else if(type === 'game' || type === 'dailyShared' || id === 'dailyShared'){
+    const text = ((notifTitle || '') + ' ' + (notifBody || '') + ' ' + (id || '') + ' ' + (type || '')).toLowerCase();
+    if(text.includes('balderdash') || text.includes('خمنها') || text.includes('معنى الكلمة')) targetGame = 'balderdash';
+    else if(text.includes('fibbage') || text.includes('كذبة مقنعة') || text.includes('كذبه')) targetGame = 'fibbage';
+    else if(text.includes('codenames') || text.includes('كلمات سرية') || text.includes('تلميح') || text.includes('شفرات')) targetGame = 'codenames';
+    else if(text.includes('werewolf') || text.includes('الذئب') || text.includes('ليلة الذئب')) targetGame = 'werewolf';
+    else if(text.includes('resistance') || text.includes('المهمة السرية') || text.includes('المقاومة') || text.includes('مخرّب')) targetGame = 'resistance';
+    else if(text.includes('draw') || text.includes('رسم') || text.includes('ارسم')) targetGame = 'draw';
+    else if(text.includes('xo') || text.includes('إكس أو') || text.includes('اكس او')) targetGame = 'xo';
+    else if(text.includes('story') || text.includes('قصة') || text.includes('روايتنا')) targetGame = 'story';
+    else if(text.includes('trivia') || text.includes('ترفيه') || text.includes('خداع')) targetGame = 'trivia';
+    else if(text.includes('puzzle') || text.includes('لغز') || text.includes('الأذكياء')) targetGame = 'puzzle';
+    else if(text.includes('telepathy') || text.includes('تخاطر') || text.includes('تطابق')) targetGame = 'telepathy';
+    else if(text.includes('spin') || text.includes('عجلة') || text.includes('عجله')) targetGame = 'spin';
+    else if(text.includes('guessnum') || text.includes('تخمين الرقم') || text.includes('رقم')) targetGame = 'guessNum';
+    else if(text.includes('cards') || text.includes('كرت') || text.includes('كروت') || text.includes('قلب جديد')) targetGame = 'cards';
+    else if(text.includes('doors') || text.includes('باب') || text.includes('أبواب')) targetGame = 'doors';
+    else if(text.includes('dailyshared') || text.includes('سؤال اليوم المشترك')) targetGame = 'dailyShared';
+    else if(type === 'game') targetGame = (id && id !== 'new-games') ? id : 'balderdash';
+  }
+
+  // 3. إذا كانت الوجهة لعبة: الدخول المباشر فوراً داخل اللعبة المحددة تماماً مثل لعبة الرسم
+  if(targetGame){
     switchView('games');
-    if(id){ setTimeout(() => window.launchGameModal(id), 300); }
+    const openGameDirectly = () => {
+      if(targetGame === 'dailyShared' && typeof window.openDailySharedQuestion === 'function') {
+        window.openDailySharedQuestion();
+      } else if(typeof window.launchGameModal === 'function') {
+        window.launchGameModal(targetGame);
+      } else if(typeof window.openCommunityGame === 'function') {
+        window.openCommunityGame(targetGame);
+      }
+    };
+
+    // فتح فوري مباشر في 0ms دون أي تأخير
+    openGameDirectly();
+    // تأكيد إضافي بعد وقت قصير
+    setTimeout(openGameDirectly, 60);
+
+    // التركيز التلقائي على منطقة لعب الدور بحسب اللعبة
+    setTimeout(() => {
+      // خمنها وكذبة مقنعة: حقل كتابة التمويه
+      const cgInput = document.getElementById('cgTextInput');
+      if(cgInput) {
+        cgInput.focus();
+        cgInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      // خيارات التصويت في خمنها وكذبة مقنعة
+      const voteBtns = document.querySelectorAll('[data-cg-vote]:not([disabled])');
+      if(voteBtns.length) {
+        voteBtns[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      // كلمات سرية: حقل التلميح للقائد أو لوحة الكلمات
+      const clueInput = document.getElementById('cgClueInput');
+      if(clueInput) clueInput.focus();
+      const wordsGrid = document.querySelector('[data-cg-word]:not([disabled])');
+      if(wordsGrid) wordsGrid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // ليلة الذئب: أزرار التصويت
+      const wolfBtn = document.querySelector('[data-cg-wolf]:not([disabled])');
+      if(wolfBtn) wolfBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // المهمة السرية: أزرار التصويت أو البطاقات
+      const approveBtn = document.querySelector('[data-cg-approve]:not([disabled])');
+      if(approveBtn) approveBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const missionBtn = document.querySelector('[data-cg-mission]:not([disabled])');
+      if(missionBtn) missionBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // القصة: حقل إكمال السطر
+      const storyInput = document.getElementById('storyNewSentence');
+      if(storyInput && !storyInput.disabled) {
+        storyInput.focus();
+        storyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      // اللغز: حقل الحل
+      const puzzleInput = document.getElementById('puzzleUserAns');
+      if(puzzleInput) puzzleInput.focus();
+      // الترفيه والخداع (Trivia): حقل التمويه
+      const trivInput = document.getElementById('fakeAnsInput');
+      if(trivInput) trivInput.focus();
+      // إكس أو (XO)
+      const xoBoard = document.getElementById('xoStatus');
+      if(xoBoard) xoBoard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // تخمين الرقم
+      const numInput = document.getElementById('userGuessInput');
+      if(numInput) numInput.focus();
+      // سؤال اليوم المشترك
+      const dailyInput = document.getElementById('dailyAnsInput');
+      if(dailyInput) dailyInput.focus();
+    }, 200);
     return;
   }
-  if(type === 'mail'){ switchView('mail'); if(id){setTimeout(()=>focusRequestedMail(id), 500);} return; }
-  if(type === 'surprise'){ switchView('surprise'); return; }
-  if(type === 'memory'){ switchView('memories'); return; }
-  if(type === 'ping' || type === 'answer'){
+
+  // 4. البريد والرسائل: الانتقال إلى المحادثة وتركيز مؤشر الكتابة للرد الفوري
+  if(type === 'mail'){ 
+    switchView('mail'); 
+    setTimeout(() => {
+      if(id) focusRequestedMail(id);
+      const textInput = document.getElementById('instantMailText');
+      if(textInput) {
+        textInput.focus();
+        textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 300);
+    return; 
+  }
+
+  // 5. المفاجآت: فتح قسم المفاجآت وفتح المفاجأة المحددة مباشرة إذا وُجد معرّفها
+  if(type === 'surprise'){
+    switchView('surprise');
+    if(id){
+      setTimeout(() => {
+        if(typeof window.v9OpenGift === 'function') window.v9OpenGift(id);
+      }, 300);
+    }
+    return;
+  }
+
+  // 6. الذكريات: الانتقال للذكريات والتركيز على الذكرى المحددة
+  if(type === 'memory'){
+    switchView('memories');
+    if(id){
+      setTimeout(() => {
+        const memCard = document.querySelector(`[onclick*="${id}"]`);
+        if(memCard) {
+          memCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          memCard.style.outline = '3px solid #d81b60';
+          setTimeout(() => { memCard.style.outline = ''; }, 2500);
+        }
+      }, 350);
+    }
+    return;
+  }
+
+  // 7. نبضة الحب (Ping): مؤثرات القلوب الفورية وتوجيه للرئيسية مع زر الرد
+  if(type === 'ping'){
     switchView('home');
-    if(type === 'answer'){ setTimeout(() => document.querySelector('.question-box')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300); }
+    burstHearts();
+    playEventSound('ping');
+    toast('💗 وصلك نبض حب فوري من شريكك!');
+    setTimeout(() => {
+      const pingBtn = document.querySelector('[onclick*="sendPing"]');
+      if(pingBtn) {
+        pingBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        pingBtn.style.transform = 'scale(1.1)';
+        setTimeout(() => { pingBtn.style.transform = ''; }, 1000);
+      }
+    }, 300);
     return;
   }
-  if(type === 'mood'){ switchView('mood'); return; }
+
+  // 8. إجابة سؤال اليوم الرئيسي
+  if(type === 'answer'){
+    switchView('home');
+    setTimeout(() => {
+      const qBox = document.querySelector('.question-box');
+      if(qBox) qBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const dailyAns = document.getElementById('dailyAnswer');
+      if(dailyAns) dailyAns.focus();
+    }, 300);
+    return;
+  }
+
+  // 9. المزاج
+  if(type === 'mood'){
+    switchView('mood');
+    setTimeout(() => {
+      const moodGrid = document.querySelector('.mood-grid');
+      if(moodGrid) moodGrid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 250);
+    return;
+  }
+
+  // 10. أنشطة عشوائية أو اختبار
+  if(type === 'quiz' || type === 'random'){
+    if(typeof window.v10ActivityModal === 'function') window.v10ActivityModal(type);
+    return;
+  }
+
   switchView('notifications');
 };
 
-function focusRequestedMail(id, attempts=0){
-  const row=[...document.querySelectorAll('[data-mail-id]')].find(e=>e.dataset.mailId===id);
-  if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.classList.add('highlight');setTimeout(()=>row.classList.remove('highlight'),4500);return;}
-  if(attempts<25)setTimeout(()=>focusRequestedMail(id,attempts+1),400);
-}
-
-function handleDeepLink(){
+function handleDeepLink(attempts = 0){
   const p = new URLSearchParams(location.search);
   const type = p.get('open');
   const id = p.get('item');
-  if(!type) return;
-  window.openEventDestination(type, id);
-  p.delete('open'); p.delete('item');
+  const forRole = p.get('for');
+  if(!type && !forRole) return;
+
+  // إذا كانت الوجهة لعبة، نتأكد من تحميل المحرك
+  if((type === 'game' || ['balderdash','fibbage','codenames','werewolf','resistance'].includes(type)) && typeof window.launchGameModal !== 'function' && attempts < 15){
+    setTimeout(() => handleDeepLink(attempts + 1), 100);
+    return;
+  }
+
+  window.openEventDestination(type, id, forRole);
+  p.delete('open'); p.delete('item'); p.delete('for');
   const newSearch = p.toString() ? '?' + p.toString() : '';
   history.replaceState({}, '', location.pathname + newSearch + location.hash);
 }
+
+// الاستماع لرسائل Service Worker عند نقر المستخدم على الإشعار من شاشة القفل في الهاتف
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('message', event => {
+    const data = event.data;
+    if(data && (data.type === 'OPEN_AYOUSHA_DESTINATION' || data.type === 'OPEN_AYOUSHA')){
+      let openType = data.open;
+      let itemId = data.item;
+      let targetRole = data.role;
+      if(data.url){
+        try {
+          const parsed = new URL(data.url, location.origin);
+          if(!openType) openType = parsed.searchParams.get('open');
+          if(!itemId) itemId = parsed.searchParams.get('item');
+          if(!targetRole) targetRole = parsed.searchParams.get('for');
+        } catch(e){}
+      }
+      if(openType){
+        window.openEventDestination(openType, itemId, targetRole);
+      }
+    }
+  });
+}
+
+// فحص روابط الفتح العميق فور عودة التطبيق من وضع الخلفية بالهاتف
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    handleDeepLink();
+  }
+});
 
 window.openModal = function(html){
   document.getElementById('modalContent').innerHTML = '<button type="button" class="v10-close" aria-label="إغلاق" onclick="window.forceCloseModal()">✕</button>' + html;
@@ -1351,20 +1947,25 @@ window.launchGameModal = function(type){
   else if(type === 'draw') window.openDrawGame();
   else if(type === 'guessNum') window.openGuessNumGame();
   else if(type === 'cards') window.openCardsGame();
+  else if(type === 'doors') window.openDoorsGame();
   else if(type === 'puzzle') window.openPuzzleGame();
   else if(type === 'telepathy') window.openTelepathyGame();
   else if(type === 'spin') window.openSpinGame();
+  else if(type === 'dailyShared') {
+    if(typeof window.openDailySharedQuestion === 'function') window.openDailySharedQuestion();
+  }
   else if(type === 'balderdash' || type === 'fibbage' || type === 'codenames' || type === 'werewolf' || type === 'resistance') {
     if(typeof window.openCommunityGame === 'function') {
       window.openCommunityGame(type);
     } else if(typeof window.launchCommunityGameModal === 'function') {
       window.launchCommunityGameModal(type);
     } else {
-      console.warn('Game engine loading for:', type);
       setTimeout(() => {
         if(typeof window.openCommunityGame === 'function') window.openCommunityGame(type);
-      }, 200);
+      }, 80);
     }
+  } else {
+    if(typeof window.openCommunityGame === 'function') window.openCommunityGame(type);
   }
 };
 window.openBalderdashGame = function(){ window.launchGameModal('balderdash'); };
@@ -1896,6 +2497,13 @@ window.v9QuestionHistory=function(){
 /* ============================================================
    Settings, Notifications UI, Misc
    ============================================================ */
+window.openNotifItem = function(id){
+  const n = allNotifs.find(x => x.id === id);
+  if(n) {
+    window.openEventDestination(n.type, n.itemId, n.to, n.title, n.body);
+  }
+};
+
 function renderNotifs(tab='inbox'){
   currentNotifTab=tab;
   const listEl=document.getElementById('notifList');
@@ -1904,8 +2512,23 @@ function renderNotifs(tab='inbox'){
   if(!items.length){listEl.innerHTML=`<div style="text-align:center;padding:30px;color:#887581;">📭 لا توجد إشعارات</div>`;return;}
   listEl.innerHTML=items.map(n=>{
     let icon='🔔';
-    if(n.type==='mail')icon='💌';if(n.type==='surprise')icon='🎁';if(n.type==='memory')icon='📸';if(n.type==='ping')icon='💗';if(n.type==='mood')icon='🌙';if(n.type==='answer')icon='📝';if(n.type==='game')icon='🎮';
-    return `<div class="notif-item" onclick="window.openEventDestination('${n.type}','${n.itemId||''}')"><div style="display:flex;gap:10px;align-items:flex-start;"><div style="font-size:1.2rem;">${icon}</div><div style="flex:1;min-width:0;"><h4 style="font-size:.92rem;color:#ad1457;margin-bottom:4px;">${escapeHtml(n.title)}</h4><p style="font-size:.85rem;color:#555;">${escapeHtml(n.body)}</p><small style="color:#aaa;font-size:.7rem;">${fmtDateTime(n.at)}</small></div></div></div>`;
+    if(n.type==='mail')icon='💌';
+    else if(n.type==='surprise')icon='🎁';
+    else if(n.type==='memory')icon='📸';
+    else if(n.type==='ping')icon='💗';
+    else if(n.type==='mood')icon='🌙';
+    else if(n.type==='answer')icon='📝';
+    else if(n.type==='quiz')icon='🧠';
+    else if(n.type==='dailyShared')icon='🌟';
+    else if(n.type==='game' || n.itemId){
+      const gIcons = {
+        balderdash:'🌀', fibbage:'🤥', codenames:'🕵️', werewolf:'🐺', resistance:'🎭',
+        xo:'❌⭕', story:'📖', trivia:'🧠', puzzle:'🧩', telepathy:'💞', spin:'🎡',
+        draw:'🎨', guessNum:'🔢', cards:'💌', doors:'🚪'
+      };
+      icon = gIcons[n.itemId] || gIcons[n.type] || '🎮';
+    }
+    return `<div class="notif-item" onclick="window.openNotifItem('${escapeHtml(n.id)}')"><div style="display:flex;gap:10px;align-items:flex-start;"><div style="font-size:1.2rem;">${icon}</div><div style="flex:1;min-width:0;"><h4 style="font-size:.92rem;color:#ad1457;margin-bottom:4px;">${escapeHtml(n.title)}</h4><p style="font-size:.85rem;color:#555;">${escapeHtml(n.body)}</p><small style="color:#aaa;font-size:.7rem;">${fmtDateTime(n.at)}</small></div></div></div>`;
   }).join('');
 }
 window.switchNotifTab=function(tab){
@@ -2048,7 +2671,7 @@ async function boot(){
         } catch(e) { return () => {}; }
       },
       remove: async path => { try { return db ? await remove(ref(db,path)) : null; } catch(e){ return null; } },
-      notify: (title,body) => { try { if(typeof addNotification === 'function') addNotification(title,body,'game','new-games'); } catch(e){} }
+      notify: (title,body,gameId='balderdash') => { try { if(typeof addNotification === 'function') addNotification(title,body,'game',gameId); } catch(e){} }
     };
   }catch(e){
     document.getElementById('syncText').textContent='فشل الاتصال بقاعدة البيانات';
@@ -2113,7 +2736,8 @@ async function boot(){
 
   setupChatPresence();
   initFCM();
-  setTimeout(handleDeepLink,1200);
+  handleDeepLink();
+  setTimeout(handleDeepLink,250);
   window.addEventListener('pageshow',handleDeepLink);
   window.addEventListener('popstate',handleDeepLink);
 
@@ -2123,8 +2747,6 @@ async function boot(){
 }
 boot();
 </script>
-
-<script src="./community-games.js"></script>
 
 </body>
 </html>
