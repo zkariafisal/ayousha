@@ -10,12 +10,6 @@
 <title>عيون عيوشة 🌸</title>
 
 <script src="./trivia-questions.js"></script>
-<script src="./daily-question-bank.js"></script>
-<script src="./balderdash-questions.js"></script>
-<script src="./fibbage-questions.js"></script>
-<script src="./codenames-questions.js"></script>
-<script src="./werewolf-questions.js"></script>
-<script src="./resistance-questions.js"></script>
 <script src="./story-questions.js"></script>
 <script src="./draw-questions.js"></script>
 <script src="./random-questions.js"></script>
@@ -26,11 +20,6 @@
 <script src="./spin-questions.js"></script>
 <script src="./xo-questions.js"></script>
 <script src="./guessNum-questions.js"></script>
-
-<!-- 🆕 الملفات الجديدة - نظام النقاط والألعاب المتقدمة -->
-<script src="./game-stats.js"></script>
-<script src="./new-games.js"></script>
-<script src="./ui-enhancements.js"></script>
 
 <link rel="manifest" href='data:application/manifest+json,{"name":"عيون عيوشة","short_name":"عيوشة","start_url":"./","display":"standalone","background_color":"%23fdf6f9","theme_color":"%23d81b60","orientation":"portrait","icons":[{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"512x512","type":"image/png","purpose":"any"}]}'>
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png">
@@ -217,7 +206,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
       <button class="btn btn-primary btn-full" id="saveDailyBtn" onclick="saveDailyAnswer()" style="margin:10px 0">💾 حفظ الإجابة وإرسالها</button>
       <div id="answerSaved"></div>
       <div id="dailyTogether" class="v9-panel"></div>
-      <button class="btn btn-soft btn-full" onclick="openDailySharedQuestion()">🌟 افتح سؤال اليوم المشترك (30 سؤالاً)</button>
       <div class="v9-actions">
         <button class="btn btn-soft" onclick="v9RandomQuestion()">🎲 سؤال عشوائي</button>
         <button class="btn btn-soft" onclick="v9Quiz()">🧠 كم تعرفني؟</button>
@@ -276,12 +264,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('puzzle')">🧩 حل اللغز قبلي (حل سري + كشف الجوابين)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('telepathy')">⚡ تخاطر القلوب (تطابق الاختيارات)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('spin')">🎡 عجلة التحديات والرومانسية</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('balderdash')">🌀 خمنها — تعريفات وخداع</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('fibbage')">🤥 كذبة مقنعة — Fibbage</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('codenames')">🕵️ كلمات سرية — أسماء رمزية</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('werewolf')">🐺 ليلة الذئب — كشف المخادع</button>
-        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('resistance')">🎭 المهمة السرية — المقاومة</button>
-        <button class="btn btn-gold btn-full" onclick="window.openDailySharedQuestion()">🌟 سؤال اليوم المشترك</button>
       </div>
     </div>
   </section>
@@ -2013,19 +1995,6 @@ async function boot(){
     db=getDatabase(firebaseApp);
     storage=getStorage(firebaseApp);
     firebaseReady=true;
-    // Public bridge for the additional games: all multiplayer state uses the same Realtime Database.
-    window.ayoushaRealtime = {
-      role: () => MY_ROLE,
-      otherRole: () => otherRole(),
-      ready: () => !!(firebaseReady && db),
-      read: async path => (await get(ref(db,path))).val(),
-      write: async (path,value) => set(ref(db,path),value),
-      patch: async (path,value) => update(ref(db,path),value),
-      push: async (path,value) => push(ref(db,path),value),
-      listen: (path,callback) => { const r=ref(db,path); const stop=onValue(r,s=>callback(s.val())); return stop; },
-      remove: async path => remove(ref(db,path)),
-      notify: (title,body) => { try { addNotification(title,body,'game','new-games'); } catch(e){} }
-    };
   }catch(e){
     document.getElementById('syncText').textContent='فشل الاتصال بقاعدة البيانات';
     return;
@@ -2099,8 +2068,5 @@ async function boot(){
 }
 boot();
 </script>
-
-<script src="./community-games.js"></script>
-
 </body>
 </html>
