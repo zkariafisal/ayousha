@@ -10,6 +10,12 @@
 <title>عيون عيوشة 🌸</title>
 
 <script src="./trivia-questions.js"></script>
+<script src="./daily-question-bank.js"></script>
+<script src="./balderdash-questions.js"></script>
+<script src="./fibbage-questions.js"></script>
+<script src="./codenames-questions.js"></script>
+<script src="./werewolf-questions.js"></script>
+<script src="./resistance-questions.js"></script>
 <script src="./story-questions.js"></script>
 <script src="./draw-questions.js"></script>
 <script src="./random-questions.js"></script>
@@ -20,6 +26,12 @@
 <script src="./spin-questions.js"></script>
 <script src="./xo-questions.js"></script>
 <script src="./guessNum-questions.js"></script>
+
+<!-- 🆕 الملفات الجديدة - نظام النقاط والألعاب المتقدمة -->
+<script src="./game-stats.js"></script>
+<script src="./new-games.js"></script>
+<script src="./community-games.js"></script>
+<script src="./ui-enhancements.js"></script>
 
 <link rel="manifest" href='data:application/manifest+json,{"name":"عيون عيوشة","short_name":"عيوشة","start_url":"./","display":"standalone","background_color":"%23fdf6f9","theme_color":"%23d81b60","orientation":"portrait","icons":[{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"512x512","type":"image/png","purpose":"any"}]}'>
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png">
@@ -90,7 +102,7 @@ nav.bottom{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:10
 .modal-actions{display:flex;gap:8px;margin-top:16px}
 .modal-actions .btn{flex:1}
 .v10-close{position:absolute;top:14px;left:14px;border:0;background:#fff0f5;color:#b31260;border-radius:50%;width:36px;height:36px;font-size:20px;font-weight:800;cursor:pointer;display:grid;place-items:center;z-index:30}
-.v9-panel{background:linear-gradient(130deg,#fff9fc,#f9efff);border:1px solid #f3d9eb;border-radius:18px;padding:13px;margin:12px 0;color:#5d3553;line-height:1.8;font-size:.9rem}
+.role-blur{filter:blur(6px);transition:filter .2s ease;display:inline-block;cursor:pointer}.revealed .role-blur{filter:none}.v9-panel{background:linear-gradient(130deg,#fff9fc,#f9efff);border:1px solid #f3d9eb;border-radius:18px;padding:13px;margin:12px 0;color:#5d3553;line-height:1.8;font-size:.9rem}
 .v9-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0 16px}
 .v9-entry{background:white;border-radius:14px;padding:10px;margin:8px 0;border:1px solid #f4ddea;overflow-wrap:anywhere}
 .v9-search{width:100%;padding:13px;border:1px solid #efc9db;border-radius:14px;margin:8px 0;background:#fff}
@@ -206,6 +218,7 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
       <button class="btn btn-primary btn-full" id="saveDailyBtn" onclick="saveDailyAnswer()" style="margin:10px 0">💾 حفظ الإجابة وإرسالها</button>
       <div id="answerSaved"></div>
       <div id="dailyTogether" class="v9-panel"></div>
+      <button class="btn btn-soft btn-full" onclick="openDailySharedQuestion()">🌟 افتح سؤال اليوم المشترك (30 سؤالاً)</button>
       <div class="v9-actions">
         <button class="btn btn-soft" onclick="v9RandomQuestion()">🎲 سؤال عشوائي</button>
         <button class="btn btn-soft" onclick="v9Quiz()">🧠 كم تعرفني؟</button>
@@ -264,6 +277,12 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('puzzle')">🧩 حل اللغز قبلي (حل سري + كشف الجوابين)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('telepathy')">⚡ تخاطر القلوب (تطابق الاختيارات)</button>
         <button class="btn btn-soft btn-full" onclick="window.launchGameModal('spin')">🎡 عجلة التحديات والرومانسية</button>
+        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('balderdash')">🌀 خمنها — تعريفات وخداع</button>
+        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('fibbage')">🤥 كذبة مقنعة — Fibbage</button>
+        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('codenames')">🕵️ كلمات سرية — أسماء رمزية</button>
+        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('werewolf')">🐺 ليلة الذئب — كشف المخادع</button>
+        <button class="btn btn-soft btn-full" onclick="window.launchGameModal('resistance')">🎭 المهمة السرية — المقاومة</button>
+        <button class="btn btn-gold btn-full" onclick="window.openDailySharedQuestion()">🌟 سؤال اليوم المشترك</button>
       </div>
     </div>
   </section>
@@ -1335,7 +1354,24 @@ window.launchGameModal = function(type){
   else if(type === 'puzzle') window.openPuzzleGame();
   else if(type === 'telepathy') window.openTelepathyGame();
   else if(type === 'spin') window.openSpinGame();
+  else if(type === 'balderdash' || type === 'fibbage' || type === 'codenames' || type === 'werewolf' || type === 'resistance') {
+    if(typeof window.openCommunityGame === 'function') {
+      window.openCommunityGame(type);
+    } else if(typeof window.launchCommunityGameModal === 'function') {
+      window.launchCommunityGameModal(type);
+    } else {
+      console.warn('Game engine loading for:', type);
+      setTimeout(() => {
+        if(typeof window.openCommunityGame === 'function') window.openCommunityGame(type);
+      }, 200);
+    }
+  }
 };
+window.openBalderdashGame = function(){ window.launchGameModal('balderdash'); };
+window.openFibbageGame = function(){ window.launchGameModal('fibbage'); };
+window.openCodenamesGame = function(){ window.launchGameModal('codenames'); };
+window.openWerewolfGame = function(){ window.launchGameModal('werewolf'); };
+window.openResistanceGame = function(){ window.launchGameModal('resistance'); };
 
 /* ============================================================
    المحادثة الفورية المطوّرة (البريد)
@@ -1995,6 +2031,25 @@ async function boot(){
     db=getDatabase(firebaseApp);
     storage=getStorage(firebaseApp);
     firebaseReady=true;
+    // Public bridge for the additional games: all multiplayer state uses the same Realtime Database.
+    window.ayoushaRealtime = {
+      role: () => (typeof MY_ROLE !== 'undefined' ? MY_ROLE : (localStorage.getItem('ayousha_role') || 'me')),
+      otherRole: () => (typeof otherRole === 'function' ? otherRole() : ((localStorage.getItem('ayousha_role') || 'me') === 'me' ? 'her' : 'me')),
+      ready: () => !!(firebaseReady && db),
+      read: async path => { try { return db ? (await get(ref(db,path))).val() : null; } catch(e){ return null; } },
+      write: async (path,value) => { try { return db ? await set(ref(db,path),value) : null; } catch(e){ return null; } },
+      patch: async (path,value) => { try { return db ? await update(ref(db,path),value) : null; } catch(e){ return null; } },
+      push: async (path,value) => { try { return db ? await push(ref(db,path),value) : null; } catch(e){ return null; } },
+      listen: (path,callback) => { 
+        try { 
+          if(!db) return () => {};
+          const r = ref(db, path); 
+          return onValue(r, s => callback(s.val())); 
+        } catch(e) { return () => {}; }
+      },
+      remove: async path => { try { return db ? await remove(ref(db,path)) : null; } catch(e){ return null; } },
+      notify: (title,body) => { try { if(typeof addNotification === 'function') addNotification(title,body,'game','new-games'); } catch(e){} }
+    };
   }catch(e){
     document.getElementById('syncText').textContent='فشل الاتصال بقاعدة البيانات';
     return;
@@ -2068,5 +2123,8 @@ async function boot(){
 }
 boot();
 </script>
+
+<script src="./community-games.js"></script>
+
 </body>
 </html>
