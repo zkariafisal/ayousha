@@ -38,7 +38,7 @@ function open(t){
  else if(t==='codenames')content=`<div id="cg-code" class="v9-panel">جارٍ تحميل اللوحة…</div><div id="cg-code-board" style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px"></div><div id="cg-code-actions" class="v9-panel"></div><button id="cg-new" class="btn btn-soft btn-full">جولة جديدة / تبديل القائد</button>`;
  else content=`<div id="cg-scenario" class="v9-panel">جارٍ تحميل السيناريو…</div><div id="cg-role" class="v9-panel">جارٍ تحميل الدور السري…</div><div id="cg-actions" class="v9-panel"></div><div id="cg-result" class="v9-panel"></div><button id="cg-new" class="btn btn-soft btn-full">بدء الجولة التالية</button>`;
  window.openModal(`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><h3>${GAMES[t].title}</h3><span class="muted">${cfg.rounds||5} جولات · ${cfg.mode==='random'?'عشوائي ومفاجآت':'عادي'}</span></div><div class="v9-panel"><b>📘 طريقة اللعب</b><p>${GAMES[t].how}</p></div>${content}<p id="cg-status" class="v9-panel"></p><button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button>`);
- if(!a?.ready?.()){status('قاعدة البيانات غير متاحة. افتح المشروع من الاستضافة وتحقق من اتصال Firebase.');return;}
+ if(!a?.ready?.()){offlineOpen(t);return;}
  try {
   if(t==='balderdash'||t==='fibbage')textGame(t,item,cfg).catch(e=>{console.error(e);status('تعذر تشغيل اللعبة: '+(e?.message||e));});
   if(t==='codenames')codeGame(item,cfg).catch(e=>{console.error(e);status('تعذر تشغيل اللعبة: '+(e?.message||e));});
@@ -46,6 +46,22 @@ function open(t){
  } catch(e) { console.error(e); status('حدث خطأ أثناء فتح اللعبة: '+(e?.message||e)); }
 }
 function pickBank(t,round,mode){const b=bank(t);if(!b.length)return {};return mode==='random'?b[Math.floor(Math.random()*b.length)]:b[((Math.max(1,round||1)-1)%b.length)];}
+function offlineOpen(t){
+ const items=bank(t); let idx=0, points=Number(localStorage.getItem('cg-offline-score-'+t)||0);
+ const choose=()=>items.length?items[idx%items.length]:{};
+ const safeStatus=m=>{const e=document.getElementById('cg-status');if(e)e.textContent=m;};
+ const paint=()=>{const q=choose();const qe=document.getElementById('cg-question');if(qe)qe.innerHTML=`<b>${esc(q.word||q.q||q.question||q.clue||'تحدي الجولة')}</b><p>${esc(q.question||q.scenario||q.mission||q.definition||'ناقشوا الإجابة ثم سجلوا اختياركم.')}</p>`;
+ const sc=document.getElementById('cg-scenario');if(sc)sc.innerHTML=`<b>الجولة ${idx+1}</b><p>${esc(q.scenario||q.mission||q.task||q.q||'ناقشوا الموقف ثم اختاروا.')}</p>`;
+ const code=document.getElementById('cg-code');if(code)code.innerHTML=`<b>تلميح:</b> ${esc(q.clue||q.q||'اربط الكلمات بالتلميح')} <p>وضع محلي تجريبي</p>`;
+ const board=document.getElementById('cg-code-board');if(board){const words=(q.words&&q.words.length?q.words:['قمر','بحر','كتاب','نجم','باب','شمس','مفتاح','ورد','طائرة','مدينة','قلم','جبل','ساعة','نهر','بيت','قلب','طريق','شجرة','ثلج','مطر','نار','صوت','لون','حلم','سفينة']).slice(0,25);board.innerHTML=words.map(w=>`<button class="btn btn-soft" data-local-pick="1" style="padding:5px;min-height:44px">${esc(w)}</button>`).join('');}
+ const role=document.getElementById('cg-role');if(role)role.innerHTML=`<b>وضع الجهاز الواحد</b><p>النقاط المحلية: ${points}</p>`;
+ const act=document.getElementById('cg-actions')||document.getElementById('cg-code-actions');if(act){if(t==='werewolf')act.innerHTML='<p>صوّت بعد مناقشة السيناريو:</p><button class="btn btn-primary btn-full" data-local-score="1">كشف الذئب</button><button class="btn btn-soft btn-full" data-local-score="0">تخطي التصويت</button>';else if(t==='resistance')act.innerHTML='<p>نتيجة المهمة:</p><button class="btn btn-primary btn-full" data-local-score="1">نجاح المهمة</button><button class="btn btn-soft btn-full" data-local-score="0">فشل المهمة</button>';else act.innerHTML='<button class="btn btn-primary btn-full" data-local-score="1">تسجيل اختيار / نقطة</button>';act.querySelectorAll('[data-local-score]').forEach(b=>b.onclick=()=>{points+=Number(b.dataset.localScore);localStorage.setItem('cg-offline-score-'+t,String(points));safeStatus('تم حفظ النتيجة محلياً. النقاط: '+points);paint();});act.querySelectorAll('[data-local-pick]').forEach(b=>b.onclick=()=>{points++;localStorage.setItem('cg-offline-score-'+t,String(points));safeStatus('تم اختيار «'+b.textContent+'» محلياً. النقاط: '+points);});}
+ const submit=document.getElementById('cg-submit');if(submit)submit.onclick=()=>{const v=document.getElementById('cg-answer')?.value.trim();if(!v){safeStatus('اكتب إجابتك أولاً.');return;}points++;localStorage.setItem('cg-offline-score-'+t,String(points));const res=document.getElementById('cg-result');if(res)res.innerHTML=`تم حفظ إجابتك على هذا الجهاز: <b>${esc(v)}</b><p>الإجابة المرجعية: ${esc(q.answer||q.definition||'ناقشوا الإجابة معاً')}</p><b>النقاط: ${points}</b>`;safeStatus('تم تسجيل الإجابة محلياً.');};
+ const res=document.getElementById('cg-result');if(res)res.innerHTML=`النقاط المحلية: ${points}`;
+ safeStatus('الوضع المحلي يعمل دون Firebase. هذا الوضع لا يزامن بين الأجهزة.');};
+ const next=document.getElementById('cg-new');if(next)next.onclick=()=>{idx++;const input=document.getElementById('cg-answer');if(input)input.value='';paint();safeStatus('بدأت الجولة '+(idx+1)+'.');};
+ paint();
+}
 function shuffled(arr){const x=[...arr];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;}
 async function getOrCreate(path,create){const a=api();let d=await a.read(path);if(!d||d.version!==2){d=create();d.version=2;await a.write(path,d);d=await a.read(path)||d;}return d;}
 async function textGame(t,seed,cfg={rounds:10,mode:"standard"}){const a=api(),path=roomPath(t);const d0=await getOrCreate(path,()=>{const q=pickBank(t,1,cfg.mode)||seed;return {version:2,game:t,question:q.q||'',answer:q.answer||'',fake:q.fake||[],submissions:{},votes:{},scores:{me:0,her:0},status:'writing',round:1,maxRounds:cfg.rounds||10,mode:cfg.mode||'standard',createdAt:Date.now(),options:[]}});
