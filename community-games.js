@@ -488,24 +488,16 @@
 
     if (state.status === 'writing') {
       if (!mySub) {
-        // الحفاظ على الكلام المكتوب أثناء كتابة الشريك وإرساله للحل
-        const existingInput = document.getElementById('cgTextInput');
-        const draftText = (existingInput && existingInput.value) ? existingInput.value : '';
-        const partnerNotice = otherSub 
-          ? `<div style="font-size:.78rem;color:#1b5e20;background:#e8f5e9;padding:6px 10px;border-radius:10px;margin-bottom:8px;font-weight:bold;">⚡ وصل تمويه ${otherName}! أكمل كتابة تمويهك دون قلق، كلامك محفوظ 👇</div>`
-          : '';
-
         body = `
           <div class="v9-panel" style="text-align:center;">
             <div style="font-size:.82rem;color:var(--muted);margin-bottom:4px;">${type === 'balderdash' ? 'الكلمة أو الأداة الغامضة:' : 'السؤال / الحقيقة الغريبة من النظام:'}</div>
             <div style="font-size:1.15rem;font-weight:bold;color:#ad1457;">${esc(state.question)}</div>
           </div>
           <div style="margin:14px 0;">
-            ${partnerNotice}
             <label style="font-size:.85rem;font-weight:600;display:block;margin-bottom:6px;">
               🎭 ${type === 'balderdash' ? 'اكتب تعريفاً خيالياً ذكياً لخداع ' + otherName + ':' : 'ابتكر كذبة مقنعة تخدع بها ' + otherName + ' قبل كشف الحقيقة:'}
             </label>
-            <textarea id="cgTextInput" class="answer-input" rows="3" maxlength="350" placeholder="${type === 'balderdash' ? 'مثال: أداة خيالية قديمة لقياس سرعة الرياح الخفيفة...' : 'مثال: لأنه أحضر قطة صغيرة لتقرأ معه...'}" style="width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);font-family:inherit;font-size:.95rem;">${esc(draftText)}</textarea>
+            <textarea id="cgTextInput" class="answer-input" rows="3" maxlength="350" placeholder="${type === 'balderdash' ? 'مثال: أداة خيالية قديمة لقياس سرعة الرياح الخفيفة...' : 'مثال: لأنه أحضر قطة صغيرة لتقرأ معه...'}" style="width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);font-family:inherit;font-size:.95rem;"></textarea>
             <button id="cgSubmitBtn" class="btn btn-primary btn-full" style="margin-top:10px;">🚀 إرسال التمويه السري</button>
           </div>
         `;
@@ -1268,17 +1260,15 @@
   // 9. سؤال اليوم المشترك
   // ==========================================
   window.openDailySharedQuestion = async function () {
-    const questions = (window.AYOUSHA_DAILY_QUESTIONS && window.AYOUSHA_DAILY_QUESTIONS.length) 
-      ? window.AYOUSHA_DAILY_QUESTIONS 
-      : (typeof DEFAULT_QUESTIONS !== 'undefined' ? DEFAULT_QUESTIONS : [
-        'ما أكثر شيء بسيط يجعلك تبتسم اليوم؟',
-        'لو سافرنا غداً، أي مدينة نختار؟',
-        'ما ذكرى مشتركة بيننا تحب استعادتها دائماً؟'
-      ]);
+    const questions = window.AYOUSHA_DAILY_QUESTIONS || [
+      'ما أكثر شيء بسيط يجعلك تبتسم اليوم؟',
+      'لو سافرنا غداً، أي مدينة نختار؟',
+      'ما ذكرى مشتركة بيننا تحب استعادتها دائماً؟'
+    ];
     const now = new Date();
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const dayIndex = Math.abs(Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000)) % questions.length;
-    const dailyQ = (typeof window.getDailyQuestion === 'function') ? window.getDailyQuestion() : questions[dayIndex];
+    const dailyQ = questions[dayIndex];
 
     const myRole = getRole();
     const otherRole = getOtherRole();
@@ -1290,64 +1280,37 @@
     try {
       if (window.ayoushaRealtime?.ready?.()) {
         saved = (await window.ayoushaRealtime.read(path)) || {};
+      } else {
+        saved = JSON.parse(localStorage.getItem('ayousha_daily_' + dateKey) || '{}');
       }
     } catch {}
 
-    if (!saved || !saved.answers) {
-      try {
-        saved = JSON.parse(localStorage.getItem('ayousha_daily_' + dateKey) || '{}');
-      } catch {}
-    }
-
-    // مزامنة مع إجابات v9Daily إذا كانت متوفرة
-    if (window.v9Daily && window.v9Daily[dateKey]) {
-      const v9 = window.v9Daily[dateKey];
-      saved = saved || {};
-      saved.answers = saved.answers || {};
-      if (v9[myRole]?.a && !saved.answers[myRole]) saved.answers[myRole] = v9[myRole].a;
-      if (v9[otherRole]?.a && !saved.answers[otherRole]) saved.answers[otherRole] = v9[otherRole].a;
-    }
-
-    // الحفاظ التام على ما يكتبه المستخدم حالياً حتى لو وصل تحديث من الشريك
-    const existingInput = document.getElementById('dailyAnsInput');
-    const userDraft = (existingInput && existingInput.value) ? existingInput.value : '';
-
     const myAns = saved?.answers?.[myRole] || '';
     const otherAns = saved?.answers?.[otherRole] || '';
-    const bothAnswered = !!(myAns && otherAns);
 
     const html = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <h3 style="margin:0;color:var(--primary);">🌟 سؤال اليوم المشترك</h3>
         <span style="font-size:.78rem;color:var(--muted);background:#fff0f6;padding:3px 8px;border-radius:10px;">${dateKey}</span>
       </div>
-      <div class="v9-panel" style="text-align:center;background:linear-gradient(135deg,#fffbf0,#fff5d9);border-color:#f8dfa0;">
-        <div style="font-size:1.15rem;font-weight:bold;color:#936500;line-height:1.7;">${esc(dailyQ)}</div>
-        <p style="font-size:.82rem;color:#b78103;margin-top:6px;">سؤال رومانسي موحد للطرفين طوال اليوم يتجدد تلقائياً بحسب التاريخ 💞</p>
+      <div class="v9-panel" style="text-align:center;">
+        <div style="font-size:1.15rem;font-weight:bold;color:#ad1457;line-height:1.7;">${esc(dailyQ)}</div>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:6px;">سؤال موحد للطرفين طوال اليوم؛ يكتمل بحفظ إجابتي الطرفين 💞</p>
       </div>
 
       <div style="margin:12px 0;">
         <label style="font-size:.85rem;font-weight:600;display:block;margin-bottom:6px;">إجابتك يا ${myName}:</label>
-        <textarea id="dailyAnsInput" class="answer-input" rows="3" placeholder="اكتب إجابتك هنا من القلب..." style="width:100%;padding:10px;border-radius:14px;border:1px solid var(--border);font-family:inherit;">${esc(userDraft || myAns)}</textarea>
+        <textarea id="dailyAnsInput" class="answer-input" rows="3" placeholder="اكتب إجابتك هنا من القلب..." style="width:100%;padding:10px;border-radius:14px;border:1px solid var(--border);font-family:inherit;">${esc(myAns)}</textarea>
         <button id="dailySaveBtn" class="btn btn-primary btn-full" style="margin-top:8px;">💾 حفظ ومزامنة إجابتي</button>
       </div>
 
-      <div class="v9-panel" style="font-size:.88rem;line-height:1.9;">
-        ${bothAnswered ? `
-          <div style="background:#e8f5e9;padding:10px;border-radius:12px;color:#1b5e20;border:1px solid #c8e6c9;">
-            <div style="font-weight:bold;margin-bottom:4px;font-size:.95rem;">🎉 اكتملت إجابتا اليوم معاً!</div>
-            <div>💗 <b>${myName}:</b> ${esc(myAns)}</div>
-            <div>💜 <b>${otherName}:</b> ${esc(otherAns)}</div>
-          </div>
-        ` : `
-          <div><b>${myName}:</b> ${myAns ? '✅ ' + esc(myAns) : '⏳ بانتظار إجابتك'}</div>
-          <div style="margin-top:4px;"><b>${otherName}:</b> ${otherAns ? '🔒 الشريك أجاب! احفظ إجابتك لتظهر الإجابتان معاً' : '⏳ بانتظار إجابة الشريك'}</div>
-        `}
+      <div class="v9-panel" style="font-size:.86rem;line-height:1.8;">
+        <div><b>${myName}:</b> ${myAns ? '✅ ' + esc(myAns) : '⏳ بانتظار إجابتك'}</div>
+        <div style="margin-top:4px;"><b>${otherName}:</b> ${otherAns ? '✅ ' + esc(otherAns) : '⏳ بانتظار إجابة الشريك'}</div>
       </div>
 
-      <div style="margin-top:12px;display:flex;gap:8px;">
-        <button class="btn btn-soft" style="flex:1;" onclick="window.closeModal()">إغلاق</button>
-        <button class="btn btn-gold" style="flex:1;" onclick="triggerCelebration(); if(window.toast) window.toast('💖 قلوب حب لكما!');">💖 قلوب حب</button>
+      <div style="margin-top:12px;">
+        <button class="btn btn-soft btn-full" onclick="window.closeModal()">إغلاق</button>
       </div>
     `;
 
@@ -1356,7 +1319,7 @@
       document.getElementById('dailySaveBtn').onclick = async () => {
         const val = document.getElementById('dailyAnsInput')?.value.trim();
         if (!val) {
-          if (window.toast) window.toast('اكتب إجابتك أولاً ✍️');
+          if (window.toast) window.toast('اكتب إجابتك أولاً');
           return;
         }
         const updatedAnswers = { ...(saved.answers || {}), [myRole]: val };
@@ -1372,24 +1335,6 @@
           }
         } catch {}
 
-        // حفظ في مسار v9Daily أيضاً للتوافق التام
-        try {
-          if (typeof set !== 'undefined' && typeof ref !== 'undefined' && window.db) {
-            await set(ref(window.db, `app/dailyResponses/${dateKey}/${myRole}`), { q: dailyQ, a: val, t: new Date().toISOString(), by: myRole });
-            await set(ref(window.db, `app/dailyShared/${dateKey}`), record);
-          }
-        } catch(e) {}
-
-        if (window.v9Daily) {
-          window.v9Daily[dateKey] = window.v9Daily[dateKey] || {};
-          window.v9Daily[dateKey][myRole] = { q: dailyQ, a: val, t: new Date().toISOString(), by: myRole };
-        }
-
-        if (typeof addNotification === 'function') {
-          addNotification('💭 إجابة سؤال اليوم', `أجاب ${myName} عن سؤال اليوم!`, 'dailyShared', dateKey);
-        }
-
-        if (typeof renderDaily === 'function') renderDaily();
         triggerCelebration();
         if (window.toast) window.toast('💖 تم حفظ ومزامنة إجابتك بنجاح!');
         window.openDailySharedQuestion();
