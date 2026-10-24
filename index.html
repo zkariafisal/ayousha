@@ -356,6 +356,9 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
 <header>
   <div class="brand"><div class="brand-logo">🌸</div><div><h1>عيون عيوشة</h1><small>ألعاب مشتركة وتنبيهات فورية بيننا</small></div></div>
   <div class="header-actions">
+    <button class="icon-btn interactive-gift-btn" id="interactiveGiftBtn" onclick="openInteractiveGiftSystem()" title="الهدية التفاعلية 🎁" aria-label="الهدية التفاعلية" style="position:relative;background:linear-gradient(135deg,#ff4081,#e91e63);color:#fff;border:none;box-shadow:0 2px 8px rgba(233,30,99,0.35);">
+      🎁<span id="giftBadge" class="gift-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ffeb3b;color:#d81b60;font-size:10px;font-weight:900;border-radius:10px;padding:1px 5px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);animation:pulse 1.2s infinite;">1</span>
+    </button>
     <button class="icon-btn" id="notifBell" onclick="switchView('notifications')" title="الإشعارات" aria-label="مركز الإشعارات">🔔<span class="badge-dot"></span></button>
     <button class="icon-btn" onclick="openSettings()" title="الإعدادات">⚙️</button>
   </div>
@@ -373,6 +376,20 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
         <div class="cd-cell"><b>--</b><small>دقيقة</small></div><div class="cd-cell"><b>--</b><small>ثانية</small></div>
       </div>
     </div>
+    <!-- الهدية التفاعلية السريعة -->
+    <div id="homeInteractiveGiftCard" class="card" style="background:linear-gradient(135deg,#fff0f5,#fce4ec);border:1.5px solid #f8bbd0;cursor:pointer;margin-bottom:14px;box-shadow:0 4px 14px rgba(233,30,99,0.12);transition:transform 0.2s;" onclick="openInteractiveGiftSystem()">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="font-size:2.4rem;animation:bounce 2s infinite;">🎁</div>
+          <div>
+            <div style="font-weight:800;color:#c2185b;font-size:1.05rem;" id="homeGiftTitle">الهدية التفاعلية 🎀</div>
+            <small style="color:#880e4f;" id="homeGiftSubtitle">تظهر الرسالة والمفاجأة مباشرة داخل الأيقونة دون الانتقال للبريد ✨</small>
+          </div>
+        </div>
+        <button class="btn btn-soft" style="background:#fff;color:#d81b60;border-color:#f48fb1;font-weight:bold;white-space:nowrap;padding:7px 14px;font-size:0.85rem;border-radius:20px;box-shadow:0 2px 6px rgba(233,30,99,0.15);">افتح 🎀</button>
+      </div>
+    </div>
+
     <div class="card question-box">
       <div class="card-title"><span>☀️</span> سؤال اليوم المشترك</div>
       <div class="q-text" id="dailyQ">جاري التحميل...</div>
@@ -882,7 +899,7 @@ function showInteractiveInAppBanner(title, body, type, itemId, role){
   const bodyEl = document.getElementById('notifBannerBody');
 
   const symbols = {
-    mail:'💌', game:'🎮', surprise:'🎁', memory:'📸', ping:'💗', mood:'🌙', answer:'📝', quiz:'🧠', dailyShared:'🌟',
+    mail:'💌', game:'🎮', surprise:'🎁', memory:'📸', ping:'💗', mood:'🌙', answer:'📝', quiz:'🧠', dailyShared:'🌟', interactiveGift:'🎁', gift:'🎁',
     balderdash:'🌀', fibbage:'🤥', codenames:'🕵️', werewolf:'🐺', resistance:'🎭', xo:'❌⭕', story:'📖', trivia:'🧠', puzzle:'🧩', telepathy:'💞', spin:'🎡', draw:'🎨', guessNum:'🔢', cards:'💌', doors:'🚪'
   };
   if(iconEl) iconEl.textContent = symbols[itemId] || symbols[type] || '🔔';
@@ -1085,6 +1102,14 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
   }
 
   // 5. المفاجآت: فتح قسم المفاجآت وفتح المفاجأة المحددة مباشرة إذا وُجد معرّفها
+  // 4.5 الهدية التفاعلية: تفتح مباشرة في نفس أيقونة الهدية التفاعلية دون فتح بريد الرسائل نهائياً
+  if(type === 'interactiveGift' || type === 'gift' || id === 'interactiveGift'){
+    if(typeof window.openInteractiveGiftSystem === 'function'){
+      window.openInteractiveGiftSystem(id !== 'interactiveGift' ? id : null);
+    }
+    return;
+  }
+
   if(type === 'surprise'){
     switchView('surprise');
     if(id){
@@ -1208,8 +1233,44 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
+// نظام الحفاظ التلقائي على نصوص الإدخال لمنع اختفاء ما يكتبه المستخدم عند وصول إجابة الشريك
+window.preserveModalInputs = function() {
+  const content = document.getElementById('modalContent');
+  if(!content) return {};
+  const drafts = {};
+  content.querySelectorAll('input:not([type=button]):not([type=submit]):not([type=checkbox]):not([type=radio]), textarea').forEach(el => {
+    if(el.id) {
+      drafts[el.id] = {
+        value: el.value,
+        selectionStart: el.selectionStart,
+        selectionEnd: el.selectionEnd,
+        isFocused: (document.activeElement === el)
+      };
+    }
+  });
+  return drafts;
+};
+
+window.restoreModalInputs = function(drafts) {
+  if(!drafts) return;
+  Object.entries(drafts).forEach(([id, draft]) => {
+    const el = document.getElementById(id);
+    if(el && draft.value && !el.value) {
+      el.value = draft.value;
+      if(draft.isFocused) {
+        try {
+          el.focus();
+          el.setSelectionRange(draft.selectionStart, draft.selectionEnd);
+        } catch(e){}
+      }
+    }
+  });
+};
+
 window.openModal = function(html){
+  const drafts = window.preserveModalInputs();
   document.getElementById('modalContent').innerHTML = '<button type="button" class="v10-close" aria-label="إغلاق" onclick="window.forceCloseModal()">✕</button>' + html;
+  window.restoreModalInputs(drafts);
   document.getElementById('modalBg').classList.add('show');
 };
 function closeModal(){ if(modalLocked) return; if(typeof v10ActivityListeners!=="undefined"){Object.values(v10ActivityListeners).forEach(fn=>fn());v10ActivityListeners={};} document.getElementById('modalBg').classList.remove('show'); if(window._activeGameUnsub){window._activeGameUnsub();window._activeGameUnsub=null;} if(window._activeChatUnsub){window._activeChatUnsub();window._activeChatUnsub=null;} }
@@ -1311,12 +1372,26 @@ window.openTriviaGame = function(){
 
     if(t.status === 'faking'){
       if(!myFake){
+        // الحفاظ التام على ما يكتبه المستخدم في حقل التمويه عند وصول إشعار الشريك
+        const existingFake = document.getElementById('fakeAnsInput');
+        const draftFake = existingFake ? existingFake.value : '';
+        const wasFocused = (document.activeElement === existingFake);
+        const selStart = existingFake ? existingFake.selectionStart : 0;
+        const selEnd = existingFake ? existingFake.selectionEnd : 0;
+
         cEl.innerHTML = `
           <div class="v9-panel"><b>فئة [${escapeHtml(t.currentQ.cat)}]:</b><br><span style="font-size:1.05rem;color:#ad1457;">${escapeHtml(t.currentQ.q)}</span></div>
-          <p class="muted">🎭 <b>مرحلة التمويه:</b> اكتب إجابة وهمية تبدو صحيحة ومقنعة لخداع ${senderName(otherRole())}:</p>
-          <input id="fakeAnsInput" placeholder="اكتب تمويهك الذكي هنا..." style="margin:8px 0;width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);">
+          ${otherFake ? `<div style="font-size:.78rem;color:#1b5e20;background:#e8f5e9;padding:6px 10px;border-radius:10px;margin-bottom:8px;font-weight:bold;">⚡ ${senderName(otherRole())} كتب تمويهه وانتهى! كلامك محفوظ، أكمل تمويهك لإظهار الخيارات الأربعة 👇</div>` : `<p class="muted">🎭 <b>مرحلة التمويه:</b> اكتب إجابة وهمية تبدو صحيحة ومقنعة لخداع ${senderName(otherRole())}:</p>`}
+          <input id="fakeAnsInput" placeholder="اكتب تمويهك الذكي هنا..." style="margin:8px 0;width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);" value="${escapeHtml(draftFake)}">
           <button class="btn btn-primary btn-full" onclick="window.submitFakeAnswer()">🎭 إرسال الإجابة التمويهية</button>
         `;
+        if(wasFocused) {
+          const inp = document.getElementById('fakeAnsInput');
+          if(inp) {
+            inp.focus();
+            try { inp.setSelectionRange(selStart, selEnd); } catch(e){}
+          }
+        }
       } else {
         cEl.innerHTML = `
           <div class="v9-panel"><b>السؤال:</b> ${escapeHtml(t.currentQ.q)}</div>
@@ -2332,7 +2407,330 @@ window.deleteSurprise=async function(id){
   state.surprises=state.surprises.filter(s=>s.id!==id);
   renderSurprises();
 };
-window.v9Gift=()=>v9MakeSurprise('🎀 هدية تفاعلية');
+
+/* ============================================================
+   نظام الهدية التفاعلية المتطور (تظهر الرسالة في الأيقونة دون الانتقال للبريد)
+   ============================================================ */
+window.allInteractiveGifts = [];
+try {
+  window.allInteractiveGifts = JSON.parse(localStorage.getItem('ayousha_interactive_gifts') || '[]');
+} catch(e){}
+
+const GIFT_DEFINITIONS = {
+  rose: { title: '🌹 باقة ورد جوري أحمر', icon: '🌹', desc: 'باقة ورد أنيقة تعبر عن حب نقي' },
+  ring: { title: '💍 خاتم الحب الأبدي', icon: '💍', desc: 'رمز للوعد والمحبة الصادقة' },
+  chocolate: { title: '🍫 علبة شوكولاتة فاخرة', icon: '🍫', desc: 'مذاق حلو ولحظة دافئة' },
+  teddy: { title: '🧸 دبدوب حنون ودافئ', icon: '🧸', desc: 'عناق دافئ ولطيف يرافقك' },
+  letter: { title: '💌 رسالة سرية بفيونكة', icon: '💌', desc: 'كلمات من القلب إلى القلب' },
+  perfume: { title: '✨ عطر رومانسي مميز', icon: '✨', desc: 'شذى رقيق يذكرك بي دائماً' },
+  crown: { title: '👑 تاج المحبة والجمال', icon: '👑', desc: 'لأنكِ أميرة قلبي دائماً' }
+};
+
+window.updateInteractiveGiftBadge = function(){
+  try {
+    const role = typeof MY_ROLE !== 'undefined' ? MY_ROLE : 'me';
+    const unopened = (window.allInteractiveGifts || []).filter(g => 
+      (g.recipient === role || g.to === role || (!g.recipient && g.sender !== role && g.from !== role)) && !g.opened
+    );
+    const badge = document.getElementById('giftBadge');
+    if(badge){
+      if(unopened.length > 0){
+        badge.textContent = unopened.length;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+    const homeSub = document.getElementById('homeGiftSubtitle');
+    if(homeSub){
+      if(unopened.length > 0){
+        homeSub.innerHTML = `<span style="color:#d81b60;font-weight:900;">🎀 وصلتك ${unopened.length} هدية تفاعلية بانتظارك! انقر هنا لفتحها فوراً ✨</span>`;
+      } else {
+        homeSub.textContent = 'تظهر الرسالة والمفاجأة مباشرة داخل الأيقونة دون الانتقال للبريد ✨';
+      }
+    }
+  } catch(e){ console.warn(e); }
+};
+
+window.openInteractiveGiftSystem = function(specificGiftId = null){
+  const role = typeof MY_ROLE !== 'undefined' ? MY_ROLE : 'me';
+  const gifts = window.allInteractiveGifts || [];
+  
+  // إذا تم تمرير معرف محدد
+  if(specificGiftId && specificGiftId !== 'interactiveGift'){
+    const target = gifts.find(g => g.id === specificGiftId);
+    if(target){
+      window.openInteractiveGiftModal(target);
+      return;
+    }
+  }
+  
+  // البحث عن أي هدية غير مفتوحة موجهة للمستخدم
+  const unopened = gifts.find(g => 
+    (g.recipient === role || g.to === role || (!g.recipient && g.sender !== role && g.from !== role)) && !g.opened
+  );
+  if(unopened){
+    window.openInteractiveGiftModal(unopened);
+    return;
+  }
+  
+  // إذا لم توجد هدايا معلقة، فتح شاشة إرسال أو استعراض الهدايا السابقة
+  window.openSendInteractiveGiftModal();
+};
+
+window.openInteractiveGiftModal = function(gift){
+  if(!gift) return;
+  const def = GIFT_DEFINITIONS[gift.giftType] || { title: '🎁 هدية تفاعلية', icon: '🎁' };
+  const sName = gift.senderName || (typeof senderName === 'function' ? senderName(gift.sender || gift.from || otherRole()) : 'شريكك');
+
+  if(!gift.opened){
+    // شاشة فك الشريط والتفاعل
+    openModal(`
+      <div style="text-align:center;padding:10px 5px;">
+        <h3 style="color:#c2185b;font-weight:900;margin-bottom:8px;">🎁 هدية تفاعلية خاصة</h3>
+        <p class="muted" style="margin-bottom:18px;">وصلتك هدية مميزة بفيونكة من <b>${escapeHtml(sName)}</b> 💕</p>
+        
+        <div id="interactiveGiftBoxTap" onclick="window.unwrapInteractiveGift('${escapeHtml(gift.id)}')" 
+             style="cursor:pointer;display:inline-block;padding:20px;background:radial-gradient(circle, #fff0f5 0%, #fce4ec 70%);border-radius:24px;border:2px dashed #f48fb1;box-shadow:0 8px 25px rgba(233,30,99,0.2);animation:bounce 1.5s infinite;margin:10px auto;">
+          <div style="font-size:5.5rem;filter:drop-shadow(0 10px 15px rgba(233,30,99,0.3));">🎁</div>
+          <div style="margin-top:12px;background:linear-gradient(135deg,#ff4081,#e91e63);color:#fff;padding:8px 18px;border-radius:20px;font-weight:bold;font-size:0.95rem;box-shadow:0 3px 10px rgba(233,30,99,0.35);">
+            🎀 اضغطي هنا لفك الشريط واكتشاف الرسالة! ✨
+          </div>
+        </div>
+        
+        <div style="margin-top:16px;">
+          <button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button>
+        </div>
+      </div>
+    `);
+  } else {
+    // تم فكها مسبقاً - عرض المحتوى والرسالة فوراً
+    window.renderRevealedGift(gift);
+  }
+};
+
+window.unwrapInteractiveGift = async function(giftId){
+  const gift = (window.allInteractiveGifts || []).find(g => g.id === giftId);
+  if(!gift) return;
+  
+  gift.opened = true;
+  gift.openedAt = Date.now();
+  
+  try {
+    localStorage.setItem('ayousha_interactive_gifts', JSON.stringify(window.allInteractiveGifts));
+  } catch(e){}
+  
+  if(typeof playEventSound === 'function') playEventSound('surprise', true);
+  if(typeof burstHearts === 'function') burstHearts();
+  
+  if(firebaseReady && db){
+    try {
+      await update(ref(db, 'app/interactiveGifts/' + giftId), { opened: true, openedAt: Date.now() });
+    } catch(e){ console.warn(e); }
+  }
+  
+  window.updateInteractiveGiftBadge();
+  window.renderRevealedGift(gift);
+};
+
+window.renderRevealedGift = function(gift){
+  const def = GIFT_DEFINITIONS[gift.giftType] || { title: '🎁 هدية تفاعلية', icon: '🎁' };
+  const sName = gift.senderName || (typeof senderName === 'function' ? senderName(gift.sender || gift.from || otherRole()) : 'شريكك');
+  const dateStr = gift.createdAt ? new Date(gift.createdAt).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+
+  openModal(`
+    <div style="text-align:center;padding:5px 0;">
+      <div style="font-size:4.8rem;animation:pulse 1.8s infinite;margin-bottom:6px;filter:drop-shadow(0 6px 12px rgba(233,30,99,0.25));">${def.icon}</div>
+      <h3 style="color:#ad1457;font-weight:900;margin:0 0 10px;">${escapeHtml(def.title)}</h3>
+      
+      <!-- كرت الرسالة الخاص بالهدية التفاعلية -->
+      <div style="background:linear-gradient(135deg,#ffffff,#fff5f8);border:2px dashed #f48fb1;border-radius:20px;padding:18px;margin:14px 0;text-align:center;box-shadow:0 6px 20px rgba(244,143,177,0.25);">
+        <div style="font-size:0.9rem;font-weight:800;color:#c2185b;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <span>💌</span> رسالة الهدية الخاصة:
+        </div>
+        <p style="font-size:1.18rem;font-weight:700;color:#2c1b26;line-height:1.75;white-space:pre-wrap;margin:0;padding:6px 0;">${escapeHtml(gift.message || '')}</p>
+        <div style="margin-top:14px;padding-top:10px;border-top:1px dashed #f8bbd0;font-size:0.85rem;color:#ad1457;display:flex;justify-content:space-between;align-items:center;">
+          <span>من: <b>${escapeHtml(sName)}</b> 💕</span>
+          <span>${dateStr}</span>
+        </div>
+      </div>
+      
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+        <button class="btn btn-primary btn-full" onclick="sendPing();toast('💗 أُرسلت نبضة حب فورية كشكر على الهدية!')" style="font-weight:bold;">💖 رد فوري بنبضة حب</button>
+        <button class="btn btn-gold btn-full" onclick="openSendInteractiveGiftModal()" style="font-weight:bold;">🎁 رد بهدية تفاعلية بفيونكة</button>
+        <button class="btn btn-soft btn-full" onclick="openInteractiveGiftArchive()">📜 سجل الهدايا التفاعلية</button>
+        <button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button>
+      </div>
+    </div>
+  `);
+};
+
+window.openSendInteractiveGiftModal = function(){
+  const role = typeof MY_ROLE !== 'undefined' ? MY_ROLE : 'me';
+  const partnerNameStr = typeof partnerName === 'function' ? partnerName(role) : 'شريكك';
+
+  openModal(`
+    <h3 style="color:#c2185b;font-weight:900;text-align:center;margin-bottom:6px;">🎁 إرسال هدية تفاعلية</h3>
+    <p class="muted" style="text-align:center;margin-bottom:14px;font-size:0.9rem;">
+      تصل هديتك بفيونكة جميلة، وتظهر رسالتك في أيقونة الهدية مباشرة لدى الطرف الآخر دون إدراجها في البريد ✨
+    </p>
+
+    <label style="font-weight:bold;color:#4a148c;display:block;margin-bottom:6px;">1. اختر نوع الهدية التفاعلية:</label>
+    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;margin-bottom:14px;" id="giftTypeSelector">
+      <button type="button" class="btn btn-soft active" data-type="rose" onclick="selectGiftType('rose')" style="border-radius:14px;padding:8px 4px;text-align:center;border:2px solid #e91e63;">
+        <span style="font-size:1.6rem;display:block;">🌹</span>
+        <small style="font-weight:bold;font-size:0.75rem;">باقة ورد</small>
+      </button>
+      <button type="button" class="btn btn-soft" data-type="ring" onclick="selectGiftType('ring')" style="border-radius:14px;padding:8px 4px;text-align:center;">
+        <span style="font-size:1.6rem;display:block;">💍</span>
+        <small style="font-weight:bold;font-size:0.75rem;">خاتم حب</small>
+      </button>
+      <button type="button" class="btn btn-soft" data-type="chocolate" onclick="selectGiftType('chocolate')" style="border-radius:14px;padding:8px 4px;text-align:center;">
+        <span style="font-size:1.6rem;display:block;">🍫</span>
+        <small style="font-weight:bold;font-size:0.75rem;">شوكولاتة</small>
+      </button>
+      <button type="button" class="btn btn-soft" data-type="teddy" onclick="selectGiftType('teddy')" style="border-radius:14px;padding:8px 4px;text-align:center;">
+        <span style="font-size:1.6rem;display:block;">🧸</span>
+        <small style="font-weight:bold;font-size:0.75rem;">دبدوب لطيف</small>
+      </button>
+      <button type="button" class="btn btn-soft" data-type="letter" onclick="selectGiftType('letter')" style="border-radius:14px;padding:8px 4px;text-align:center;">
+        <span style="font-size:1.6rem;display:block;">💌</span>
+        <small style="font-weight:bold;font-size:0.75rem;">رسالة سرية</small>
+      </button>
+      <button type="button" class="btn btn-soft" data-type="crown" onclick="selectGiftType('crown')" style="border-radius:14px;padding:8px 4px;text-align:center;">
+        <span style="font-size:1.6rem;display:block;">👑</span>
+        <small style="font-weight:bold;font-size:0.75rem;">تاج ملكي</small>
+      </button>
+    </div>
+
+    <label style="font-weight:bold;color:#4a148c;display:block;margin-bottom:6px;">2. رسالتك الخاصة بداخل الهدية:</label>
+    <textarea id="interactiveGiftMsg" placeholder="اكتب الكلمات الدافئة التي ستظهر عندما يفك شريكك شريط الهدية..." rows="3" style="width:100%;border-radius:14px;padding:10px;border:1.5px solid #f48fb1;font-size:0.95rem;resize:none;margin-bottom:12px;"></textarea>
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-soft" style="flex:1;" onclick="closeModal()">إلغاء</button>
+      <button class="btn btn-primary" style="flex:2;background:linear-gradient(135deg,#ff4081,#e91e63);font-weight:bold;" onclick="submitSendInteractiveGift()">🎁 تغليف وإرسال الهدية</button>
+    </div>
+    
+    <div style="margin-top:12px;text-align:center;">
+      <button class="btn btn-soft" style="font-size:0.85rem;padding:4px 10px;" onclick="openInteractiveGiftArchive()">📜 عرض سجل الهدايا السابقة</button>
+    </div>
+  `);
+  window._selectedGiftType = 'rose';
+};
+
+window.selectGiftType = function(type){
+  window._selectedGiftType = type;
+  const buttons = document.querySelectorAll('#giftTypeSelector button');
+  buttons.forEach(btn => {
+    if(btn.dataset.type === type){
+      btn.style.border = '2px solid #e91e63';
+      btn.classList.add('active');
+    } else {
+      btn.style.border = '';
+      btn.classList.remove('active');
+    }
+  });
+};
+
+window.submitSendInteractiveGift = async function(){
+  const msgInput = document.getElementById('interactiveGiftMsg');
+  const message = (msgInput?.value || '').trim();
+  if(!message){
+    toast('اكتب رسالة الهدية أولاً 💕');
+    return;
+  }
+  
+  const giftType = window._selectedGiftType || 'rose';
+  const role = typeof MY_ROLE !== 'undefined' ? MY_ROLE : 'me';
+  const sName = typeof senderName === 'function' ? senderName(role) : (role === 'me' ? 'حبيبك' : 'عيوشة');
+  const to = typeof otherRole === 'function' ? otherRole() : (role === 'me' ? 'her' : 'me');
+
+  const giftItem = {
+    id: 'gift_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+    giftType,
+    message,
+    sender: role,
+    recipient: to,
+    senderName: sName,
+    createdAt: new Date().toISOString(),
+    opened: false,
+    openedAt: null
+  };
+
+  // 1. الحفظ المحلي فوراً
+  window.allInteractiveGifts = [giftItem, ...(window.allInteractiveGifts || [])];
+  try {
+    localStorage.setItem('ayousha_interactive_gifts', JSON.stringify(window.allInteractiveGifts));
+  } catch(e){}
+
+  closeModal();
+  toast('🎁 جاري تغليف وإرسال هديتك...');
+  if(typeof playEventSound === 'function') playEventSound('surprise', true);
+  if(typeof burstHearts === 'function') burstHearts();
+
+  // 2. المزامنة السحابية عبر Firebase
+  if(firebaseReady && db){
+    try {
+      await set(ref(db, 'app/interactiveGifts/' + giftItem.id), giftItem);
+      // إشعار موجه إلى أيقونة الهدية وليس البريد
+      await addNotification('🎁 هدية تفاعلية بفيونكة!', `${sName} أرسل لك هدية تفاعلية خاصة! انقر على أيقونة الهدية لفتحها`, 'interactiveGift', giftItem.id);
+      toast('✨ تم إرسال الهدية التفاعلية بنجاح!');
+    } catch(err){
+      console.warn('Firebase gift sync:', err);
+      toast('تم حفظ الهدية محلياً وسيتم إرسالها عند الاتصال');
+    }
+  } else {
+    toast('✨ حُفظت الهدية التفاعلية محلياً');
+  }
+
+  window.updateInteractiveGiftBadge();
+};
+
+window.openInteractiveGiftArchive = function(){
+  const gifts = window.allInteractiveGifts || [];
+  if(!gifts.length){
+    openModal(`
+      <h3 style="color:#c2185b;font-weight:900;text-align:center;">📜 سجل الهدايا التفاعلية</h3>
+      <p style="text-align:center;color:#887581;padding:25px 0;">لا توجد هدايا تفاعلية مرسلة بعد 🎁</p>
+      <button class="btn btn-primary btn-full" onclick="openSendInteractiveGiftModal()">🎁 أرسل أول هدية تفاعلية</button>
+    `);
+    return;
+  }
+
+  const role = typeof MY_ROLE !== 'undefined' ? MY_ROLE : 'me';
+  const listHtml = gifts.map(g => {
+    const isMine = g.sender === role || g.from === role;
+    const def = GIFT_DEFINITIONS[g.giftType] || { title: '🎁 هدية', icon: '🎁' };
+    const dateStr = g.createdAt ? new Date(g.createdAt).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+    return `
+      <div class="v9-entry" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;background:#fff8fa;border-radius:12px;margin-bottom:8px;border:1px solid #f8bbd0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.8rem;">${def.icon}</span>
+          <div>
+            <div style="font-weight:bold;font-size:0.95rem;color:#ad1457;">${escapeHtml(def.title)}</div>
+            <small class="muted">${isMine ? 'أنت أرسلتها' : 'وصلتك من ' + escapeHtml(g.senderName || 'شريكك')} • ${dateStr}</small>
+          </div>
+        </div>
+        <button class="btn btn-soft" style="font-size:0.8rem;padding:5px 10px;white-space:nowrap;" onclick="window.renderRevealedGift(window.allInteractiveGifts.find(x=>x.id==='${escapeHtml(g.id)}'))">عرض 💌</button>
+      </div>
+    `;
+  }).join('');
+
+  openModal(`
+    <h3 style="color:#c2185b;font-weight:900;text-align:center;margin-bottom:12px;">📜 سجل الهدايا التفاعلية</h3>
+    <div style="max-height:60vh;overflow-y:auto;padding-left:4px;">
+      ${listHtml}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button class="btn btn-soft" style="flex:1;" onclick="closeModal()">إغلاق</button>
+      <button class="btn btn-primary" style="flex:2;" onclick="openSendInteractiveGiftModal()">🎁 إرسال هدية جديدة</button>
+    </div>
+  `);
+};
+
+// ربط زر الهدية التفاعلية في قسم المفاجآت بالنظام الجديد
+window.v9Gift = () => window.openInteractiveGiftSystem();
+
 window.v9Puzzle=()=>v9MakeSurprise('🧩 أحجية رسالة');
 window.v9FutureLetter=()=>v9MakeSurprise('💌 رسالة من الماضي');
 function v9MakeSurprise(kind){
@@ -2453,44 +2851,121 @@ const DEFAULT_QUESTIONS = [
   "أحلى هدية أو كلمة سمعتيها مني وما نسيتيها؟"
 ];
 function getDailyQuestion(){
-  const key=getTodayKey();
-  if(v9Prompts[key])return v9Prompts[key];
-  const idx=Math.floor(new Date().setHours(0,0,0,0)/86400000);
-  return DEFAULT_QUESTIONS[idx%DEFAULT_QUESTIONS.length];
+  const questions = (window.AYOUSHA_DAILY_QUESTIONS && window.AYOUSHA_DAILY_QUESTIONS.length)
+    ? window.AYOUSHA_DAILY_QUESTIONS
+    : DEFAULT_QUESTIONS;
+  const key = getTodayKey();
+  if(v9Prompts && v9Prompts[key]) return v9Prompts[key];
+  const now = new Date();
+  const dayIndex = Math.abs(Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000)) % questions.length;
+  return questions[dayIndex];
 }
+window.getDailyQuestion = getDailyQuestion;
 function renderDaily(){
-  const key=getTodayKey(),q=getDailyQuestion();
+  const key=getTodayKey(), q=getDailyQuestion();
   const qEl=document.getElementById('dailyQ');
-  if(qEl)qEl.textContent=q;
+  if(qEl) qEl.textContent=q;
   const ta=document.getElementById('dailyAnswer');
-  const a=v9Daily[key]?.[MY_ROLE];
-  if(ta&&document.activeElement!==ta)ta.value=a?.a||'';
+  
+  // مزامنة مع التخزين المحلي إن وجد
+  let localRecord = {};
+  try {
+    localRecord = JSON.parse(localStorage.getItem('ayousha_daily_' + key) || '{}');
+  } catch(e){}
+
+  const myAnswerFromV9 = v9Daily[key]?.[MY_ROLE]?.a;
+  const myAnswerFromLocal = localRecord?.answers?.[MY_ROLE];
+  const aText = myAnswerFromV9 || myAnswerFromLocal || '';
+  const aTime = v9Daily[key]?.[MY_ROLE]?.t || localRecord?.updatedAt;
+
+  // الحفاظ على النص المكتوب وعدم مسحه إذا كان المستخدم يكتب حالياً
+  if(ta && document.activeElement !== ta && !ta.value.trim()){
+    ta.value = aText;
+  }
+  
   const saved=document.getElementById('answerSaved');
-  if(saved)saved.innerHTML=a?.a?`<div class="answer-saved">💚 محفوظة — ${fmtDateTime(a.t)}</div>`:'';
+  if(saved) saved.innerHTML = aText ? `<div class="answer-saved">💚 إجابتك محفوظة ومزامنة ${aTime ? '— ' + fmtDateTime(aTime) : ''}</div>` : '';
+  
   const tog=document.getElementById('dailyTogether');
   if(tog){
-    const mine=v9Daily[key]?.[MY_ROLE]?.a,other=v9Daily[key]?.[otherRole()]?.a;
-    if(mine&&other){tog.innerHTML=`<b>💞 إجابتكما معاً:</b><br>💗 <b>${senderName(MY_ROLE)}:</b> ${escapeHtml(mine)}<br>💜 <b>${senderName(otherRole())}:</b> ${escapeHtml(other)}`;}
-    else if(mine){tog.innerHTML=`🔒 أجبت! في انتظار إجابة <b>${senderName(otherRole())}</b> 💕`;}
-    else{tog.innerHTML='🔒 شارك بإجابتك أولاً لتظهر إجابة شريكك.';}
+    const mine = aText;
+    const other = v9Daily[key]?.[otherRole()]?.a || localRecord?.answers?.[otherRole()];
+    if(mine && other){
+      tog.innerHTML = `
+        <div style="background:#e8f5e9;padding:12px;border-radius:14px;border:1px solid #c8e6c9;color:#1b5e20;">
+          <div style="font-weight:bold;margin-bottom:6px;font-size:1rem;">💞 إجابتكما معاً على سؤال اليوم:</div>
+          <div style="margin-bottom:4px;">💗 <b>${senderName(MY_ROLE)}:</b> ${escapeHtml(mine)}</div>
+          <div>💜 <b>${senderName(otherRole())}:</b> ${escapeHtml(other)}</div>
+        </div>
+      `;
+    } else if(mine){
+      tog.innerHTML = `
+        <div style="background:#fff8e1;padding:10px;border-radius:12px;color:#795548;border:1px solid #ffe0b2;">
+          🔒 <b>أجبت بنجاح!</b> في انتظار إجابة <b>${senderName(otherRole())}</b> لتكشف الإجابتين معاً 💕
+        </div>
+      `;
+    } else if(other){
+      tog.innerHTML = `
+        <div style="background:#e3f2fd;padding:10px;border-radius:12px;color:#0d47a1;border:1px solid #bbdefb;font-weight:bold;">
+          ⚡ <b>${senderName(otherRole())}</b> أجاب عن سؤال اليوم! اكتب إجابتك واضغط حفظ لتكشف الإجابتين فوراً! 🌟
+        </div>
+      `;
+    } else {
+      tog.innerHTML = '🔒 شارك بإجابتك أولاً لتظهر إجابة شريكك عند اكتمال السؤال اليومي.';
+    }
   }
 }
 window.saveDailyAnswer=async function(){
   const ta=document.getElementById('dailyAnswer');
   const a=ta?.value.trim();
-  if(!a||!db)return toast('اكتب إجابتك أولاً');
-  const key=getTodayKey(),payload={q:getDailyQuestion(),a,t:new Date().toISOString(),by:MY_ROLE};
+  if(!a) return toast('اكتب إجابتك أولاً ✍️');
+  const key=getTodayKey(), q=getDailyQuestion(), nowIso=new Date().toISOString();
+  const payload={q, a, t:nowIso, by:MY_ROLE};
   const btn=document.getElementById('saveDailyBtn');
-  if(btn)btn.disabled=true;
-  try{
-    await set(ref(db,`app/dailyResponses/${key}/${MY_ROLE}`),payload);
-    v9Daily[key]||={};v9Daily[key][MY_ROLE]=payload;
-    renderDaily();
-    await addNotification('💭 إجابة سؤال اليوم',`أجاب ${senderName(MY_ROLE)} عن سؤال اليوم!`,'answer');
-    playEventSound('answer',true);
-    toast('💗 حُفظت إجابتك');
-  }catch(e){toast('تعذر الحفظ');}
-  finally{if(btn)btn.disabled=false;}
+  if(btn) btn.disabled=true;
+  
+  // حفظ محلي فوري
+  try {
+    let local = JSON.parse(localStorage.getItem('ayousha_daily_' + key) || '{}');
+    local.date = key;
+    local.question = q;
+    local.answers = local.answers || {};
+    local.answers[MY_ROLE] = a;
+    local.updatedAt = Date.now();
+    localStorage.setItem('ayousha_daily_' + key, JSON.stringify(local));
+  } catch(e){}
+
+  v9Daily[key] = v9Daily[key] || {};
+  v9Daily[key][MY_ROLE] = payload;
+
+  try {
+    if(db) {
+      await set(ref(db, `app/dailyResponses/${key}/${MY_ROLE}`), payload);
+      await set(ref(db, `app/dailyShared/${key}/answers/${MY_ROLE}`), a);
+    }
+  } catch(e){}
+
+  try {
+    if(window.ayoushaRealtime?.ready?.()) {
+      await window.ayoushaRealtime.write('app/dailyShared/' + key, {
+        date: key,
+        question: q,
+        answers: { ...(v9Daily[key] || {}), [MY_ROLE]: a },
+        updatedAt: Date.now()
+      });
+    }
+  } catch(e){}
+
+  renderDaily();
+  burstHearts();
+  playEventSound('answer', true);
+  toast('💗 حُفظت وموزمنت إجابتك لسؤال اليوم!');
+  
+  try {
+    await addNotification('💭 إجابة سؤال اليوم', `أجاب ${senderName(MY_ROLE)} عن سؤال اليوم المشترك!`, 'dailyShared', key);
+  } catch(e){}
+
+  if(btn) btn.disabled=false;
 };
 
 const v9Questions=[...DEFAULT_QUESTIONS];
@@ -2709,7 +3184,7 @@ async function boot(){
     navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
   }
 
-  updateGreet();updateCountdown();renderDaily();renderPings();renderSurprises();renderMails();renderMemories();renderMood();
+  updateGreet();updateCountdown();renderDaily();renderPings();renderSurprises();if(typeof updateInteractiveGiftBadge==='function')updateInteractiveGiftBadge();renderMails();renderMemories();renderMood();
 
   onValue(ref(db,'.info/connected'),s=>{
     const ok=s.val()===true;
@@ -2745,6 +3220,12 @@ async function boot(){
   onValue(ref(db,'app/v9Moods'),s=>{v9Moods=s.val()||{};renderMood();});
   onValue(ref(db,'app/v9Occasions'),s=>{v9Occasions=s.val()||{};});
 
+  onValue(ref(db,'app/interactiveGifts'),s=>{
+    const v=s.val();
+    window.allInteractiveGifts = v ? Object.entries(v).map(([id,item])=>({id,...item})).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)) : [];
+    try { localStorage.setItem('ayousha_interactive_gifts', JSON.stringify(window.allInteractiveGifts)); } catch(e){}
+    if(typeof window.updateInteractiveGiftBadge === 'function') window.updateInteractiveGiftBadge();
+  }, e=>console.warn('interactiveGifts sync', e));
   onValue(ref(db,'app/surprises'),s=>{
     const v=s.val();
     state.surprises=v?Object.entries(v).map(([id,item])=>({id,...item})):[];
