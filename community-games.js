@@ -125,7 +125,7 @@
         window.addNotification(title, body, 'game', gameId);
       }
       if (window.ayoushaRealtime?.notify) {
-        window.ayoushaRealtime.notify(title, body, gameId);
+        window.ayoushaRealtime.notify(title, body);
       }
     } catch {}
   };
@@ -1103,25 +1103,21 @@
     }
   }
 
-  const getCachedState = (type) => {
-    try {
-      const local = localStorage.getItem(storageKey(type));
-      if (local) return JSON.parse(local);
-    } catch {}
-    return null;
-  };
-
   // ==========================================
-  // 8. الدالة الرئيسية لفتح الألعاب - فتح فوري مباشر في 0ms
+  // 8. الدالة الرئيسية لفتح الألعاب
   // ==========================================
-  window.openCommunityGame = function (type) {
+  window.openCommunityGame = async function (type) {
     if (!GAMES[type]) {
       console.warn('Unknown community game type:', type);
       return;
     }
 
     const cfg = getSettings(type);
-    const meta = GAMES[type];
+    let state = await readState(type);
+    if (!state || !state.game || state.game !== type) {
+      state = createInitialState(type, cfg, null);
+      await writeState(type, state);
+    }
 
     const render = (currentState) => {
       let html = '';
@@ -1144,42 +1140,8 @@
       }
     };
 
-    // 1. فتح نافذة اللعبة فوراً دون انتظار أي طلب شبكة (تماماً مثل لعبة الرسم)
-    const cached = getCachedState(type);
-    if (cached && cached.game === type) {
-      render(cached);
-    } else {
-      if (window.openModal) {
-        window.openModal(`
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-            <div style="font-size:1.8rem;">${meta.icon}</div>
-            <div>
-              <h3 style="margin:0;color:var(--primary);">${meta.title}</h3>
-              <small style="color:#887581;">غرفة اللعبة المباشرة بينك وبين عيوشة</small>
-            </div>
-          </div>
-          <div class="v9-panel" style="text-align:center;padding:25px 15px;">
-            <div style="font-size:2rem;margin-bottom:8px;">⏳</div>
-            <p style="margin:0;font-weight:bold;color:var(--primary);">جارٍ الدخول إلى دورك في اللعبة...</p>
-          </div>
-        `);
-      }
-    }
-
-    // 2. مزامنة الحالة اللحظية من قاعدة البيانات والاشتراك في التحديثات المباشرة
-    (async () => {
-      try {
-        let state = await readState(type);
-        if (!state || !state.game || state.game !== type) {
-          state = createInitialState(type, cfg, null);
-          await writeState(type, state);
-        }
-        render(state);
-        listenState(type, render);
-      } catch (err) {
-        console.warn('Game sync error:', err);
-      }
-    })();
+    render(state);
+    listenState(type, render);
   };
 
   // Alias for compatibility
