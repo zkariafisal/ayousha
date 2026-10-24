@@ -6,36 +6,32 @@
 <meta name="theme-color" content="#d81b60">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="تطبيق زكريا وعيوشة">
-<title>تطبيق زكريا وعيوشة - تواصل وألعاب رومانسية مباشرة</title>
-<meta name="description" content="تطبيق تواصل وألعاب رومانسية حقيقي بين زكريا وعيوشة متصل مباشرة بهاتفها وقاعدة البيانات الفورية مع إشعارات الهاتف">
-<meta property="og:title" content="تطبيق زكريا وعيوشة - تواصل وألعاب رومانسية مباشرة">
-<meta property="og:description" content="تطبيق تواصل وألعاب رومانسية حقيقي بين زكريا وعيوشة متصل مباشرة بهاتفها وقاعدة البيانات الفورية مع إشعارات الهاتف">
-<meta property="og:type" content="website">
+<meta name="apple-mobile-web-app-title" content="عيون عيوشة">
+<title>عيون عيوشة 🌸</title>
 
-<script src="/trivia-questions.js"></script>
-<script src="/daily-question-bank.js"></script>
-<script src="/balderdash-questions.js"></script>
-<script src="/fibbage-questions.js"></script>
-<script src="/codenames-questions.js"></script>
-<script src="/werewolf-questions.js"></script>
-<script src="/resistance-questions.js"></script>
-<script src="/story-questions.js"></script>
-<script src="/draw-questions.js"></script>
-<script src="/random-questions.js"></script>
-<script src="/know-me-questions.js"></script>
-<script src="/cards-questions.js"></script>
-<script src="/puzzle-questions.js"></script>
-<script src="/telepathy-questions.js"></script>
-<script src="/spin-questions.js"></script>
-<script src="/xo-questions.js"></script>
-<script src="/guessNum-questions.js"></script>
+<script src="./trivia-questions.js"></script>
+<script src="./daily-question-bank.js"></script>
+<script src="./balderdash-questions.js"></script>
+<script src="./fibbage-questions.js"></script>
+<script src="./codenames-questions.js"></script>
+<script src="./werewolf-questions.js"></script>
+<script src="./resistance-questions.js"></script>
+<script src="./story-questions.js"></script>
+<script src="./draw-questions.js"></script>
+<script src="./random-questions.js"></script>
+<script src="./know-me-questions.js"></script>
+<script src="./cards-questions.js"></script>
+<script src="./puzzle-questions.js"></script>
+<script src="./telepathy-questions.js"></script>
+<script src="./spin-questions.js"></script>
+<script src="./xo-questions.js"></script>
+<script src="./guessNum-questions.js"></script>
 
 <!-- 🆕 الملفات الجديدة - نظام النقاط والألعاب المتقدمة -->
-<script src="/game-stats.js"></script>
-<script src="/new-games.js"></script>
-<script src="/community-games.js"></script>
-<script src="/ui-enhancements.js"></script>
+<script src="./game-stats.js"></script>
+<script src="./new-games.js"></script>
+<script src="./community-games.js"></script>
+<script src="./ui-enhancements.js"></script>
 
 <link rel="manifest" href='data:application/manifest+json,{"name":"عيون عيوشة","short_name":"عيوشة","start_url":"./","display":"standalone","background_color":"%23fdf6f9","theme_color":"%23d81b60","orientation":"portrait","icons":[{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png","sizes":"512x512","type":"image/png","purpose":"any"}]}'>
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png">
@@ -62,31 +58,6 @@ header{padding:calc(15px + env(safe-area-inset-top)) 20px 12px;display:flex;alig
 .sync-dot.offline{background:#ff9800;animation:none}
 .sync-dot.local{background:#9e9e9e;animation:none}
 @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.4}}
-
-/* بطاقة الاتصال المباشر بهاتف عيوشة */
-.ayousha-direct-card{max-width:900px;margin:0 auto 14px;padding:14px 16px;border-radius:20px;background:linear-gradient(135deg,#fff7fa 0%,#fff 100%);border:1.5px solid #f8c8dc;box-shadow:0 8px 24px rgba(216,27,96,.08);position:relative;overflow:hidden;transition:all .3s ease}
-.ayousha-direct-card.preview-mode{background:linear-gradient(135deg,#f3e5f5 0%,#fff 100%);border-color:#ce93d8}
-.ayousha-card-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.partner-avatar{position:relative;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f48fb1,#ad1457);display:grid;place-items:center;color:#fff;font-size:1.3rem;box-shadow:0 4px 12px rgba(173,20,87,.25);flex-shrink:0}
-.avatar-ring.pulse{position:absolute;inset:-3px;border-radius:50%;border:2px solid #e91e63;animation:ringPulse 2s infinite}
-@keyframes ringPulse{0%{transform:scale(1);opacity:.8}50%{transform:scale(1.15);opacity:.2}100%{transform:scale(1);opacity:.8}}
-.partner-info{flex:1;min-width:190px}
-.partner-title{font-size:.96rem;font-weight:800;color:var(--primary-2);display:flex;align-items:center;gap:8px}
-.conn-arrow{color:#d81b60;font-size:1.1rem}
-.partner-status-row{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted);margin-top:3px}
-.status-indicator-dot{width:9px;height:9px;border-radius:50%;display:inline-block}
-.status-indicator-dot.online{background:#2e7d32;box-shadow:0 0 8px #4caf50;animation:pulseDot 1.6s infinite}
-.status-indicator-dot.away{background:#f57c00}
-.status-indicator-dot.offline{background:#9e9e9e}
-.quick-role-toggle{background:#fff;color:#ad1457;border:1.5px solid #f48fb1;padding:6px 12px;border-radius:14px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(216,27,96,.08)}
-.quick-role-toggle:hover{background:#fce4ec;transform:translateY(-1px)}
-.ayousha-card-details{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(242,217,228,.85);font-size:.76rem;color:var(--muted);flex-wrap:wrap;align-items:center}
-.partner-meta-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.9);padding:4px 10px;border-radius:10px;border:1px solid #f8c8dc}
-.partner-meta-pill.fcm-active{border-color:#a5d6a7;background:#f1f8e9;color:#1b5e20}
-.partner-link-badge{color:#ad1457;font-weight:700;text-decoration:none;border-bottom:1px solid currentColor}
-.partner-link-badge:hover{color:#880e4f}
-.test-push-btn{background:#ad1457;color:#fff;border-radius:10px;padding:3px 10px;font-size:.74rem;font-weight:700;cursor:pointer;border:none;margin-right:auto}
-.test-push-btn:active{transform:scale(.95)}
 main{max-width:900px;margin:0 auto;padding:0 16px}
 .view{display:none;animation:fadeIn .35s ease}
 .view.active{display:block}
@@ -383,7 +354,7 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
 </script>
 
 <header>
-  <div class="brand"><div class="brand-logo">🌸</div><div><h1>عيوشة وزكريا 💕</h1><small>تواصل مباشر وألعاب رومانسية مشتركة</small></div></div>
+  <div class="brand"><div class="brand-logo">🌸</div><div><h1>عيون عيوشة</h1><small>ألعاب مشتركة وتنبيهات فورية بيننا</small></div></div>
   <div class="header-actions">
     <button class="icon-btn" id="notifBell" onclick="switchView('notifications')" title="الإشعارات" aria-label="مركز الإشعارات">🔔<span class="badge-dot"></span></button>
     <button class="icon-btn" onclick="openSettings()" title="الإعدادات">⚙️</button>
@@ -391,44 +362,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
 </header>
 
 <div class="sync-status"><span class="sync-dot local" id="syncDot"></span><span id="syncText">جاري الاتصال...</span></div>
-
-<!-- بطاقة الاتصال المباشر بهاتف عيوشة -->
-<div id="ayoushaDirectLinkCard" class="ayousha-direct-card">
-  <div class="ayousha-card-header">
-    <div class="partner-avatar">
-      <span class="avatar-ring pulse"></span>
-      <span class="avatar-emoji">💖</span>
-    </div>
-    <div class="partner-info">
-      <div class="partner-title">
-        <span id="roleBadgeMyName">زكريا (حبيبي)</span>
-        <span class="conn-arrow">⇄</span>
-        <span class="partner-name">عيوشة 🌸</span>
-      </div>
-      <div class="partner-status-row">
-        <span id="ayoushaLiveDot" class="status-indicator-dot offline"></span>
-        <span id="ayoushaLiveStatusText">جارٍ فحص حالة هاتف عيوشة...</span>
-      </div>
-    </div>
-    <button class="quick-role-toggle" onclick="toggleRolePreview()" title="تبديل العرض بين هاتفي وهاتف عيوشة">
-      <span id="roleToggleText">👁️ تجربة دور عيوشة</span>
-    </button>
-  </div>
-
-  <div class="ayousha-card-details">
-    <div class="partner-meta-pill">
-      <span>📲 رابط هاتف عيوشة:</span>
-      <a href="https://ayousha.vercel.app/?for=her" target="_blank" rel="noopener noreferrer" class="partner-link-badge">
-        ayousha.vercel.app/?for=her ↗
-      </a>
-    </div>
-    <div id="fcmStatusPill" class="partner-meta-pill fcm-active">
-      <span>🔔 هاتفها بالإشعارات (FCM):</span>
-      <span id="fcmStatusText">متصل ومربوط ✅</span>
-    </div>
-    <button type="button" class="test-push-btn" onclick="window.sendTestPushToAyousha()">🔔 تجربة إشعار لهاتفها</button>
-  </div>
-</div>
 
 <main>
   <section id="view-home" class="view active">
@@ -927,66 +860,15 @@ async function sendFCM(toRole, title, body, type='game', itemId=''){
   try {
     const snap = await get(ref(db, `config/${toRole}/fcmToken`));
     const token = snap.val();
-    if(!token) {
-      console.warn(`[sendFCM] No FCM token registered for ${toRole}`);
-      return false;
-    }
-    // الرابط المباشر الذي سيفتح تطبيق عيوشة المثبت في هاتفها عند الضغط على الإشعار
-    const targetUrl = `https://ayousha.vercel.app/?for=${encodeURIComponent(toRole)}&open=${encodeURIComponent(type)}&item=${encodeURIComponent(itemId)}`;
-    
-    const payload = {
-      token,
-      title: String(title),
-      body: String(body || ''),
-      type: String(type),
-      itemId: String(itemId),
-      role: toRole,
-      url: targetUrl
-    };
-
-    console.log(`[sendFCM] Sending push notification to ${toRole}:`, title);
-
-    // المحاولة 1: عبر الخادم المحلي (Proxy) لتفادي أي مشاكل CORS
-    try {
-      const res = await fetch('/api/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if(res.ok) {
-        console.log(`[sendFCM] ✅ تم إرسال الإشعار بنجاح إلى هاتف ${toRole}`);
-        return true;
-      }
-    } catch(err) {
-      console.warn('[sendFCM] Proxy /api/notify error:', err);
-    }
-
-    // المحاولة 2: الاتصال المباشر بنقطة Vercel كخطة احتياطية
-    try {
-      await fetch('https://ayousha.vercel.app/api/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      return true;
-    } catch(e) {}
-  } catch(e){
-    console.warn('[sendFCM] Global error:', e);
-  }
-  return false;
+    if(!token) return;
+    const targetUrl = `${location.origin}/index.html?for=${toRole}&open=${encodeURIComponent(type)}&item=${encodeURIComponent(itemId)}`;
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, title, body, type, itemId, role: toRole, url: targetUrl })
+    }).catch(()=>{});
+  } catch(e){}
 }
-
-window.sendTestPushToAyousha = async function(){
-  toast('جارٍ إرسال إشعار تجريبي لهاتف عيوشة...');
-  const success = await sendFCM('her', '💖 نبضة حب من زكريا', 'حبيبتي عيوشة، تطبيقي متصل بهاتفكِ الآن!', 'ping');
-  if(success) {
-    burstHearts();
-    playEventSound('win');
-    toast('✅ تم إرسال الإشعار بنجاح لهاتف عيوشة!');
-  } else {
-    toast('⚠️ تم إرسال الإشعار عبر قاعدة البيانات (تحقق من رمز FCM)');
-  }
-};
 
 // الإشعار التفاعلي العائم داخل التطبيق
 let _bannerTimer = null;
@@ -2210,56 +2092,12 @@ function setupChatPresence(){
 function updateOwnChatPresence(){if(firebaseReady&&db&&MY_ROLE)update(ref(db,'app/chatPresence/'+MY_ROLE),{online:true,inChat:chatIsOpen(),lastSeen:serverTimestamp()}).catch(()=>{});}
 function updateChatPresence(){
   const el=document.getElementById('chatPresence'),typing=document.getElementById('chatTyping');
+  if(!el)return;
   const active=chatTyping.active&&Date.now()-(chatTyping.at||0)<4500;
   const last=chatPresence.lastSeen?new Date(chatPresence.lastSeen).toLocaleString('ar'):'';
-  if(el) el.textContent=active?'✍️ يكتب الآن...':chatPresence.online?(chatPresence.inChat?'💗 أنتما معًا الآن':'🟢 متصل الآن'):(last?'آخر ظهور: '+last:'غير متصل');
+  el.textContent=active?'✍️ يكتب الآن...':chatPresence.online?(chatPresence.inChat?'💗 أنتما معًا الآن':'🟢 متصل الآن'):(last?'آخر ظهور: '+last:'غير متصل');
   if(typing)typing.textContent=active?'💗 '+senderName(otherRole())+' يكتب الآن...':'';
-
-  // تحديث حالة هاتف عيوشة في بطاقة الاتصال العلوية
-  const liveDot = document.getElementById('ayoushaLiveDot');
-  const liveText = document.getElementById('ayoushaLiveStatusText');
-  if(liveDot && liveText){
-    const partner = senderName(otherRole());
-    if(chatPresence.online){
-      liveDot.className = 'status-indicator-dot online';
-      liveText.textContent = chatPresence.inChat ? `${partner} متصلة الآن وداخل المحادثة 💗` : `${partner} متصلة بالتطبيق الآن 🟢`;
-    } else if(last){
-      liveDot.className = 'status-indicator-dot away';
-      liveText.textContent = `آخر ظهور لهاتف ${partner}: ${last}`;
-    } else {
-      liveDot.className = 'status-indicator-dot offline';
-      liveText.textContent = `هاتف ${partner} في وضع الانتظار — ستصلها إشعاراتك فوراً 🔔`;
-    }
-  }
 }
-
-function updateRoleUI(){
-  const myNameEl = document.getElementById('roleBadgeMyName');
-  const toggleBtnText = document.getElementById('roleToggleText');
-  const roleCard = document.getElementById('ayoushaDirectLinkCard');
-  const isMe = (MY_ROLE === 'me');
-  if(myNameEl) myNameEl.textContent = isMe ? (state.settings.myName || 'زكريا (حبيبي)') : (state.settings.wifeName || 'عيوشة (أنا)');
-  if(toggleBtnText) toggleBtnText.textContent = isMe ? '👁️ تجربة دور عيوشة' : '📱 العودة لهاتفي كـ زكريا';
-  if(roleCard){
-    if(!isMe){
-      roleCard.classList.add('preview-mode');
-    } else {
-      roleCard.classList.remove('preview-mode');
-    }
-  }
-}
-
-window.toggleRolePreview = function(){
-  const newRole = MY_ROLE === 'me' ? 'her' : 'me';
-  MY_ROLE = newRole;
-  localStorage.setItem('ayousha_role', newRole);
-  window.currentMailRole = newRole;
-  updateRoleUI();
-  toast(newRole === 'her' ? '👁️ تم التبديل إلى وضع المعاينة (كهاتف عيوشة)' : '📱 تم العودة إلى وضع هاتفك الأساسي (زكريا)');
-  renderMails();
-  updateChatPresence();
-  updateGreet();
-};
 window.chatTypingInput=function(){
   if(!db||!MY_ROLE)return;
   const now=Date.now();
@@ -2772,37 +2610,20 @@ function updateGreet(){
 }
 
 window.openSettings=function(){
-  const notifStatus=!('Notification' in window)?'<div class="v9-panel" style="background:#fff8e1;color:#795548;">⚠️ متصفحك لا يدعم الإشعارات</div>':Notification.permission==='granted'?'<div class="v9-panel" style="background:#e8f5e9;color:#1b5e20;">✅ إشعارات هذا الجهاز مفعّلة</div>':Notification.permission==='denied'?'<div class="v9-panel" style="background:#ffebee;color:#c62828;">❌ الإشعارات مرفوضة — افتح إعدادات المتصفح</div>':'<div class="v9-panel">🔔 الإشعارات غير مفعّلة في هذا الجهاز</div>';
-  const roleLabel = MY_ROLE === 'me' ? 'أنا زكريا (المرسل إلى عيوشة) 💖' : 'عيوشة (المستلمة) 🌸';
+  const notifStatus=!('Notification' in window)?'<div class="v9-panel" style="background:#fff8e1;color:#795548;">⚠️ متصفحك لا يدعم الإشعارات</div>':Notification.permission==='granted'?'<div class="v9-panel" style="background:#e8f5e9;color:#1b5e20;">✅ الإشعارات مفعّلة</div>':Notification.permission==='denied'?'<div class="v9-panel" style="background:#ffebee;color:#c62828;">❌ الإشعارات مرفوضة — افتح إعدادات المتصفح</div>':'<div class="v9-panel">🔔 الإشعارات غير مفعّلة</div>';
   openModal(`
-    <h3>⚙️ إعدادات التطبيق والاتصال</h3>
-    
-    <div class="v9-panel" style="background:#fce4ec;border:1px solid #f8bbd0;margin-bottom:12px;">
-      <b>📱 دور هذا الجهاز:</b>
-      <div style="font-size:1rem;color:#ad1457;font-weight:bold;margin:4px 0;">${roleLabel}</div>
-      <button class="btn btn-soft btn-full" style="margin-top:6px;font-size:.8rem;" onclick="window.toggleRolePreview();window.openSettings();">
-        🔄 ${MY_ROLE==='me'?'التبديل إلى دور عيوشة (للمعاينة)':'التبديل إلى دوري (زكريا)'}
-      </button>
-    </div>
-
-    <div class="v9-panel" style="margin-bottom:12px;">
-      <b>📲 تطبيق عيوشة في هاتفها:</b>
-      <p style="font-size:.8rem;color:#666;margin:4px 0;">أي رسالة أو حركة في الألعاب ترسلها تذهب تلقائياً لهذا الرابط في هاتفها:</p>
-      <a href="https://ayousha.vercel.app/?for=her" target="_blank" rel="noopener noreferrer" style="color:#d81b60;font-weight:bold;font-size:.85rem;word-break:break-all;">https://ayousha.vercel.app/?for=her ↗</a>
-    </div>
-
-    <label style="display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px;">اسمك في التطبيق</label>
+    <h3>⚙️ إعدادات التطبيق</h3>
+    <label style="display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px;">اسمك</label>
     <input id="setNameMe" value="${escapeHtml(state.settings.myName)}">
-    <label style="display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px;">اسم شريكة حياتك</label>
+    <label style="display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px;">اسم شريكك</label>
     <input id="setNameHer" value="${escapeHtml(state.settings.wifeName)}">
-    <label style="display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px;">موعد اللقاء القادم</label>
+    <label style="display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px;">موعد اللقاء</label>
     <input type="datetime-local" id="setMeetup" value="${state.meetupDate?state.meetupDate.slice(0,16):''}">
     <div class="modal-actions" style="flex-direction:column;gap:8px;margin-top:14px;">
-      <button class="btn btn-primary btn-full" onclick="window.saveSettings()">💾 حفظ الأسماء وموعد اللقاء</button>
-      <button class="btn btn-gold btn-full" onclick="window.sendTestPushToAyousha()">🔔 إرسال إشعار فوري مباشر لهاتف عيوشة</button>
-      <a href="/ayousha-app.zip" download="ayousha-app.zip" class="btn btn-soft btn-full" style="text-decoration:none;">📥 تحميل ملف المشروع كاملاً (ZIP)</a>
-      <button class="btn btn-soft btn-full" onclick="window.askNotifPermission()">🔔 تفعيل أذونات إشعارات هذا الجهاز</button>
+      <button class="btn btn-soft btn-full" onclick="window.askNotifPermission()">🔔 تفعيل أذونات الإشعارات</button>
+      <button class="btn btn-soft btn-full" onclick="window.testNotification()">🧪 اختبار الإشعار</button>
       <button class="btn btn-soft btn-full" onclick="window.toggleSounds()">🔊 تشغيل / كتم أصوات التفاعل</button>
+      <button class="btn btn-primary btn-full" onclick="window.saveSettings()">💾 حفظ الإعدادات</button>
     </div>
     ${notifStatus}
   `);
@@ -2941,24 +2762,6 @@ async function boot(){
   onValue(ref(db,'app/meetupDate'),s=>{state.meetupDate=s.val()||'';updateCountdown();});
 
   setupChatPresence();
-  updateRoleUI();
-
-  // متابعة تسجيل هاتف عيوشة في خدمة الإشعارات الفورية
-  onValue(ref(db, 'config/her/fcmToken'), snap => {
-    const token = snap.val();
-    const fcmText = document.getElementById('fcmStatusText');
-    const fcmPill = document.getElementById('fcmStatusPill');
-    if(fcmText){
-      if(token){
-        fcmText.textContent = 'متصل ومربوط ✅';
-        if(fcmPill) fcmPill.classList.add('fcm-active');
-      } else {
-        fcmText.textContent = 'بانتظار تفعيل الإشعارات على هاتفها';
-        if(fcmPill) fcmPill.classList.remove('fcm-active');
-      }
-    }
-  });
-
   initFCM();
   handleDeepLink();
   setTimeout(handleDeepLink,250);
@@ -3126,6 +2929,16 @@ window.openCardsProject = function() {
   wrap.id = 'cardsProjectContainer';
   wrap.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100dvh; z-index:999999; background:#0d060f; display:flex; flex-direction:column; overflow:hidden;';
 
+  const cardsSrc = (function() {
+    try {
+      return new URL('cards.html', window.location.href).href;
+    } catch(e) {
+      const p = window.location.pathname || '';
+      if (p.endsWith('/ayousha')) return '/ayousha/cards.html';
+      return './cards.html';
+    }
+  })();
+
   wrap.innerHTML = `
     <div style="background:linear-gradient(135deg, #1c0517, #2d0a25); color:white; padding:8px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #4a154b; box-shadow:0 4px 16px rgba(0,0,0,0.5); flex-shrink:0;">
       <div style="display:flex; align-items:center; gap:10px;">
@@ -3141,10 +2954,11 @@ window.openCardsProject = function() {
       <div style="display:flex; align-items:center; gap:8px;">
         <button onclick="window.toggleCardsFullScreen()" title="ملء الشاشة" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:6px 10px; border-radius:10px; cursor:pointer; font-size:0.85rem;">⛶</button>
         <button onclick="const f=document.getElementById('cardsFrame'); if(f) f.contentWindow.location.reload();" title="إعادة تحميل" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:6px 10px; border-radius:10px; cursor:pointer; font-size:0.85rem;">🔄</button>
+        <button onclick="window.location.href=cardsSrc;" title="فتح مباشر بدون إطار" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:6px 10px; border-radius:10px; cursor:pointer; font-size:0.82rem;">🔗 فتح مباشر</button>
         <button onclick="window.closeCardsProject()" style="background:linear-gradient(135deg, #e11d48, #be123c); color:#fff; border:none; padding:6px 14px; border-radius:10px; cursor:pointer; font-weight:bold; font-size:0.88rem; display:flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(225,29,72,0.4);">✕ خروج</button>
       </div>
     </div>
-    <iframe id="cardsFrame" src="/cards-app/index.html" style="flex:1; width:100%; height:100%; border:none; background:#0d060f;" allow="autoplay; fullscreen"></iframe>
+    <iframe id="cardsFrame" src="${cardsSrc}" style="flex:1; width:100%; height:100%; border:none; background:#0d060f;" allow="autoplay; fullscreen"></iframe>
   `;
 
   document.body.appendChild(wrap);
