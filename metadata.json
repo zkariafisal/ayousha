@@ -1,0 +1,6 @@
+{
+  "name": "تطبيق زكريا وعيوشة - تواصل وألعاب رومانسية مباشرة",
+  "description": "تطبيق تواصل وألعاب رومانسية حقيقي بين زكريا وعيوشة متصل مباشرة بهاتفها وقاعدة البيانات الفورية مع إشعارات الهاتف",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
