@@ -179,136 +179,22 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
 .notif-item{background:#fff;padding:12px;border-radius:14px;border:1px solid #f2d9e4;margin-bottom:8px;cursor:pointer;transition:transform .15s}
 .notif-item:active{transform:scale(.98)}
 
-.interactive-notif-banner {
-  position: fixed;
-  top: 14px;
-  left: 14px;
-  right: 14px;
-  max-width: 520px;
-  margin: 0 auto;
-  z-index: 99999;
-  background: linear-gradient(135deg, #d81b60, #ad1457);
-  color: #fff;
-  border-radius: 20px;
-  padding: 12px 16px;
-  box-shadow: 0 12px 36px rgba(173,20,87,0.38);
-  border: 2px solid rgba(255,255,255,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  cursor: pointer;
-  transform: translateY(-120%);
-  opacity: 0;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
-  user-select: none;
-}
-.interactive-notif-banner.show {
-  transform: translateY(0);
-  opacity: 1;
-}
-.notif-banner-badge {
-  background: rgba(255,255,255,0.22);
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: .75rem;
-  font-weight: 700;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+.interactive-notif-banner{position:fixed;top:14px;left:14px;right:14px;max-width:520px;margin:0 auto;z-index:99999;background:linear-gradient(135deg,#d81b60,#ad1457);color:#fff;border-radius:20px;padding:12px 16px;box-shadow:0 12px 36px rgba(173,20,87,.38);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transform:translateY(-120%);opacity:0;transition:transform .35s cubic-bezier(0.16,1,0.3,1),opacity .35s ease;user-select:none}
+.interactive-notif-banner.show{transform:translateY(0);opacity:1}
+.notif-banner-badge{background:rgba(255,255,255,.22);color:#fff;padding:4px 10px;border-radius:12px;font-size:.75rem;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:4px}
 
-.game-pro-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-  margin: 12px 0 16px;
-}
-@media (max-width: 600px) {
-  .game-pro-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
-.game-pro-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 10px;
-  cursor: pointer;
-  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-.game-pro-card:active {
-  transform: scale(0.975);
-}
-.game-pro-card:hover {
-  border-color: var(--primary);
-  box-shadow: 0 8px 24px rgba(216,27,96,0.12);
-}
-.game-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.game-card-icon-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  font-size: 1.6rem;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-}
-.game-card-tag {
-  font-size: .72rem;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 10px;
-  background: #fce4ec;
-  color: #ad1457;
-}
-.game-card-title {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--primary-2);
-  margin-top: 2px;
-}
-.game-card-desc {
-  font-size: .82rem;
-  color: var(--muted);
-  line-height: 1.6;
-}
-.game-card-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 8px;
-  border-top: 1px solid #f9e9f2;
-  font-size: .75rem;
-  color: #795548;
-}
-.game-card-btn {
-  background: linear-gradient(135deg, var(--primary), var(--primary-2));
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: .8rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
+.game-pro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:12px 0 16px}
+@media(max-width:600px){.game-pro-grid{grid-template-columns:1fr;gap:10px}}
+.game-pro-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;gap:10px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.game-pro-card:active{transform:scale(.975)}
+.game-pro-card:hover{border-color:var(--primary);box-shadow:0 8px 24px rgba(216,27,96,.12)}
+.game-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.game-card-icon-wrap{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:1.6rem;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.game-card-tag{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:10px;background:#fce4ec;color:#ad1457}
+.game-card-title{font-size:1.05rem;font-weight:800;color:var(--primary-2);margin-top:2px}
+.game-card-desc{font-size:.82rem;color:var(--muted);line-height:1.6}
+.game-card-foot{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid #f9e9f2;font-size:.75rem;color:#795548}
+.game-card-btn{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;padding:6px 14px;border-radius:12px;font-weight:700;font-size:.8rem;display:inline-flex;align-items:center;gap:4px}
 
 </style>
 </head>
@@ -798,7 +684,7 @@ function fmtDate(d){if(!d)return '';try{return new Date(d).toLocaleDateString('a
 function fmtDateTime(d){if(!d)return '';try{const dt=new Date(d);return dt.toLocaleDateString('ar-EG',{day:'numeric',month:'short'})+' - '+pad(dt.getHours())+':'+pad(dt.getMinutes());}catch(e){return '';}}
 function timeUntil(d){const diff=new Date(d)-new Date();if(diff<=0)return 'جاهزة';const dd=Math.floor(diff/86400000),hh=Math.floor((diff%86400000)/3600000),mm=Math.floor((diff%3600000)/60000);return dd>0?`بعد ${dd} يوم`:hh>0?`بعد ${hh} ساعة`:`بعد ${mm} دقيقة`;}
 
-/* ✅ مزامنة دور الجهاز مع الـ Service Worker (Cache API + postMessage) */
+/* ✅ مزامنة دور الجهاز مع الـ Service Worker */
 async function syncRoleToSW(){
   try {
     const cache = await caches.open(ROLE_CACHE_NAME);
@@ -883,7 +769,6 @@ async function sendFCM(toRole, title, body, type='game', itemId=''){
   } catch(e){}
 }
 
-// الإشعار التفاعلي العائم داخل التطبيق
 let _bannerTimer = null;
 let _bannerPayload = null;
 
@@ -958,7 +843,6 @@ function processIncomingNotifications(notifs){
     _initialNotifsLoaded = true;
     return;
   }
-  // ✅ الإصلاح: استبعاد الإشعارات التي أرسلتها بنفسك
   const myNew = notifs.filter(n => 
     n.to === MY_ROLE && 
     n.from !== MY_ROLE && 
@@ -972,7 +856,6 @@ function processIncomingNotifications(notifs){
   });
 }
 
-// ✅ التوجيه المباشر — لا يغيّر MY_ROLE إطلاقاً
 window.openEventDestination = function(type, id, targetRole, notifTitle='', notifBody=''){
   if(targetRole && (targetRole === 'me' || targetRole === 'her') && targetRole !== MY_ROLE){
     console.warn('🚫 محاولة فتح إشعار موجه لدور آخر:', targetRole, '| دورك الحالي:', MY_ROLE);
@@ -1159,7 +1042,6 @@ function handleDeepLink(attempts = 0){
   const forRole = p.get('for');
   if(!type && !forRole) return;
 
-  // ✅ تجاهل الروابط الموجهة لدور مختلف
   if(forRole && forRole !== MY_ROLE){
     console.warn('🚫 رابط فتح عميق لدور آخر ('+forRole+') — سيتم تجاهله (دورك الحالي: '+MY_ROLE+')');
     p.delete('open'); p.delete('item'); p.delete('for');
@@ -1179,7 +1061,6 @@ function handleDeepLink(attempts = 0){
   history.replaceState({}, '', location.pathname + newSearch + location.hash);
 }
 
-// ✅ رسائل SW
 if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('message', event => {
     const data = event.data;
@@ -1267,9 +1148,7 @@ window.switchView = function(name){
   if(name === 'notifications'){ renderNotifs('inbox'); markNotifsRead(); }
 };
 
-/* =========================================================
-   In-Game Floating Chat
-   ========================================================= */
+/* ============ In-Game Floating Chat ============ */
 let gameChatTimer = null;
 window.renderGameChatUI = function(gamePath){
   return `
@@ -1303,7 +1182,7 @@ window.sendGameInlineMsg = async function(gamePath){
   try { await update(ref(db, `${gamePath}/lastMsg`), { text, by: MY_ROLE, at: Date.now() }); playEventSound('mail', true); } catch(e){}
 };
 
-/* ================= 1. Trivia ================= */
+/* ============ 1. Trivia ============ */
 window.openTriviaGame = function(){
   if(!db) return toast('جاري الاتصال...');
   const trivRef = ref(db, 'games/trivia');
@@ -1497,7 +1376,7 @@ window.nextTriviaQuestion = async function(){
   addNotification('🎲 جولة جديدة!', 'سؤال جديد ينتظرك، ادخل واكتب تمويهك!', 'game', 'trivia');
 };
 
-/* ================= 2. Story ================= */
+/* ============ 2. Story ============ */
 const STORY_STARTERS = [
   "في مساء هادئ وجميل، وصل إلى باب عيوشة صندوق وردي مربوط بشريط ذهبي وبداخله مفتاح غامض ورسالة...",
   "قررنا فجأة وبدون أي تخطيط أن نركب السيارة ونسافر إلى مكان لم يزره أحد من قبل، وفجأة وصلنا إلى...",
@@ -1585,7 +1464,7 @@ window.resetStoryWithNewStarter = async function(){
   toast('✨ بداية جديدة للقصة!');
 };
 
-/* ================= 3. XO ================= */
+/* ============ 3. XO ============ */
 window.openXOGame = function(){
   if(!db) return toast('جاري الاتصال...');
   const xoRef = ref(db, 'games/xo');
@@ -1654,7 +1533,7 @@ window.resetXOGame = async function(){
   toast('🔄 جولة جديدة!');
 };
 
-/* ================= 4. Draw ================= */
+/* ============ 4. Draw ============ */
 const DRAW_WORDS = ["شمس ☀️","قلب 💖","قطة 🐱","سيارة 🚗","وردة 🌹","قمر 🌙","بيت 🏡"].concat(window.GAME_EXTRAS?.draw||[]);
 const nextDrawWord=()=>DRAW_WORDS[Math.floor(Math.random()*DRAW_WORDS.length)];
 let drawCtx=null,isDrawing=false,drawColor='#d81b60',drawRoundId=null;
@@ -1697,7 +1576,7 @@ const normalizeDraw=s=>String(s||'').replace(/[\u064B-\u065F\u0670]/g,'').replac
 window.submitUserGuess=async()=>{const guess=document.getElementById('userGuessWordInput')?.value.trim();if(!guess)return toast('اكتب التخمين');try{const r=ref(db,'games/draw'),d=(await get(r)).val();if(!d||d.drawer===MY_ROLE||d.phase!=='guessing')return toast('انتهى دور التخمين');const correct=normalizeDraw(guess)===normalizeDraw(d.word);await update(r,{phase:'finished',guess,guesser:MY_ROLE,correct});if(correct)addSharedHearts(15);toast(correct?'✅ صحيح!':'❌ خطأ، ظهرت الإجابة الصحيحة')}catch(e){toast('تعذر حفظ التخمين: '+e.message)}};
 window.nextDrawTurn=async()=>{try{const r=ref(db,'games/draw'),d=(await get(r)).val();if(!d||d.phase!=='finished'||d.guesser!==MY_ROLE)return toast('ليس دورك');await set(r,{drawer:MY_ROLE,word:nextDrawWord(),roundId:Date.now(),phase:'drawing'});}catch(e){toast('تعذر بدء الجولة: '+e.message)}};
 
-/* ================= 5. Guess Number ================= */
+/* ============ 5. Guess Number ============ */
 window.openGuessNumGame = function(){
   if(!db) return toast('جاري الاتصال...');
   const gRef = ref(db, 'games/guessNum');
@@ -1758,7 +1637,7 @@ window.makeSecretNumberGuess = async function(){
 };
 window.resetSecretNumGame = async function(){ await set(ref(db, 'games/guessNum'), { secret: Math.floor(Math.random()*100)+1, turn: 'me', winner: null, history: [] }); toast('🔄 رقم سري جديد!'); };
 
-/* ================= 6. Doors ================= */
+/* ============ 6. Doors ============ */
 window.openDoorsGame = function(){
   if(!db) return toast('جاري الاتصال...');
   const doorsRef = ref(db, 'games/doors');
@@ -1797,7 +1676,7 @@ window.pickSharedDoor = async function(num){
   addNotification('🚪 فُتح باب!', `فتح ${senderName(MY_ROLE)} الباب [${num}]! دورك الآن!`, 'game', 'doors');
 };
 
-/* ================= 7. Cards ================= */
+/* ============ 7. Cards ============ */
 const CARD_MESSAGES = {
   1: "اذكري أجمل شيء حدث لك معي هذا الأسبوع 💗",
   2: "اختاري ذكرى تتمنين تكرارها معنا مجدداً ✨",
@@ -1847,7 +1726,7 @@ window.pickSharedCard = async function(n){
   addNotification('💌 قلب جديد!', `فتح ${senderName(MY_ROLE)} الكرت [${n}]: "${msg.slice(0,30)}..."`, 'game', 'cards');
 };
 
-/* ================= 8. Puzzle ================= */
+/* ============ 8. Puzzle ============ */
 const PUZZLES_POOL = [
   { q: "شيء كلما أخذت منه كبر، فما هو؟", a: ["حفرة", "الحفرة"] },
   { q: "ما هو الشيء الذي ينبض بدون قلب ويبكي بدون عينين؟", a: ["السحاب", "المطر", "السحابة"] },
@@ -1913,7 +1792,7 @@ window.nextPuzzleRound = async function(){
   toast('🎲 لغز جديد!');
 };
 
-/* ================= 9. Telepathy ================= */
+/* ============ 9. Telepathy ============ */
 const TELEPATHY_QUESTIONS = [
   { q: "لو طلبنا عشاء الليلة، ماذا نختار؟", options: ["بيتزا إيطالية 🍕", "برجر ولغوصة 🍔", "مشاوي وشاورما 🥙", "حلى وقهوة بس ☕"] },
   { q: "وجهتنا المفضلة للسفر القادم؟", options: ["بحر وأجواء استرخاء 🏖️", "طبيعة وجبال خضراء 🌲", "مدينة وتسوق وصخب 🏙️", "ملاذ ريفي هادئ 🏡"] }
@@ -1962,7 +1841,7 @@ window.nextTelepathyQuestion = async function(){
   toast('✨ سؤال تخاطر جديد!');
 };
 
-/* ================= 10. Spin ================= */
+/* ============ 10. Spin ============ */
 const SPIN_WHEEL_TASKS = [
   "أرسل تسجيلاً صوتياً أو رسالة حب من 4 كلمات حالاً 💌",
   "اذكر أكثر صفة تحبها في الطرف الآخر دون تردد 🥰",
@@ -2053,9 +1932,7 @@ window.openCodenamesGame = function(){ window.launchGameModal('codenames'); };
 window.openWerewolfGame = function(){ window.launchGameModal('werewolf'); };
 window.openResistanceGame = function(){ window.launchGameModal('resistance'); };
 
-/* ============================================================
-   المحادثة الفورية المطوّرة (البريد)
-   ============================================================ */
+/* ============ Chat / Mail ============ */
 window.resizeChatInput=function(el){ if(!el) return; el.style.height='43px'; el.style.height=Math.min(el.scrollHeight,115)+'px'; };
 
 function chatMessageHtml(m){
@@ -2123,7 +2000,6 @@ window.sendInstantMail=async function(event){
   finally{button.disabled=false;}
 };
 
-/* ===== Presence ===== */
 function chatIsOpen(){return document.getElementById('view-mail')?.classList.contains('active')&&document.visibilityState==='visible';}
 function setupChatPresence(){
   if(!db||!MY_ROLE)return;
@@ -2206,7 +2082,6 @@ window.deleteMail=async function(id){
 window.toggleChatDark=function(){document.body.classList.toggle('chat-dark');localStorage.setItem('ayousha_chat_dark',document.body.classList.contains('chat-dark')?'1':'0');};
 if(localStorage.getItem('ayousha_chat_dark')==='1')document.body.classList.add('chat-dark');
 
-/* ===== Attachments & Voice ===== */
 async function uploadChatFile(file){
   if(!file)throw Error('لم يتم اختيار ملف');
   if(file.size>15*1024*1024)throw Error('الحد الأقصى 15 ميجابايت');
@@ -2233,17 +2108,14 @@ window.sendChatAttachment=async function(event){
   if(f)await sendChatMedia(f);
 };
 
-
-/* ============================================================
-   عالمنا / الذكريات (مطوّر)
-   ============================================================ */
+/* ============ Memories ============ */
 let tempPhoto=null;
 window.addMemory=function(type){
   if(type==='text'){
     openModal(`<h3>📝 ذكرى نصية</h3><label>العنوان</label><input id="memTitle"><label>الذكرى</label><textarea id="memText"></textarea><div class="modal-actions"><button class="btn btn-soft" onclick="window.closeModal()">إلغاء</button><button class="btn btn-primary" onclick="window.saveMemory('text')">حفظ</button></div>`);
   } else {
     tempPhoto=null;
-    openModal(`<h3>📷 ذكرى صورة</h3><label>العنوان</label><input id="memTitle"><label>اختاري صورة</label><input type="file" id="memFile" accept="image/*" onchange="window.previewPhoto(event)"><div id="photoPreview" style="margin-top:10px"></div><small class="help" style="display:block;color:var(--muted);font-size:.72rem;margin-top:6px;">💡 سيتم ضغط الصورة تلقائياً. اضغطي عليها لاحقاً لرؤيتها بالحجم الكامل.</small><div class="modal-actions"><button class="btn btn-soft" onclick="window.closeModal()">إلغاء</button><button class="btn btn-primary" onclick="window.saveMemory('photo')">حفظ</button></div>`);
+    openModal(`<h3>📷 ذكرى صورة</h3><label>العنوان</label><input id="memTitle"><label>اختاري صورة</label><input type="file" id="memFile" accept="image/*" onchange="window.previewPhoto(event)"><div id="photoPreview" style="margin-top:10px"></div><small class="help" style="display:block;color:var(--muted);font-size:.72rem;margin-top:6px;">💡 سيتم ضغط الصورة تلقائياً.</small><div class="modal-actions"><button class="btn btn-soft" onclick="window.closeModal()">إلغاء</button><button class="btn btn-primary" onclick="window.saveMemory('photo')">حفظ</button></div>`);
   }
 };
 function compressImage(file, maxWidth, maxHeight, quality){
@@ -2347,9 +2219,7 @@ window.v9MemoryMap=function(){
   openModal('<h3>🗺️ أماكن ذكرياتنا</h3>'+(items.map(m=>`<div class="v9-entry">📍 ${escapeHtml(m.place)} — ${escapeHtml(m.title||'ذكرى')}</div>`).join('')||'<p>لا توجد أماكن محفوظة بعد.</p>'));
 };
 
-/* ============================================================
-   المفاجآت (مطوّر)
-   ============================================================ */
+/* ============ Surprises ============ */
 window.openAddSurprise=function(){
   openModal(`<h3>🎁 مفاجأة جديدة</h3><label>نص المفاجأة</label><textarea id="spText" placeholder="اكتبي رسالة، ذكرى، وعد..."></textarea><label>تفتح في</label><input type="datetime-local" id="spTime"><small class="help" style="display:block;color:var(--muted);font-size:.72rem;margin-top:6px;">🔔 سيصل إشعار فوري عند فتحها.</small><div class="modal-actions"><button class="btn btn-soft" onclick="window.closeModal()">إلغاء</button><button class="btn btn-primary" onclick="window.saveSurprise()">حفظ</button></div>`);
   const dt=new Date(Date.now()+3600000); dt.setMinutes(0,0,0);
@@ -2385,9 +2255,7 @@ window.deleteSurprise=async function(id){
   renderSurprises();
 };
 
-/* ============================================================
-   نظام الهدية التفاعلية
-   ============================================================ */
+/* ============ Interactive Gifts ============ */
 window.allInteractiveGifts = [];
 try {
   window.allInteractiveGifts = JSON.parse(localStorage.getItem('ayousha_interactive_gifts') || '[]');
@@ -2411,12 +2279,8 @@ window.updateInteractiveGiftBadge = function(){
     );
     const badge = document.getElementById('giftBadge');
     if(badge){
-      if(unopened.length > 0){
-        badge.textContent = unopened.length;
-        badge.style.display = 'inline-block';
-      } else {
-        badge.style.display = 'none';
-      }
+      if(unopened.length > 0){ badge.textContent = unopened.length; badge.style.display = 'inline-block'; }
+      else { badge.style.display = 'none'; }
     }
     const homeSub = document.getElementById('homeGiftSubtitle');
     if(homeSub){
@@ -2432,23 +2296,14 @@ window.updateInteractiveGiftBadge = function(){
 window.openInteractiveGiftSystem = function(specificGiftId = null){
   const role = typeof MY_ROLE !== 'undefined' ? MY_ROLE : 'me';
   const gifts = window.allInteractiveGifts || [];
-  
   if(specificGiftId && specificGiftId !== 'interactiveGift'){
     const target = gifts.find(g => g.id === specificGiftId);
-    if(target){
-      window.openInteractiveGiftModal(target);
-      return;
-    }
+    if(target){ window.openInteractiveGiftModal(target); return; }
   }
-  
   const unopened = gifts.find(g => 
     (g.recipient === role || g.to === role || (!g.recipient && g.sender !== role && g.from !== role)) && !g.opened
   );
-  if(unopened){
-    window.openInteractiveGiftModal(unopened);
-    return;
-  }
-  
+  if(unopened){ window.openInteractiveGiftModal(unopened); return; }
   window.openSendInteractiveGiftModal();
 };
 
@@ -2456,13 +2311,11 @@ window.openInteractiveGiftModal = function(gift){
   if(!gift) return;
   const def = GIFT_DEFINITIONS[gift.giftType] || { title: '🎁 هدية تفاعلية', icon: '🎁' };
   const sName = gift.senderName || (typeof senderName === 'function' ? senderName(gift.sender || gift.from || otherRole()) : 'شريكك');
-
   if(!gift.opened){
     openModal(`
       <div style="text-align:center;padding:10px 5px;">
         <h3 style="color:#c2185b;font-weight:900;margin-bottom:8px;">🎁 هدية تفاعلية خاصة</h3>
         <p class="muted" style="margin-bottom:18px;">وصلتك هدية مميزة بفيونكة من <b>${escapeHtml(sName)}</b> 💕</p>
-        
         <div id="interactiveGiftBoxTap" onclick="window.unwrapInteractiveGift('${escapeHtml(gift.id)}')" 
              style="cursor:pointer;display:inline-block;padding:20px;background:radial-gradient(circle, #fff0f5 0%, #fce4ec 70%);border-radius:24px;border:2px dashed #f48fb1;box-shadow:0 8px 25px rgba(233,30,99,0.2);animation:bounce 1.5s infinite;margin:10px auto;">
           <div style="font-size:5.5rem;filter:drop-shadow(0 10px 15px rgba(233,30,99,0.3));">🎁</div>
@@ -2470,7 +2323,6 @@ window.openInteractiveGiftModal = function(gift){
             🎀 اضغطي هنا لفك الشريط واكتشاف الرسالة! ✨
           </div>
         </div>
-        
         <div style="margin-top:16px;">
           <button class="btn btn-soft btn-full" onclick="closeModal()">إغلاق</button>
         </div>
@@ -2484,23 +2336,13 @@ window.openInteractiveGiftModal = function(gift){
 window.unwrapInteractiveGift = async function(giftId){
   const gift = (window.allInteractiveGifts || []).find(g => g.id === giftId);
   if(!gift) return;
-  
-  gift.opened = true;
-  gift.openedAt = Date.now();
-  
-  try {
-    localStorage.setItem('ayousha_interactive_gifts', JSON.stringify(window.allInteractiveGifts));
-  } catch(e){}
-  
+  gift.opened = true; gift.openedAt = Date.now();
+  try { localStorage.setItem('ayousha_interactive_gifts', JSON.stringify(window.allInteractiveGifts)); } catch(e){}
   if(typeof playEventSound === 'function') playEventSound('surprise', true);
   if(typeof burstHearts === 'function') burstHearts();
-  
   if(firebaseReady && db){
-    try {
-      await update(ref(db, 'app/interactiveGifts/' + giftId), { opened: true, openedAt: Date.now() });
-    } catch(e){ console.warn(e); }
+    try { await update(ref(db, 'app/interactiveGifts/' + giftId), { opened: true, openedAt: Date.now() }); } catch(e){ console.warn(e); }
   }
-  
   window.updateInteractiveGiftBadge();
   window.renderRevealedGift(gift);
 };
@@ -2509,12 +2351,10 @@ window.renderRevealedGift = function(gift){
   const def = GIFT_DEFINITIONS[gift.giftType] || { title: '🎁 هدية تفاعلية', icon: '🎁' };
   const sName = gift.senderName || (typeof senderName === 'function' ? senderName(gift.sender || gift.from || otherRole()) : 'شريكك');
   const dateStr = gift.createdAt ? new Date(gift.createdAt).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
-
   openModal(`
     <div style="text-align:center;padding:5px 0;">
       <div style="font-size:4.8rem;animation:pulse 1.8s infinite;margin-bottom:6px;filter:drop-shadow(0 6px 12px rgba(233,30,99,0.25));">${def.icon}</div>
       <h3 style="color:#ad1457;font-weight:900;margin:0 0 10px;">${escapeHtml(def.title)}</h3>
-      
       <div style="background:linear-gradient(135deg,#ffffff,#fff5f8);border:2px dashed #f48fb1;border-radius:20px;padding:18px;margin:14px 0;text-align:center;box-shadow:0 6px 20px rgba(244,143,177,0.25);">
         <div style="font-size:0.9rem;font-weight:800;color:#c2185b;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;">
           <span>💌</span> رسالة الهدية الخاصة:
@@ -2525,7 +2365,6 @@ window.renderRevealedGift = function(gift){
           <span>${dateStr}</span>
         </div>
       </div>
-      
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
         <button class="btn btn-primary btn-full" onclick="sendPing();toast('💗 أُرسلت نبضة حب فورية كشكر على الهدية!')" style="font-weight:bold;">💖 رد فوري بنبضة حب</button>
         <button class="btn btn-gold btn-full" onclick="openSendInteractiveGiftModal()" style="font-weight:bold;">🎁 رد بهدية تفاعلية بفيونكة</button>
@@ -2537,51 +2376,38 @@ window.renderRevealedGift = function(gift){
 };
 
 window.openSendInteractiveGiftModal = function(){
-  const role = typeof MY_ROLE !== 'undefined' ? MY_ROLE : 'me';
-  const partnerNameStr = typeof partnerName === 'function' ? partnerName(role) : 'شريكك';
-
   openModal(`
     <h3 style="color:#c2185b;font-weight:900;text-align:center;margin-bottom:6px;">🎁 إرسال هدية تفاعلية</h3>
     <p class="muted" style="text-align:center;margin-bottom:14px;font-size:0.9rem;">
       تصل هديتك بفيونكة جميلة، وتظهر رسالتك في أيقونة الهدية مباشرة لدى الطرف الآخر دون إدراجها في البريد ✨
     </p>
-
     <label style="font-weight:bold;color:#4a148c;display:block;margin-bottom:6px;">1. اختر نوع الهدية التفاعلية:</label>
     <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;margin-bottom:14px;" id="giftTypeSelector">
       <button type="button" class="btn btn-soft active" data-type="rose" onclick="selectGiftType('rose')" style="border-radius:14px;padding:8px 4px;text-align:center;border:2px solid #e91e63;">
-        <span style="font-size:1.6rem;display:block;">🌹</span>
-        <small style="font-weight:bold;font-size:0.75rem;">باقة ورد</small>
+        <span style="font-size:1.6rem;display:block;">🌹</span><small style="font-weight:bold;font-size:0.75rem;">باقة ورد</small>
       </button>
       <button type="button" class="btn btn-soft" data-type="ring" onclick="selectGiftType('ring')" style="border-radius:14px;padding:8px 4px;text-align:center;">
-        <span style="font-size:1.6rem;display:block;">💍</span>
-        <small style="font-weight:bold;font-size:0.75rem;">خاتم حب</small>
+        <span style="font-size:1.6rem;display:block;">💍</span><small style="font-weight:bold;font-size:0.75rem;">خاتم حب</small>
       </button>
       <button type="button" class="btn btn-soft" data-type="chocolate" onclick="selectGiftType('chocolate')" style="border-radius:14px;padding:8px 4px;text-align:center;">
-        <span style="font-size:1.6rem;display:block;">🍫</span>
-        <small style="font-weight:bold;font-size:0.75rem;">شوكولاتة</small>
+        <span style="font-size:1.6rem;display:block;">🍫</span><small style="font-weight:bold;font-size:0.75rem;">شوكولاتة</small>
       </button>
       <button type="button" class="btn btn-soft" data-type="teddy" onclick="selectGiftType('teddy')" style="border-radius:14px;padding:8px 4px;text-align:center;">
-        <span style="font-size:1.6rem;display:block;">🧸</span>
-        <small style="font-weight:bold;font-size:0.75rem;">دبدوب لطيف</small>
+        <span style="font-size:1.6rem;display:block;">🧸</span><small style="font-weight:bold;font-size:0.75rem;">دبدوب لطيف</small>
       </button>
       <button type="button" class="btn btn-soft" data-type="letter" onclick="selectGiftType('letter')" style="border-radius:14px;padding:8px 4px;text-align:center;">
-        <span style="font-size:1.6rem;display:block;">💌</span>
-        <small style="font-weight:bold;font-size:0.75rem;">رسالة سرية</small>
+        <span style="font-size:1.6rem;display:block;">💌</span><small style="font-weight:bold;font-size:0.75rem;">رسالة سرية</small>
       </button>
       <button type="button" class="btn btn-soft" data-type="crown" onclick="selectGiftType('crown')" style="border-radius:14px;padding:8px 4px;text-align:center;">
-        <span style="font-size:1.6rem;display:block;">👑</span>
-        <small style="font-weight:bold;font-size:0.75rem;">تاج ملكي</small>
+        <span style="font-size:1.6rem;display:block;">👑</span><small style="font-weight:bold;font-size:0.75rem;">تاج ملكي</small>
       </button>
     </div>
-
     <label style="font-weight:bold;color:#4a148c;display:block;margin-bottom:6px;">2. رسالتك الخاصة بداخل الهدية:</label>
-    <textarea id="interactiveGiftMsg" placeholder="اكتب الكلمات الدافئة التي ستظهر عندما يفك شريكك شريط الهدية..." rows="3" style="width:100%;border-radius:14px;padding:10px;border:1.5px solid #f48fb1;font-size:0.95rem;resize:none;margin-bottom:12px;"></textarea>
-
+    <textarea id="interactiveGiftMsg" placeholder="اكتب الكلمات الدافئة..." rows="3" style="width:100%;border-radius:14px;padding:10px;border:1.5px solid #f48fb1;font-size:0.95rem;resize:none;margin-bottom:12px;"></textarea>
     <div style="display:flex;gap:8px;">
       <button class="btn btn-soft" style="flex:1;" onclick="closeModal()">إلغاء</button>
       <button class="btn btn-primary" style="flex:2;background:linear-gradient(135deg,#ff4081,#e91e63);font-weight:bold;" onclick="submitSendInteractiveGift()">🎁 تغليف وإرسال الهدية</button>
     </div>
-    
     <div style="margin-top:12px;text-align:center;">
       <button class="btn btn-soft" style="font-size:0.85rem;padding:4px 10px;" onclick="openInteractiveGiftArchive()">📜 عرض سجل الهدايا السابقة</button>
     </div>
@@ -2593,51 +2419,30 @@ window.selectGiftType = function(type){
   window._selectedGiftType = type;
   const buttons = document.querySelectorAll('#giftTypeSelector button');
   buttons.forEach(btn => {
-    if(btn.dataset.type === type){
-      btn.style.border = '2px solid #e91e63';
-      btn.classList.add('active');
-    } else {
-      btn.style.border = '';
-      btn.classList.remove('active');
-    }
+    if(btn.dataset.type === type){ btn.style.border = '2px solid #e91e63'; btn.classList.add('active'); }
+    else { btn.style.border = ''; btn.classList.remove('active'); }
   });
 };
 
 window.submitSendInteractiveGift = async function(){
   const msgInput = document.getElementById('interactiveGiftMsg');
   const message = (msgInput?.value || '').trim();
-  if(!message){
-    toast('اكتب رسالة الهدية أولاً 💕');
-    return;
-  }
-  
+  if(!message){ toast('اكتب رسالة الهدية أولاً 💕'); return; }
   const giftType = window._selectedGiftType || 'rose';
   const role = typeof MY_ROLE !== 'undefined' ? MY_ROLE : 'me';
   const sName = typeof senderName === 'function' ? senderName(role) : (role === 'me' ? 'حبيبك' : 'عيوشة');
   const to = typeof otherRole === 'function' ? otherRole() : (role === 'me' ? 'her' : 'me');
-
   const giftItem = {
     id: 'gift_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-    giftType,
-    message,
-    sender: role,
-    recipient: to,
-    senderName: sName,
-    createdAt: new Date().toISOString(),
-    opened: false,
-    openedAt: null
+    giftType, message, sender: role, recipient: to, senderName: sName,
+    createdAt: new Date().toISOString(), opened: false, openedAt: null
   };
-
   window.allInteractiveGifts = [giftItem, ...(window.allInteractiveGifts || [])];
-  try {
-    localStorage.setItem('ayousha_interactive_gifts', JSON.stringify(window.allInteractiveGifts));
-  } catch(e){}
-
+  try { localStorage.setItem('ayousha_interactive_gifts', JSON.stringify(window.allInteractiveGifts)); } catch(e){}
   closeModal();
   toast('🎁 جاري تغليف وإرسال هديتك...');
   if(typeof playEventSound === 'function') playEventSound('surprise', true);
   if(typeof burstHearts === 'function') burstHearts();
-
   if(firebaseReady && db){
     try {
       await set(ref(db, 'app/interactiveGifts/' + giftItem.id), giftItem);
@@ -2650,7 +2455,6 @@ window.submitSendInteractiveGift = async function(){
   } else {
     toast('✨ حُفظت الهدية التفاعلية محلياً');
   }
-
   window.updateInteractiveGiftBadge();
 };
 
@@ -2664,7 +2468,6 @@ window.openInteractiveGiftArchive = function(){
     `);
     return;
   }
-
   const role = typeof MY_ROLE !== 'undefined' ? MY_ROLE : 'me';
   const listHtml = gifts.map(g => {
     const isMine = g.sender === role || g.from === role;
@@ -2683,12 +2486,9 @@ window.openInteractiveGiftArchive = function(){
       </div>
     `;
   }).join('');
-
   openModal(`
     <h3 style="color:#c2185b;font-weight:900;text-align:center;margin-bottom:12px;">📜 سجل الهدايا التفاعلية</h3>
-    <div style="max-height:60vh;overflow-y:auto;padding-left:4px;">
-      ${listHtml}
-    </div>
+    <div style="max-height:60vh;overflow-y:auto;padding-left:4px;">${listHtml}</div>
     <div style="display:flex;gap:8px;margin-top:14px;">
       <button class="btn btn-soft" style="flex:1;" onclick="closeModal()">إغلاق</button>
       <button class="btn btn-primary" style="flex:2;" onclick="openSendInteractiveGiftModal()">🎁 إرسال هدية جديدة</button>
@@ -2749,9 +2549,7 @@ window.v9OccasionList=function(){
   openModal('<h3>📅 مناسباتنا</h3>'+(Object.values(v9Occasions).map(x=>`<div class="v9-entry">🎂 ${escapeHtml(x.name)} — ${escapeHtml(x.date)}</div>`).join('')||'<p>لم تضيفا مناسبات بعد</p>'));
 };
 
-/* ============================================================
-   المزاج (مطوّر)
-   ============================================================ */
+/* ============ Mood ============ */
 const MOOD_LABELS = { happy:'😊 سعيدة', tired:'😴 متعبة', sad:'🥺 حزينة', missing:'💭 مشتاقة', angry:'😤 زعلانة', calm:'😌 هادية', excited:'🤩 متحمسة', sick:'🤒 مريضة' };
 const MOOD_RESPONSES = { happy:["😊 فرحتك تفرحني."], tired:["😴 ارتاحي حبيبتي."], sad:["🥺 ما أحب أشوفك زعلانة."], missing:["💭 وأنا مشتاق لك أكثر."], angry:["😤 أنا معك."], calm:["😌 هدوءك جميل."], excited:["🤩 شاركيني الحماس!"], sick:["🤒 سلامتك."] };
 function getMoodValue(m){if(typeof m==='string')return m;if(m&&m.mood)return m.mood;return null;}
@@ -2772,7 +2570,7 @@ function renderV9Moods(){
   const el=document.getElementById('v9BothMoods');
   if(!el)return;
   const x=v9Moods[getTodayKey()]||{};
-  el.innerHTML=`<b>💞 مزاجنا اليوم</b><div class="v9-entry">💗 ${senderName('me')}: ${MOOD_LABELS[x.me?.mood]||'لم يحدد بعد'}</div><div class="v9-entry">💜 ${senderName('her')}: ${MOOD_LABELS[x.her?.mood]||'لم تحدد بعد'}</div><p class="v9-soft">مشاركة المشاعر اختيارية، ويمكن تغيير المزاج في أي وقت.</p>`;
+  el.innerHTML=`<b>💞 مزاجنا اليوم</b><div class="v9-entry">💗 ${senderName('me')}: ${MOOD_LABELS[x.me?.mood]||'لم يحدد بعد'}</div><div class="v9-entry">💜 ${senderName('her')}: ${MOOD_LABELS[x.her?.mood]||'لم تحدد بعد'}</div><p class="v9-soft">مشاركة المشاعر اختيارية.</p>`;
 }
 document.querySelectorAll('.mood-btn').forEach(btn=>{
   btn.addEventListener('click',async()=>{
@@ -2807,9 +2605,7 @@ window.v9MoodSound=function(){
   }catch(e){toast('تعذر تشغيل الصوت');}
 };
 
-/* ============================================================
-   Daily & Dashboard
-   ============================================================ */
+/* ============ Daily ============ */
 const DEFAULT_QUESTIONS = [
   "لو عندك يوم كامل نقضيه سوا، شو أول شيء تحبين نعمله؟",
   "إيش الكلمة اللي لو سمعتيها مني اليوم تفرح قلبك؟",
@@ -2818,9 +2614,7 @@ const DEFAULT_QUESTIONS = [
   "أحلى هدية أو كلمة سمعتيها مني وما نسيتيها؟"
 ];
 function getDailyQuestion(){
-  const questions = (window.AYOUSHA_DAILY_QUESTIONS && window.AYOUSHA_DAILY_QUESTIONS.length)
-    ? window.AYOUSHA_DAILY_QUESTIONS
-    : DEFAULT_QUESTIONS;
+  const questions = (window.AYOUSHA_DAILY_QUESTIONS && window.AYOUSHA_DAILY_QUESTIONS.length) ? window.AYOUSHA_DAILY_QUESTIONS : DEFAULT_QUESTIONS;
   const key = getTodayKey();
   if(v9Prompts && v9Prompts[key]) return v9Prompts[key];
   const now = new Date();
@@ -2833,48 +2627,33 @@ function renderDaily(){
   const qEl=document.getElementById('dailyQ');
   if(qEl) qEl.textContent=q;
   const ta=document.getElementById('dailyAnswer');
-  
   let localRecord = {};
-  try {
-    localRecord = JSON.parse(localStorage.getItem('ayousha_daily_' + key) || '{}');
-  } catch(e){}
-
+  try { localRecord = JSON.parse(localStorage.getItem('ayousha_daily_' + key) || '{}'); } catch(e){}
   const myAnswerFromV9 = v9Daily[key]?.[MY_ROLE]?.a;
   const myAnswerFromLocal = localRecord?.answers?.[MY_ROLE];
   const aText = myAnswerFromV9 || myAnswerFromLocal || '';
   const aTime = v9Daily[key]?.[MY_ROLE]?.t || localRecord?.updatedAt;
-
-  if(ta && document.activeElement !== ta && !ta.value.trim()){
-    ta.value = aText;
-  }
-  
+  if(ta && document.activeElement !== ta && !ta.value.trim()){ ta.value = aText; }
   const saved=document.getElementById('answerSaved');
   if(saved) saved.innerHTML = aText ? `<div class="answer-saved">💚 إجابتك محفوظة ومزامنة ${aTime ? '— ' + fmtDateTime(aTime) : ''}</div>` : '';
-  
   const tog=document.getElementById('dailyTogether');
   if(tog){
     const mine = aText;
     const other = v9Daily[key]?.[otherRole()]?.a || localRecord?.answers?.[otherRole()];
     if(mine && other){
-      tog.innerHTML = `
-        <div style="background:#e8f5e9;padding:12px;border-radius:14px;border:1px solid #c8e6c9;color:#1b5e20;">
+      tog.innerHTML = `<div style="background:#e8f5e9;padding:12px;border-radius:14px;border:1px solid #c8e6c9;color:#1b5e20;">
           <div style="font-weight:bold;margin-bottom:6px;font-size:1rem;">💞 إجابتكما معاً على سؤال اليوم:</div>
           <div style="margin-bottom:4px;">💗 <b>${senderName(MY_ROLE)}:</b> ${escapeHtml(mine)}</div>
           <div>💜 <b>${senderName(otherRole())}:</b> ${escapeHtml(other)}</div>
-        </div>
-      `;
+        </div>`;
     } else if(mine){
-      tog.innerHTML = `
-        <div style="background:#fff8e1;padding:10px;border-radius:12px;color:#795548;border:1px solid #ffe0b2;">
+      tog.innerHTML = `<div style="background:#fff8e1;padding:10px;border-radius:12px;color:#795548;border:1px solid #ffe0b2;">
           🔒 <b>أجبت بنجاح!</b> في انتظار إجابة <b>${senderName(otherRole())}</b> لتكشف الإجابتين معاً 💕
-        </div>
-      `;
+        </div>`;
     } else if(other){
-      tog.innerHTML = `
-        <div style="background:#e3f2fd;padding:10px;border-radius:12px;color:#0d47a1;border:1px solid #bbdefb;font-weight:bold;">
+      tog.innerHTML = `<div style="background:#e3f2fd;padding:10px;border-radius:12px;color:#0d47a1;border:1px solid #bbdefb;font-weight:bold;">
           ⚡ <b>${senderName(otherRole())}</b> أجاب عن سؤال اليوم! اكتب إجابتك واضغط حفظ لتكشف الإجابتين فوراً! 🌟
-        </div>
-      `;
+        </div>`;
     } else {
       tog.innerHTML = '🔒 شارك بإجابتك أولاً لتظهر إجابة شريكك عند اكتمال السؤال اليومي.';
     }
@@ -2888,47 +2667,36 @@ window.saveDailyAnswer=async function(){
   const payload={q, a, t:nowIso, by:MY_ROLE};
   const btn=document.getElementById('saveDailyBtn');
   if(btn) btn.disabled=true;
-  
   try {
     let local = JSON.parse(localStorage.getItem('ayousha_daily_' + key) || '{}');
-    local.date = key;
-    local.question = q;
+    local.date = key; local.question = q;
     local.answers = local.answers || {};
     local.answers[MY_ROLE] = a;
     local.updatedAt = Date.now();
     localStorage.setItem('ayousha_daily_' + key, JSON.stringify(local));
   } catch(e){}
-
   v9Daily[key] = v9Daily[key] || {};
   v9Daily[key][MY_ROLE] = payload;
-
   try {
     if(db) {
       await set(ref(db, `app/dailyResponses/${key}/${MY_ROLE}`), payload);
       await set(ref(db, `app/dailyShared/${key}/answers/${MY_ROLE}`), a);
     }
   } catch(e){}
-
   try {
     if(window.ayoushaRealtime?.ready?.()) {
       await window.ayoushaRealtime.write('app/dailyShared/' + key, {
-        date: key,
-        question: q,
-        answers: { ...(v9Daily[key] || {}), [MY_ROLE]: a },
-        updatedAt: Date.now()
+        date: key, question: q, answers: { ...(v9Daily[key] || {}), [MY_ROLE]: a }, updatedAt: Date.now()
       });
     }
   } catch(e){}
-
   renderDaily();
   burstHearts();
   playEventSound('answer', true);
   toast('💗 حُفظت وموزمنت إجابتك لسؤال اليوم!');
-  
   try {
     await addNotification('💭 إجابة سؤال اليوم', `أجاب ${senderName(MY_ROLE)} عن سؤال اليوم المشترك!`, 'dailyShared', key);
   } catch(e){}
-
   if(btn) btn.disabled=false;
 };
 
@@ -2960,9 +2728,7 @@ window.v9QuestionHistory=function(){
   openModal('<h3>📅 أرشيف الأسئلة</h3>'+(days.map(([k,v])=>`<div class="v9-entry"><b>${escapeHtml(k)}</b><p>${escapeHtml(v.me?.q||v.her?.q||'سؤال اليوم')}</p><small>${v.me?.a&&v.her?.a?'💞 أجبتما معًا':'⏳ لم تكتمل الإجابات'}</small></div>`).join('')||'<p>لا توجد إجابات بعد</p>'));
 };
 
-/* ============================================================
-   Settings, Notifications UI, Misc
-   ============================================================ */
+/* ============ Notifications UI ============ */
 window.openNotifItem = function(id){
   const n = allNotifs.find(x => x.id === id);
   if(!n) return;
@@ -3052,16 +2818,30 @@ function updateGreet(){
   document.getElementById('greetTitle').textContent=title;
 }
 
+/* ============ Settings ============ */
 window.openSettings=function(){
   const notifStatus=!('Notification' in window)?'<div class="v9-panel" style="background:#fff8e1;color:#795548;">⚠️ متصفحك لا يدعم الإشعارات</div>':Notification.permission==='granted'?'<div class="v9-panel" style="background:#e8f5e9;color:#1b5e20;">✅ الإشعارات مفعّلة</div>':Notification.permission==='denied'?'<div class="v9-panel" style="background:#ffebee;color:#c62828;">❌ الإشعارات مرفوضة — افتح إعدادات المتصفح</div>':'<div class="v9-panel">🔔 الإشعارات غير مفعّلة</div>';
+  const roleLabel = MY_ROLE === 'me' ? '💙 زكريا' : '💗 عيوشة';
   openModal(`
     <h3>⚙️ إعدادات التطبيق</h3>
+    <div class="v9-panel" style="text-align:center;background:#fff0f5;border-color:#f8bbd0;">
+      <div style="font-size:0.85rem;color:#880e4f;margin-bottom:6px;">هوية هذا الجهاز الحالية:</div>
+      <div style="font-size:1.3rem;font-weight:900;color:#ad1457;">${roleLabel}</div>
+    </div>
     <label style="display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px;">اسمك</label>
     <input id="setNameMe" value="${escapeHtml(state.settings.myName)}">
     <label style="display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px;">اسم شريكك</label>
     <input id="setNameHer" value="${escapeHtml(state.settings.wifeName)}">
     <label style="display:block;font-size:.82rem;font-weight:700;color:var(--muted);margin:12px 0 6px;">موعد اللقاء</label>
     <input type="datetime-local" id="setMeetup" value="${state.meetupDate?state.meetupDate.slice(0,16):''}">
+    <div style="margin-top:16px;padding-top:12px;border-top:1px dashed #f2d9e4;">
+      <div style="font-weight:800;color:#ad1457;font-size:.92rem;margin-bottom:8px;">🔄 تغيير هوية هذا الجهاز</div>
+      <div style="font-size:.78rem;color:#887581;margin-bottom:10px;line-height:1.5;">إذا كانت الرسائل تظهر وكأنك ترسل لنفسك، اضغط على الزر الصحيح لهويتك:</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button class="btn ${MY_ROLE==='me'?'btn-primary':'btn-soft'}" style="flex:1;" onclick="window.setMyRole('me')" ${MY_ROLE==='me'?'disabled':''}>💙 أنا زكريا</button>
+        <button class="btn ${MY_ROLE==='her'?'btn-primary':'btn-soft'}" style="flex:1;" onclick="window.setMyRole('her')" ${MY_ROLE==='her'?'disabled':''}>💗 أنا عيوشة</button>
+      </div>
+    </div>
     <div class="modal-actions" style="flex-direction:column;gap:8px;margin-top:14px;">
       <button class="btn btn-soft btn-full" onclick="window.askNotifPermission()">🔔 تفعيل أذونات الإشعارات</button>
       <button class="btn btn-soft btn-full" onclick="window.testNotification()">🧪 اختبار الإشعار</button>
@@ -3071,6 +2851,37 @@ window.openSettings=function(){
     ${notifStatus}
   `);
 };
+
+/* ✅ دالة تغيير الدور الحالية */
+window.setMyRole = async function(newRole){
+  if(newRole !== 'me' && newRole !== 'her') return;
+  if(newRole === MY_ROLE){ toast('هذا الجهاز مضبوط بالفعل على هذه الهوية ✓'); return; }
+  const label = newRole === 'me' ? 'زكريا' : 'عيوشة';
+  if(!confirm('تعيين هذا الجهاز كـ "' + label + '"؟\n\nسيتم إعادة تحميل التطبيق لتفعيل الهوية الجديدة.')) return;
+  const oldRole = MY_ROLE;
+  try {
+    localStorage.setItem('ayousha_role', newRole);
+    // مسح توكن FCM القديم من الدور السابق لتجنب الازدواج
+    if(firebaseReady && db){
+      try { await remove(ref(db, `config/${oldRole}/fcmToken`)); } catch(e){}
+    }
+    // إبلاغ SW بالدور الجديد عبر Cache + postMessage
+    try {
+      const cache = await caches.open(ROLE_CACHE_NAME);
+      await cache.put('/__my_role__', new Response(newRole, { headers: { 'Content-Type': 'text/plain' } }));
+      const reg = await navigator.serviceWorker.ready;
+      if(reg.active) reg.active.postMessage({ type: 'SET_ROLE', role: newRole });
+    } catch(e){}
+    toast('✅ تم التعيين — جارٍ إعادة التحميل...');
+    setTimeout(() => {
+      const u = new URL(location.origin + location.pathname);
+      u.searchParams.set('for', newRole);
+      u.searchParams.set('force', '1');
+      location.href = u.href;
+    }, 900);
+  } catch(e){ toast('تعذر تغيير الدور'); }
+};
+
 window.saveSettings=async function(){
   try{
     const myName=document.getElementById('setNameMe')?.value.trim()||'حبيبي';
@@ -3101,7 +2912,6 @@ async function initFCM(){
     const registration=await navigator.serviceWorker.ready;
     const token=await getToken(messaging,{vapidKey:DEFAULT_VAPID_KEY,serviceWorkerRegistration:registration});
     if(token){
-      // ✅ تنظيف التوكن القديم من الدور الآخر (في حال تغيّر الدور سابقاً)
       const otherRoleName = MY_ROLE === 'me' ? 'her' : 'me';
       try {
         const otherSnap = await get(ref(db, `config/${otherRoleName}/fcmToken`));
@@ -3110,11 +2920,7 @@ async function initFCM(){
           console.log('[FCM] حذف التوكن القديم من config/' + otherRoleName);
         }
       } catch(e){}
-      
-      // ✅ حفظ التوكن في دورنا الصحيح
       await set(ref(db, `config/${MY_ROLE}/fcmToken`), token);
-      
-      // ✅ إعادة إبلاغ SW بالدور
       try {
         const reg = await navigator.serviceWorker.ready;
         if (reg.active) reg.active.postMessage({ type: 'SET_ROLE', role: MY_ROLE });
@@ -3122,7 +2928,6 @@ async function initFCM(){
     }
     onMessage(messaging,payload=>{
       const d=payload.data||{};
-      // ✅ الإصلاح: لا تعرض إشعاراً موجهاً لدور آخر
       if(d.role && d.role !== MY_ROLE){
         console.warn('🚫 FCM: إشعار لدور آخر — تجاهل', d.role, '| دورك:', MY_ROLE);
         return;
@@ -3133,27 +2938,45 @@ async function initFCM(){
 }
 
 /* ============================================================
-   Boot
+   Boot — قراءة الدور بذكاء (بدون حذف التطبيق)
    ============================================================ */
 async function boot(){
   setTimeout(()=>{const s=document.getElementById('splashScreen');if(s){s.style.opacity='0';setTimeout(()=>s.remove(),600);}},1600);
+  
   const urlParams=new URLSearchParams(location.search);
   const r=urlParams.get('for');
+  const forceRole = urlParams.get('force') === '1';
+  const hasOpenParam = urlParams.has('open'); // هل هذا رابط إشعار عميق؟
   const storedRole = localStorage.getItem('ayousha_role');
+  
+  console.log('🔍 [BOOT] قراءة الدور:', { fromUrl: r, fromStorage: storedRole, force: forceRole, isDeepLink: hasOpenParam });
+  
   if(r==='her'||r==='me'){
-    // ✅ لا تُغيّر الدور المحفوظ إذا كان الرابط موجهاً لدور آخر
-    if(!storedRole || storedRole === r){
-      MY_ROLE=r;
-      localStorage.setItem('ayousha_role',r);
-    } else {
-      MY_ROLE = storedRole;
-      console.warn('🚫 رابط فتح لدور آخر ('+r+') مع دور محفوظ ('+storedRole+') — تم الاحتفاظ بالدور المحفوظ');
+    // 🔔 رابط إشعار عميق (يحتوي على open=) → احترم الدور المحفوظ، لا تغيّره
+    if(hasOpenParam && !forceRole){
+      if(storedRole && storedRole !== r){
+        MY_ROLE = storedRole;
+        console.warn('🚫 [BOOT] رابط إشعار لدور آخر ('+r+') — احتفظنا بالدور المحفوظ ('+storedRole+')');
+      } else {
+        MY_ROLE = r;
+        if(!storedRole) localStorage.setItem('ayousha_role', r);
+      }
+    }
+    // ⚙️ رابط إعداد (لا يحتوي open=) أو force=1 → اعتمد الدور من الرابط
+    // هذا يُستخدم لإصلاح جهاز عيوشة دون إعادة تثبيت التطبيق
+    else {
+      MY_ROLE = r;
+      localStorage.setItem('ayousha_role', r);
+      console.log('✅ [BOOT] تم ضبط دور الجهاز من الرابط:', r, forceRole ? '(force)' : '');
     }
   } else {
     MY_ROLE = storedRole || 'me';
-    localStorage.setItem('ayousha_role',MY_ROLE);
+    if(!storedRole) localStorage.setItem('ayousha_role', MY_ROLE);
+    console.log('📱 [BOOT] استخدام الدور المحفوظ:', MY_ROLE);
   }
+  
   window.currentMailRole=MY_ROLE;
+  console.log('🎯 [BOOT] الدور النهائي لهذا الجهاز:', MY_ROLE);
 
   // ✅ مزامنة الدور مع Service Worker
   syncRoleToSW();
@@ -3164,20 +2987,14 @@ async function boot(){
     storage=getStorage(firebaseApp);
     firebaseReady=true;
     window.ayoushaRealtime = {
-      role: () => (typeof MY_ROLE !== 'undefined' ? MY_ROLE : (localStorage.getItem('ayousha_role') || 'me')),
-      otherRole: () => (typeof otherRole === 'function' ? otherRole() : ((localStorage.getItem('ayousha_role') || 'me') === 'me' ? 'her' : 'me')),
+      role: () => MY_ROLE,
+      otherRole: () => (MY_ROLE === 'me' ? 'her' : 'me'),
       ready: () => !!(firebaseReady && db),
       read: async path => { try { return db ? (await get(ref(db,path))).val() : null; } catch(e){ return null; } },
       write: async (path,value) => { try { return db ? await set(ref(db,path),value) : null; } catch(e){ return null; } },
       patch: async (path,value) => { try { return db ? await update(ref(db,path),value) : null; } catch(e){ return null; } },
       push: async (path,value) => { try { return db ? await push(ref(db,path),value) : null; } catch(e){ return null; } },
-      listen: (path,callback) => { 
-        try { 
-          if(!db) return () => {};
-          const r = ref(db, path); 
-          return onValue(r, s => callback(s.val())); 
-        } catch(e) { return () => {}; }
-      },
+      listen: (path,callback) => { try { if(!db) return () => {}; return onValue(ref(db, path), s => callback(s.val())); } catch(e) { return () => {}; } },
       remove: async path => { try { return db ? await remove(ref(db,path)) : null; } catch(e){ return null; } },
       notify: (title,body,gameId='balderdash') => { try { if(typeof addNotification === 'function') addNotification(title,body,'game',gameId); } catch(e){} }
     };
@@ -3188,7 +3005,6 @@ async function boot(){
 
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
-    // مزامنة إضافية بعد تسجيل SW
     navigator.serviceWorker.ready.then(syncRoleToSW).catch(()=>{});
   }
 
@@ -3234,6 +3050,7 @@ async function boot(){
     try { localStorage.setItem('ayousha_interactive_gifts', JSON.stringify(window.allInteractiveGifts)); } catch(e){}
     if(typeof window.updateInteractiveGiftBadge === 'function') window.updateInteractiveGiftBadge();
   }, e=>console.warn('interactiveGifts sync', e));
+
   onValue(ref(db,'app/surprises'),s=>{
     const v=s.val();
     state.surprises=v?Object.entries(v).map(([id,item])=>({id,...item})):[];
@@ -3261,71 +3078,43 @@ async function boot(){
   setInterval(updateGreet,60000);
   setInterval(()=>{updateChatPresence();},3000);
 }
-/* ============================================================
-   مشروع البطاقات المضمّن
-   ============================================================ */
+
+/* ============ Cards Project ============ */
 const CARDS_DEFAULT_PIN = '36';
 function getCardsPin() {
-  try {
-    return localStorage.getItem('ayousha_cards_pin') || CARDS_DEFAULT_PIN;
-  } catch(e) {
-    return CARDS_DEFAULT_PIN;
-  }
+  try { return localStorage.getItem('ayousha_cards_pin') || CARDS_DEFAULT_PIN; } catch(e) { return CARDS_DEFAULT_PIN; }
 }
 
 window.promptCardsPasscode = function() {
   const pinHtml = `
     <div style="text-align: center; padding: 6px 4px;" id="cardsPinBox">
-      <div style="width: 58px; height: 58px; margin: 0 auto 10px; border-radius: 50%; background: linear-gradient(135deg, #fce7f3, #ffe4e6); display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 16px rgba(225,29,72,0.18);">
-        🔐
-      </div>
+      <div style="width: 58px; height: 58px; margin: 0 auto 10px; border-radius: 50%; background: linear-gradient(135deg, #fce7f3, #ffe4e6); display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 16px rgba(225,29,72,0.18);">🔐</div>
       <h3 style="margin: 0 0 4px; color: #831843; font-size: 1.25rem; font-weight: 800;">قسم البطاقات الخاص</h3>
-      <p style="color: #9d174d; font-size: 0.85rem; margin: 0 0 14px; line-height: 1.5;">
-        هذا القسم يحتوي على بطاقات وألعاب الفراش الحميمية.<br>الرجاء إدخال رمز الأمان للمتابعة:
-      </p>
-
+      <p style="color: #9d174d; font-size: 0.85rem; margin: 0 0 14px; line-height: 1.5;">هذا القسم يحتوي على بطاقات وألعاب الفراش الحميمية.<br>الرجاء إدخال رمز الأمان للمتابعة:</p>
       <div style="position: relative; max-width: 220px; margin: 0 auto 10px;">
         <input type="password" id="cardsPinInput" maxlength="10" placeholder="••••" inputmode="numeric" autocomplete="off"
-          style="width: 100%; text-align: center; font-size: 1.7rem; letter-spacing: 10px; padding: 10px 14px; border-radius: 14px; border: 2px solid #f472b6; background: #fff0f5; color: #831843; font-weight: bold; outline: none; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);"
-          onkeydown="if(event.key==='Enter') window.verifyCardsPasscode();"
-        >
-        <button type="button" onclick="window.toggleCardsPinVisibility()" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; color: #be185d;" title="إظهار / إخفاء الرمز">
-          👁️
-        </button>
+          style="width: 100%; text-align: center; font-size: 1.7rem; letter-spacing: 10px; padding: 10px 14px; border-radius: 14px; border: 2px solid #f472b6; background: #fff0f5; color: #831843; font-weight: bold; outline: none;"
+          onkeydown="if(event.key==='Enter') window.verifyCardsPasscode();">
+        <button type="button" onclick="window.toggleCardsPinVisibility()" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; color: #be185d;">👁️</button>
       </div>
-
       <div id="cardsPinError" style="color: #e11d48; font-size: 0.85rem; font-weight: bold; min-height: 20px; margin-bottom: 10px;"></div>
-
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; max-width: 230px; margin: 0 auto 14px;">
-        <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('1')">1</button>
-        <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('2')">2</button>
-        <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('3')">3</button>
-        <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('4')">4</button>
-        <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('5')">5</button>
-        <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('6')">6</button>
-        <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('7')">7</button>
-        <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('8')">8</button>
-        <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('9')">9</button>
+        ${[1,2,3,4,5,6,7,8,9].map(d=>`<button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('${d}')">${d}</button>`).join('')}
         <button type="button" class="btn btn-soft" style="font-size: 0.95rem; color: #be185d; padding: 9px 0; border-radius: 12px;" onclick="window.clearCardsPin()">مسح</button>
         <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('0')">0</button>
         <button type="button" class="btn btn-soft" style="font-size: 1.1rem; color: #be185d; padding: 9px 0; border-radius: 12px;" onclick="window.backspaceCardsPin()">⌫</button>
       </div>
-
       <div style="display: flex; gap: 8px;">
         <button type="button" class="btn btn-soft" style="flex: 1;" onclick="window.closeModal()">إلغاء</button>
         <button type="button" class="btn btn-primary" style="flex: 1; background: linear-gradient(135deg, #e11d48, #be123c);" onclick="window.verifyCardsPasscode()">دخول 🔓</button>
       </div>
-
-      <div style="margin-top: 12px; display: flex; justify-content: center; gap: 16px;">
+      <div style="margin-top: 12px;">
         <button type="button" style="background: none; border: none; font-size: 0.78rem; color: #9d174d; cursor: pointer; text-decoration: underline;" onclick="window.promptChangeCardsPasscode()">⚙️ تغيير رمز الدخول</button>
       </div>
     </div>
   `;
   window.openModal(pinHtml);
-  setTimeout(() => {
-    const input = document.getElementById('cardsPinInput');
-    if (input) input.focus();
-  }, 100);
+  setTimeout(() => { const input = document.getElementById('cardsPinInput'); if (input) input.focus(); }, 100);
 };
 
 window.appendCardsPin = function(digit) {
@@ -3334,145 +3123,74 @@ window.appendCardsPin = function(digit) {
   input.value += digit;
   const err = document.getElementById('cardsPinError');
   if (err) err.textContent = '';
-  if (input.value === getCardsPin()) {
-    setTimeout(window.verifyCardsPasscode, 150);
-  }
+  if (input.value === getCardsPin()) setTimeout(window.verifyCardsPasscode, 150);
 };
-
-window.clearCardsPin = function() {
-  const input = document.getElementById('cardsPinInput');
-  if (input) input.value = '';
-  const err = document.getElementById('cardsPinError');
-  if (err) err.textContent = '';
-};
-
-window.backspaceCardsPin = function() {
-  const input = document.getElementById('cardsPinInput');
-  if (input) {
-    input.value = input.value.slice(0, -1);
-    const err = document.getElementById('cardsPinError');
-    if (err) err.textContent = '';
-  }
-};
-
-window.toggleCardsPinVisibility = function() {
-  const input = document.getElementById('cardsPinInput');
-  if (!input) return;
-  input.type = input.type === 'password' ? 'text' : 'password';
-};
+window.clearCardsPin = function() { const i = document.getElementById('cardsPinInput'); if (i) i.value = ''; const e = document.getElementById('cardsPinError'); if(e) e.textContent = ''; };
+window.backspaceCardsPin = function() { const i = document.getElementById('cardsPinInput'); if (i) i.value = i.value.slice(0, -1); const e = document.getElementById('cardsPinError'); if(e) e.textContent = ''; };
+window.toggleCardsPinVisibility = function() { const i = document.getElementById('cardsPinInput'); if (i) i.type = i.type === 'password' ? 'text' : 'password'; };
 
 window.verifyCardsPasscode = function() {
   const input = document.getElementById('cardsPinInput');
   const err = document.getElementById('cardsPinError');
   const entered = input ? input.value.trim() : '';
-  const expected = getCardsPin();
-
-  if (entered === expected) {
+  if (entered === getCardsPin()) {
     window.closeModal();
-    if (typeof toast === 'function') {
-      toast('🔓 تم التحقق بنجاح! مرحباً بكما في قسم البطاقات');
-    }
+    if (typeof toast === 'function') toast('🔓 تم التحقق بنجاح!');
     window.openCardsProject();
   } else {
     if (err) {
-      err.textContent = '❌ رمز الدخول غير صحيح! حاول مرة أخرى';
+      err.textContent = '❌ رمز الدخول غير صحيح!';
       const box = document.getElementById('cardsPinBox');
-      if (box) {
-        box.style.animation = 'shake 0.4s ease';
-        setTimeout(() => { box.style.animation = ''; }, 400);
-      }
+      if (box) { box.style.animation = 'shake 0.4s ease'; setTimeout(() => { box.style.animation = ''; }, 400); }
     }
-    if (input) {
-      input.value = '';
-      input.focus();
-    }
+    if (input) { input.value = ''; input.focus(); }
   }
 };
 
 window.promptChangeCardsPasscode = function() {
-  const oldCode = prompt('أدخل الرمز الحالي للتأكيد (الافتراضي 36):', '');
+  const oldCode = prompt('أدخل الرمز الحالي (الافتراضي 36):', '');
   if (oldCode === null) return;
-  if (oldCode.trim() !== getCardsPin()) {
-    alert('❌ الرمز الحالي غير صحيح!');
-    return;
-  }
-  const newCode = prompt('أدخل الرمز السري الجديد:', '');
+  if (oldCode.trim() !== getCardsPin()) { alert('❌ الرمز الحالي غير صحيح!'); return; }
+  const newCode = prompt('أدخل الرمز الجديد:', '');
   if (newCode === null) return;
-  if (!newCode.trim()) {
-    alert('⚠️ لا يمكن أن يكون الرمز فارغاً!');
-    return;
-  }
-  try {
-    localStorage.setItem('ayousha_cards_pin', newCode.trim());
-  } catch(e){}
-  alert('✨ تم تغيير الرمز السري بنجاح!');
+  if (!newCode.trim()) { alert('⚠️ لا يمكن أن يكون فارغاً!'); return; }
+  try { localStorage.setItem('ayousha_cards_pin', newCode.trim()); } catch(e){}
+  alert('✨ تم تغيير الرمز بنجاح!');
   window.promptCardsPasscode();
 };
 
 window.openCardsProject = function() {
   const existing = document.getElementById('cardsProjectContainer');
   if (existing) existing.remove();
-
   const wrap = document.createElement('div');
   wrap.id = 'cardsProjectContainer';
   wrap.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100dvh; z-index:999999; background:#0d060f; display:flex; flex-direction:column; overflow:hidden;';
-
-  const cardsSrc = (function() {
-    try {
-      return new URL('cards.html', window.location.href).href;
-    } catch(e) {
-      const p = window.location.pathname || '';
-      if (p.endsWith('/ayousha')) return '/ayousha/cards.html';
-      return './cards.html';
-    }
-  })();
-
+  const cardsSrc = (function() { try { return new URL('cards.html', window.location.href).href; } catch(e) { return './cards.html'; } })();
   wrap.innerHTML = `
     <div style="background:linear-gradient(135deg, #1c0517, #2d0a25); color:white; padding:8px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #4a154b; box-shadow:0 4px 16px rgba(0,0,0,0.5); flex-shrink:0;">
       <div style="display:flex; align-items:center; gap:10px;">
         <span style="font-size:1.6rem;">🎴</span>
         <div>
-          <div style="font-weight:900; font-size:1rem; color:#fbcfe8; display:flex; align-items:center; gap:6px;">
-            <span>البطاقات</span>
-            <span style="font-size:0.75rem; color:#f472b6; font-weight:normal;">(أسرار الفراش والحميمية)</span>
-          </div>
-          <div style="font-size:0.75rem; color:#fda4af;">بطاقات اللعبة، عجلة الحظ، الدليل التطبيقي، ونرد الرومانسية</div>
+          <div style="font-weight:900; font-size:1rem; color:#fbcfe8;">البطاقات <span style="font-size:0.75rem; color:#f472b6; font-weight:normal;">(أسرار الفراش والحميمية)</span></div>
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:8px;">
-        <button onclick="window.toggleCardsFullScreen()" title="ملء الشاشة" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:6px 10px; border-radius:10px; cursor:pointer; font-size:0.85rem;">⛶</button>
-        <button onclick="const f=document.getElementById('cardsFrame'); if(f) f.contentWindow.location.reload();" title="إعادة تحميل" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:6px 10px; border-radius:10px; cursor:pointer; font-size:0.85rem;">🔄</button>
-        <button onclick="window.location.href=cardsSrc;" title="فتح مباشر بدون إطار" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:6px 10px; border-radius:10px; cursor:pointer; font-size:0.82rem;">🔗 فتح مباشر</button>
-        <button onclick="window.closeCardsProject()" style="background:linear-gradient(135deg, #e11d48, #be123c); color:#fff; border:none; padding:6px 14px; border-radius:10px; cursor:pointer; font-weight:bold; font-size:0.88rem; display:flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(225,29,72,0.4);">✕ خروج</button>
+        <button onclick="const f=document.getElementById('cardsFrame'); if(f) f.contentWindow.location.reload();" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:6px 10px; border-radius:10px; cursor:pointer; font-size:0.85rem;">🔄</button>
+        <button onclick="window.closeCardsProject()" style="background:linear-gradient(135deg, #e11d48, #be123c); color:#fff; border:none; padding:6px 14px; border-radius:10px; cursor:pointer; font-weight:bold; font-size:0.88rem;">✕ خروج</button>
       </div>
     </div>
     <iframe id="cardsFrame" src="${cardsSrc}" style="flex:1; width:100%; height:100%; border:none; background:#0d060f;" allow="autoplay; fullscreen"></iframe>
   `;
-
   document.body.appendChild(wrap);
 };
 
 window.closeCardsProject = function() {
   const container = document.getElementById('cardsProjectContainer');
-  if (container) {
-    container.remove();
-  }
-};
-
-window.toggleCardsFullScreen = function() {
-  const container = document.getElementById('cardsProjectContainer');
-  if (!container) return;
-  if (!document.fullscreenElement) {
-    container.requestFullscreen?.().catch(()=>{});
-  } else {
-    document.exitFullscreen?.().catch(()=>{});
-  }
+  if (container) container.remove();
 };
 
 window.addEventListener('message', (e) => {
-  if (e.data && e.data.type === 'CLOSE_CARDS_APP') {
-    window.closeCardsProject();
-  }
+  if (e.data && e.data.type === 'CLOSE_CARDS_APP') window.closeCardsProject();
 });
 
 boot();
