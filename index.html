@@ -344,7 +344,7 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
       s._dismissed = true;
       s.style.opacity = "0";
       s.style.pointerEvents = "none";
-      setTimeout(function(){ if (s && s.parentNode) s.remove(); }, 500);
+      setTimeout(function(){ if (s && s.parentNode) s.parentNode.removeChild(s); }, 500);
     }
   };
   setTimeout(dismiss, 1100);
@@ -964,23 +964,37 @@ function processIncomingNotifications(notifs){
     _initialNotifsLoaded = true;
     return;
   }
-  const myNew = notifs.filter(n => n.to === MY_ROLE && !n.read && n.id && !_seenNotifIds.has(n.id));
+  // ✅ الإصلاح: استبعاد الإشعارات التي أرسلتها بنفسك (n.from !== MY_ROLE)
+  // يظهر الإشعار فقط لمن هو موجّه إليه فعلاً (n.to === MY_ROLE) وليس المرسل
+  const myNew = notifs.filter(n => 
+    n.to === MY_ROLE && 
+    n.from !== MY_ROLE && 
+    !n.read && 
+    n.id && 
+    !_seenNotifIds.has(n.id)
+  );
   myNew.forEach(n => {
     _seenNotifIds.add(n.id);
     showAppNotification(n.title, n.body, n.type, n.itemId, n.to);
   });
 }
 
-// التوجيه المباشر لأي وجهة في التطبيق مع مزامنة دور المستلم للدخول واللعب فوراً
+// التوجيه المباشر لأي وجهة في التطبيق — لا يغيّر دور المستخدم أبداً
 window.openEventDestination = function(type, id, targetRole, notifTitle='', notifBody=''){
-  // 1. ضبط ومزامنة دور المستلم حتى يكون جاهزاً للعب دوره فوراً
-  if(targetRole && (targetRole === 'me' || targetRole === 'her')){
-    MY_ROLE = targetRole;
-    try { localStorage.setItem('ayousha_role', targetRole); } catch(e){}
-    if(typeof window.currentMailRole !== 'undefined') window.currentMailRole = targetRole;
+  // ✅ الإصلاح الحرج: لا نغيّر MY_ROLE إطلاقاً هنا.
+  // الدور يُحدَّد مرة واحدة فقط من boot(). إذا كان الإشعار موجهاً لدور مختلف، نرفض فتحه.
+  if(targetRole && (targetRole === 'me' || targetRole === 'her') && targetRole !== MY_ROLE){
+    console.warn('🚫 محاولة فتح إشعار موجه لدور آخر:', targetRole, '| دورك الحالي:', MY_ROLE);
+    try { toast('⚠️ هذا الإشعار موجه للطرف الآخر ولا يمكن فتحه من حسابك'); } catch(e){}
+    return;
+  }
+  
+  // تحديث اسم الشريك المعروض حسب دورك الحالي (دون تغيير الدور)
+  try {
+    if(typeof window.currentMailRole !== 'undefined') window.currentMailRole = MY_ROLE;
     const p = document.getElementById('chatPartnerName');
     if(p && state?.settings) p.textContent = MY_ROLE === 'me' ? state.settings.wifeName : state.settings.myName;
-  }
+  } catch(e){}
 
   // إذا كانت الوجهة مشروع البطاقات المحمي برمز
   if(type === 'cardsProject' || type === 'cards_app' || id === 'cardsProject'){
@@ -1038,49 +1052,38 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
 
     // التركيز التلقائي على منطقة لعب الدور بحسب اللعبة
     setTimeout(() => {
-      // خمنها وكذبة مقنعة: حقل كتابة التمويه
       const cgInput = document.getElementById('cgTextInput');
       if(cgInput) {
         cgInput.focus();
         cgInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-      // خيارات التصويت في خمنها وكذبة مقنعة
       const voteBtns = document.querySelectorAll('[data-cg-vote]:not([disabled])');
       if(voteBtns.length) {
         voteBtns[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-      // كلمات سرية: حقل التلميح للقائد أو لوحة الكلمات
       const clueInput = document.getElementById('cgClueInput');
       if(clueInput) clueInput.focus();
       const wordsGrid = document.querySelector('[data-cg-word]:not([disabled])');
       if(wordsGrid) wordsGrid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // ليلة الذئب: أزرار التصويت
       const wolfBtn = document.querySelector('[data-cg-wolf]:not([disabled])');
       if(wolfBtn) wolfBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // المهمة السرية: أزرار التصويت أو البطاقات
       const approveBtn = document.querySelector('[data-cg-approve]:not([disabled])');
       if(approveBtn) approveBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
       const missionBtn = document.querySelector('[data-cg-mission]:not([disabled])');
       if(missionBtn) missionBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // القصة: حقل إكمال السطر
       const storyInput = document.getElementById('storyNewSentence');
       if(storyInput && !storyInput.disabled) {
         storyInput.focus();
         storyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-      // اللغز: حقل الحل
       const puzzleInput = document.getElementById('puzzleUserAns');
       if(puzzleInput) puzzleInput.focus();
-      // الترفيه والخداع (Trivia): حقل التمويه
       const trivInput = document.getElementById('fakeAnsInput');
       if(trivInput) trivInput.focus();
-      // إكس أو (XO)
       const xoBoard = document.getElementById('xoStatus');
       if(xoBoard) xoBoard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // تخمين الرقم
       const numInput = document.getElementById('userGuessInput');
       if(numInput) numInput.focus();
-      // سؤال اليوم المشترك
       const dailyInput = document.getElementById('dailyAnsInput');
       if(dailyInput) dailyInput.focus();
     }, 200);
@@ -1191,6 +1194,15 @@ function handleDeepLink(attempts = 0){
   const forRole = p.get('for');
   if(!type && !forRole) return;
 
+  // ✅ الإصلاح: إذا كان الرابط موجهاً لدور مختلف عن دورك، تجاهله وامسح البارامترات
+  if(forRole && forRole !== MY_ROLE){
+    console.warn('🚫 رابط فتح عميق لدور آخر ('+forRole+') — سيتم تجاهله (دورك الحالي: '+MY_ROLE+')');
+    p.delete('open'); p.delete('item'); p.delete('for');
+    const cleanSearch = p.toString() ? '?' + p.toString() : '';
+    history.replaceState({}, '', location.pathname + cleanSearch + location.hash);
+    return;
+  }
+
   // إذا كانت الوجهة لعبة، نتأكد من تحميل المحرك
   if((type === 'game' || ['balderdash','fibbage','codenames','werewolf','resistance'].includes(type)) && typeof window.launchGameModal !== 'function' && attempts < 15){
     setTimeout(() => handleDeepLink(attempts + 1), 100);
@@ -1218,6 +1230,11 @@ if('serviceWorker' in navigator){
           if(!itemId) itemId = parsed.searchParams.get('item');
           if(!targetRole) targetRole = parsed.searchParams.get('for');
         } catch(e){}
+      }
+      // ✅ الإصلاح: تجاهل إشعارات الأدوار الأخرى
+      if(targetRole && targetRole !== MY_ROLE){
+        console.warn('🚫 SW: إشعار لدور آخر — تجاهل');
+        return;
       }
       if(openType){
         window.openEventDestination(openType, itemId, targetRole);
@@ -1372,7 +1389,6 @@ window.openTriviaGame = function(){
 
     if(t.status === 'faking'){
       if(!myFake){
-        // الحفاظ التام على ما يكتبه المستخدم في حقل التمويه عند وصول إشعار الشريك
         const existingFake = document.getElementById('fakeAnsInput');
         const draftFake = existingFake ? existingFake.value : '';
         const wasFocused = (document.activeElement === existingFake);
@@ -2484,7 +2500,6 @@ window.openInteractiveGiftModal = function(gift){
   const sName = gift.senderName || (typeof senderName === 'function' ? senderName(gift.sender || gift.from || otherRole()) : 'شريكك');
 
   if(!gift.opened){
-    // شاشة فك الشريط والتفاعل
     openModal(`
       <div style="text-align:center;padding:10px 5px;">
         <h3 style="color:#c2185b;font-weight:900;margin-bottom:8px;">🎁 هدية تفاعلية خاصة</h3>
@@ -2504,7 +2519,6 @@ window.openInteractiveGiftModal = function(gift){
       </div>
     `);
   } else {
-    // تم فكها مسبقاً - عرض المحتوى والرسالة فوراً
     window.renderRevealedGift(gift);
   }
 };
@@ -2543,7 +2557,6 @@ window.renderRevealedGift = function(gift){
       <div style="font-size:4.8rem;animation:pulse 1.8s infinite;margin-bottom:6px;filter:drop-shadow(0 6px 12px rgba(233,30,99,0.25));">${def.icon}</div>
       <h3 style="color:#ad1457;font-weight:900;margin:0 0 10px;">${escapeHtml(def.title)}</h3>
       
-      <!-- كرت الرسالة الخاص بالهدية التفاعلية -->
       <div style="background:linear-gradient(135deg,#ffffff,#fff5f8);border:2px dashed #f48fb1;border-radius:20px;padding:18px;margin:14px 0;text-align:center;box-shadow:0 6px 20px rgba(244,143,177,0.25);">
         <div style="font-size:0.9rem;font-weight:800;color:#c2185b;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;">
           <span>💌</span> رسالة الهدية الخاصة:
@@ -2657,7 +2670,6 @@ window.submitSendInteractiveGift = async function(){
     openedAt: null
   };
 
-  // 1. الحفظ المحلي فوراً
   window.allInteractiveGifts = [giftItem, ...(window.allInteractiveGifts || [])];
   try {
     localStorage.setItem('ayousha_interactive_gifts', JSON.stringify(window.allInteractiveGifts));
@@ -2668,11 +2680,9 @@ window.submitSendInteractiveGift = async function(){
   if(typeof playEventSound === 'function') playEventSound('surprise', true);
   if(typeof burstHearts === 'function') burstHearts();
 
-  // 2. المزامنة السحابية عبر Firebase
   if(firebaseReady && db){
     try {
       await set(ref(db, 'app/interactiveGifts/' + giftItem.id), giftItem);
-      // إشعار موجه إلى أيقونة الهدية وليس البريد
       await addNotification('🎁 هدية تفاعلية بفيونكة!', `${sName} أرسل لك هدية تفاعلية خاصة! انقر على أيقونة الهدية لفتحها`, 'interactiveGift', giftItem.id);
       toast('✨ تم إرسال الهدية التفاعلية بنجاح!');
     } catch(err){
@@ -2728,7 +2738,6 @@ window.openInteractiveGiftArchive = function(){
   `);
 };
 
-// ربط زر الهدية التفاعلية في قسم المفاجآت بالنظام الجديد
 window.v9Gift = () => window.openInteractiveGiftSystem();
 
 window.v9Puzzle=()=>v9MakeSurprise('🧩 أحجية رسالة');
@@ -2867,7 +2876,6 @@ function renderDaily(){
   if(qEl) qEl.textContent=q;
   const ta=document.getElementById('dailyAnswer');
   
-  // مزامنة مع التخزين المحلي إن وجد
   let localRecord = {};
   try {
     localRecord = JSON.parse(localStorage.getItem('ayousha_daily_' + key) || '{}');
@@ -2878,7 +2886,6 @@ function renderDaily(){
   const aText = myAnswerFromV9 || myAnswerFromLocal || '';
   const aTime = v9Daily[key]?.[MY_ROLE]?.t || localRecord?.updatedAt;
 
-  // الحفاظ على النص المكتوب وعدم مسحه إذا كان المستخدم يكتب حالياً
   if(ta && document.activeElement !== ta && !ta.value.trim()){
     ta.value = aText;
   }
@@ -2924,7 +2931,6 @@ window.saveDailyAnswer=async function(){
   const btn=document.getElementById('saveDailyBtn');
   if(btn) btn.disabled=true;
   
-  // حفظ محلي فوري
   try {
     let local = JSON.parse(localStorage.getItem('ayousha_daily_' + key) || '{}');
     local.date = key;
@@ -3001,9 +3007,13 @@ window.v9QuestionHistory=function(){
    ============================================================ */
 window.openNotifItem = function(id){
   const n = allNotifs.find(x => x.id === id);
-  if(n) {
-    window.openEventDestination(n.type, n.itemId, n.to, n.title, n.body);
+  if(!n) return;
+  // ✅ الإصلاح: لا يفتح إلا الإشعارات الموجهة لك فعلاً
+  if(n.to !== MY_ROLE){
+    toast('⚠️ هذا الإشعار موجه للطرف الآخر');
+    return;
   }
+  window.openEventDestination(n.type, n.itemId, n.to, n.title, n.body);
 };
 
 function renderNotifs(tab='inbox'){
@@ -3022,6 +3032,7 @@ function renderNotifs(tab='inbox'){
     else if(n.type==='answer')icon='📝';
     else if(n.type==='quiz')icon='🧠';
     else if(n.type==='dailyShared')icon='🌟';
+    else if(n.type==='interactiveGift')icon='🎁';
     else if(n.type==='game' || n.itemId){
       const gIcons = {
         balderdash:'🌀', fibbage:'🤥', codenames:'🕵️', werewolf:'🐺', resistance:'🎭',
@@ -3135,6 +3146,11 @@ async function initFCM(){
     if(token){await set(ref(db,`config/${MY_ROLE}/fcmToken`),token);}
     onMessage(messaging,payload=>{
       const d=payload.data||{};
+      // ✅ الإصلاح: لا تعرض إشعاراً موجهاً لدور آخر (حماية من مشاركة الـ Token)
+      if(d.role && d.role !== MY_ROLE){
+        console.warn('🚫 FCM: إشعار لدور آخر — تجاهل', d.role, '| دورك:', MY_ROLE);
+        return;
+      }
       showAppNotification(d.title||payload.notification?.title||'رسالة جديدة',d.body||payload.notification?.body||'',d.type||'notification',d.itemId||'');
     });
   }catch(e){}
@@ -3147,8 +3163,21 @@ async function boot(){
   setTimeout(()=>{const s=document.getElementById('splashScreen');if(s){s.style.opacity='0';setTimeout(()=>s.remove(),600);}},1600);
   const urlParams=new URLSearchParams(location.search);
   const r=urlParams.get('for');
-  if(r==='her'||r==='me'){MY_ROLE=r;localStorage.setItem('ayousha_role',r);}
-  else{MY_ROLE=localStorage.getItem('ayousha_role')||'me';localStorage.setItem('ayousha_role',MY_ROLE);}
+  const storedRole = localStorage.getItem('ayousha_role');
+  if(r==='her'||r==='me'){
+    // ✅ الإصلاح: لا تُغيّر الدور المحفوظ إذا كان الرابط موجهاً لدور آخر
+    // (يمنع تحويل جهاز المرسل إلى جهاز المستقبل عند فتح رابط إشعار لها)
+    if(!storedRole || storedRole === r){
+      MY_ROLE=r;
+      localStorage.setItem('ayousha_role',r);
+    } else {
+      MY_ROLE = storedRole;
+      console.warn('🚫 رابط فتح لدور آخر ('+r+') مع دور محفوظ ('+storedRole+') — تم الاحتفاظ بالدور المحفوظ');
+    }
+  } else {
+    MY_ROLE = storedRole || 'me';
+    localStorage.setItem('ayousha_role',MY_ROLE);
+  }
   window.currentMailRole=MY_ROLE;
 
   try{
@@ -3156,7 +3185,6 @@ async function boot(){
     db=getDatabase(firebaseApp);
     storage=getStorage(firebaseApp);
     firebaseReady=true;
-    // Public bridge for the additional games: all multiplayer state uses the same Realtime Database.
     window.ayoushaRealtime = {
       role: () => (typeof MY_ROLE !== 'undefined' ? MY_ROLE : (localStorage.getItem('ayousha_role') || 'me')),
       otherRole: () => (typeof otherRole === 'function' ? otherRole() : ((localStorage.getItem('ayousha_role') || 'me') === 'me' ? 'her' : 'me')),
@@ -3288,7 +3316,6 @@ window.promptCardsPasscode = function() {
 
       <div id="cardsPinError" style="color: #e11d48; font-size: 0.85rem; font-weight: bold; min-height: 20px; margin-bottom: 10px;"></div>
 
-      <!-- لوحة أرقام سريعة للأجهزة الذكية -->
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; max-width: 230px; margin: 0 auto 14px;">
         <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('1')">1</button>
         <button type="button" class="btn btn-soft" style="font-size: 1.2rem; font-weight: 700; padding: 9px 0; border-radius: 12px;" onclick="window.appendCardsPin('2')">2</button>
