@@ -27,7 +27,6 @@
 <script src="./xo-questions.js"></script>
 <script src="./guessNum-questions.js"></script>
 
-<!-- 🆕 الملفات الجديدة - نظام النقاط والألعاب المتقدمة -->
 <script src="./game-stats.js"></script>
 <script src="./new-games.js"></script>
 <script src="./community-games.js"></script>
@@ -114,7 +113,6 @@ nav.bottom{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:10
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 
-/* ===== Messenger المحسّن ===== */
 #view-mail .messenger-shell{display:flex;flex-direction:column;height:calc(100dvh - 185px);min-height:380px;background:#f9f1f5;border:1px solid #f1dce6;border-radius:22px;overflow:hidden}
 .messenger-header{display:flex;align-items:center;gap:11px;padding:12px 14px;background:#fff;border-bottom:1px solid #f0e2e9;flex-shrink:0}
 .messenger-avatar{width:40px;height:40px;border-radius:50%;background:#ffe1ed;display:grid;place-items:center;font-size:20px}
@@ -162,7 +160,6 @@ body.chat-dark #mailList .mine .chat-bubble{background:#4b2540;border-color:#7c3
 body.chat-dark .messenger-header,body.chat-dark .messenger-composer{background:#2b2735;border-color:#433a4f}
 body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433a4f;color:#fff}
 
-/* ===== Mood Grid ===== */
 .mood-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
 .mood-btn{border:1px solid var(--border);background:linear-gradient(180deg,#fff,#fff8fb);padding:10px 6px;border-radius:14px;font-size:.75rem;font-weight:600;color:var(--primary-2);transition:transform .18s,border-color .18s;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:70px}
 .mood-btn .emoji{font-size:1.5rem;display:block;line-height:1}
@@ -170,7 +167,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
 .mood-btn.selected{background:linear-gradient(180deg,#ffe2ed,#ffd1e2);border-color:var(--primary);box-shadow:0 4px 12px rgba(216,27,96,.18)}
 .mood-response{margin-top:10px;padding:10px 14px;background:#fff5f9;border:1px dashed #f5bbd1;border-radius:12px;font-size:.9rem;color:#ad1457;text-align:center}
 
-/* ===== Memories Grid ===== */
 .mem-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
 @media(max-width:400px){.mem-grid{grid-template-columns:1fr}}
 .mem-card{background:var(--card);border-radius:16px;border:1px solid var(--border);overflow:hidden;position:relative;box-shadow:0 4px 12px rgba(70,30,50,.04)}
@@ -183,7 +179,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
 .notif-item{background:#fff;padding:12px;border-radius:14px;border:1px solid #f2d9e4;margin-bottom:8px;cursor:pointer;transition:transform .15s}
 .notif-item:active{transform:scale(.98)}
 
-/* إشعار عائم تفاعلي فوري عند وصول أي رسالة أو دور داخل التطبيق */
 .interactive-notif-banner {
   position: fixed;
   top: 14px;
@@ -225,7 +220,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
   gap: 4px;
 }
 
-/* شبكة عرض الألعاب الاحترافية */
 .game-pro-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -376,7 +370,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
         <div class="cd-cell"><b>--</b><small>دقيقة</small></div><div class="cd-cell"><b>--</b><small>ثانية</small></div>
       </div>
     </div>
-    <!-- الهدية التفاعلية السريعة -->
     <div id="homeInteractiveGiftCard" class="card" style="background:linear-gradient(135deg,#fff0f5,#fce4ec);border:1.5px solid #f8bbd0;cursor:pointer;margin-bottom:14px;box-shadow:0 4px 14px rgba(233,30,99,0.12);transition:transform 0.2s;" onclick="openInteractiveGiftSystem()">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
         <div style="display:flex;align-items:center;gap:12px;">
@@ -413,7 +406,7 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
     </div>
   </section>
 
-    <section id="view-games" class="view">
+  <section id="view-games" class="view">
     <div class="greet" style="background:linear-gradient(135deg,#7b1fa2,#4a148c);margin-bottom:16px;">
       <h2>🎮 عالمنا نلعب</h2>
       <p>ألعاب ثنائية تفاعلية بالتناوب المباشر بين قلبينا 💕</p>
@@ -423,7 +416,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
       </div>
     </div>
 
-    <!-- رصيد القلوب والأوسمة -->
     <div class="card" style="margin-bottom:14px;">
       <div class="card-title"><span>💎</span> رصيد القلوب والإنجازات المشتركة</div>
       <div class="v9-panel" style="text-align:center;font-weight:bold;font-size:1.15rem;color:#ad1457;">
@@ -435,7 +427,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
       </div>
     </div>
 
-    <!-- قسم مميز: الألعاب الخمس الحصرية بين زكريا وعيوشة -->
     <div class="card" style="margin-bottom:14px;border:2px solid #f2bbd5;">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
         <div><span>✨</span> الألعاب الخمس الحصرية — بيني وبين عيوشة 💕</div>
@@ -446,7 +437,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
       </p>
 
       <div class="game-pro-grid">
-        <!-- 1. خمنها -->
         <div class="game-pro-card" onclick="window.launchGameModal('balderdash')">
           <div>
             <div class="game-card-head">
@@ -462,7 +452,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
           </div>
         </div>
 
-        <!-- 2. كذبة مقنعة -->
         <div class="game-pro-card" onclick="window.launchGameModal('fibbage')">
           <div>
             <div class="game-card-head">
@@ -478,7 +467,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
           </div>
         </div>
 
-        <!-- 3. كلمات سرية -->
         <div class="game-pro-card" onclick="window.launchGameModal('codenames')">
           <div>
             <div class="game-card-head">
@@ -494,7 +482,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
           </div>
         </div>
 
-        <!-- 4. ليلة الذئب -->
         <div class="game-pro-card" onclick="window.launchGameModal('werewolf')">
           <div>
             <div class="game-card-head">
@@ -510,7 +497,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
           </div>
         </div>
 
-        <!-- 5. المهمة السرية -->
         <div class="game-pro-card" onclick="window.launchGameModal('resistance')">
           <div>
             <div class="game-card-head">
@@ -526,7 +512,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
           </div>
         </div>
 
-        <!-- 6. سؤال اليوم المشترك -->
         <div class="game-pro-card" style="background:linear-gradient(135deg,#fffbf0,#fff5d9);border-color:#f8dfa0;" onclick="window.openDailySharedQuestion()">
           <div>
             <div class="game-card-head">
@@ -544,7 +529,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
       </div>
     </div>
 
-    <!-- قائمة باقي الألعاب التفاعلية الممتعة والتناوب -->
     <div class="card">
       <div class="card-title"><span>🎲</span> ألعاب التناوب المباشر والترفيه الكلاسيكي</div>
       <div class="game-pro-grid">
@@ -641,7 +625,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
     </div>
   </section>
 
-  <!-- البريد والمحادثة (المطوّر) -->
   <section id="view-mail" class="view">
     <div class="messenger-shell">
       <header class="messenger-header">
@@ -664,7 +647,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
     </div>
   </section>
 
-  <!-- المفاجآت (المطوّر) -->
   <section id="view-surprise" class="view">
     <div class="card">
       <div class="card-title"><span>🎁</span> صندوق المفاجآت</div>
@@ -681,7 +663,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
     <div id="surpriseList"></div>
   </section>
 
-  <!-- عالمنا / الذكريات (المطوّر) -->
   <section id="view-memories" class="view">
     <div class="card">
       <div class="card-title"><span>📸</span> أرشيفنا</div>
@@ -701,7 +682,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
     <div class="mem-grid" id="memGrid"></div>
   </section>
 
-  <!-- المزاج (المطوّر) -->
   <section id="view-mood" class="view">
     <div class="card">
       <div class="card-title"><span>🌙</span> كيف حالكِ اليوم؟</div>
@@ -727,7 +707,6 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
       </div>
     </div>
 
-    <!-- بطاقات الحميمية والرومانسية (مشروع البطاقات المضمّن) -->
     <div class="card" style="margin-top: 14px; background: linear-gradient(135deg, #fff0f5, #ffe4ec); border: 1.5px solid #fbcfe8; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.08); cursor: pointer;" onclick="window.promptCardsPasscode()">
       <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -789,6 +768,7 @@ const firebaseConfig = {
 
 const DEFAULT_VAPID_KEY = "BPpUV-YcYpV9OFhV2BkYllEar1_BsupWxIHP83ZDBPBozGV7mSnZqsIglbrYLWFs1E8WbXzPb577iT7D-LcZ_r8";
 const ICON_URL = 'https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png';
+const ROLE_CACHE_NAME = 'ayousha-role-v1';
 
 let MY_ROLE = 'me';
 let db = null, storage = null, firebaseApp = null, firebaseReady = false;
@@ -817,6 +797,22 @@ function chatTime(d){const x=new Date(d||Date.now());return Number.isNaN(x.getTi
 function fmtDate(d){if(!d)return '';try{return new Date(d).toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'});}catch(e){return '';}}
 function fmtDateTime(d){if(!d)return '';try{const dt=new Date(d);return dt.toLocaleDateString('ar-EG',{day:'numeric',month:'short'})+' - '+pad(dt.getHours())+':'+pad(dt.getMinutes());}catch(e){return '';}}
 function timeUntil(d){const diff=new Date(d)-new Date();if(diff<=0)return 'جاهزة';const dd=Math.floor(diff/86400000),hh=Math.floor((diff%86400000)/3600000),mm=Math.floor((diff%3600000)/60000);return dd>0?`بعد ${dd} يوم`:hh>0?`بعد ${hh} ساعة`:`بعد ${mm} دقيقة`;}
+
+/* ✅ مزامنة دور الجهاز مع الـ Service Worker (Cache API + postMessage) */
+async function syncRoleToSW(){
+  try {
+    const cache = await caches.open(ROLE_CACHE_NAME);
+    await cache.put('/__my_role__', new Response(MY_ROLE, {
+      headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' }
+    }));
+  } catch(e){ console.warn('Cache sync fail', e); }
+  try {
+    if('serviceWorker' in navigator){
+      const reg = await navigator.serviceWorker.ready;
+      if(reg.active) reg.active.postMessage({ type: 'SET_ROLE', role: MY_ROLE });
+    }
+  } catch(e){ console.warn('SW postMessage fail', e); }
+}
 
 // ====== Web Audio ======
 let audioCtx = null;
@@ -927,10 +923,8 @@ function showAppNotification(title, body, type='notification', itemId='', target
   playEventSound(type);
   if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
   
-  // 1. عرض إشعار عائم تفاعلي فوري داخل التطبيق
   showInteractiveInAppBanner(title, body, type, itemId, toRole);
 
-  // 2. إرسال إشعار للمتصفح إذا كان مسموحاً
   if('Notification' in window && Notification.permission === 'granted'){
     try {
       navigator.serviceWorker.ready.then(reg => {
@@ -964,8 +958,7 @@ function processIncomingNotifications(notifs){
     _initialNotifsLoaded = true;
     return;
   }
-  // ✅ الإصلاح: استبعاد الإشعارات التي أرسلتها بنفسك (n.from !== MY_ROLE)
-  // يظهر الإشعار فقط لمن هو موجّه إليه فعلاً (n.to === MY_ROLE) وليس المرسل
+  // ✅ الإصلاح: استبعاد الإشعارات التي أرسلتها بنفسك
   const myNew = notifs.filter(n => 
     n.to === MY_ROLE && 
     n.from !== MY_ROLE && 
@@ -979,31 +972,26 @@ function processIncomingNotifications(notifs){
   });
 }
 
-// التوجيه المباشر لأي وجهة في التطبيق — لا يغيّر دور المستخدم أبداً
+// ✅ التوجيه المباشر — لا يغيّر MY_ROLE إطلاقاً
 window.openEventDestination = function(type, id, targetRole, notifTitle='', notifBody=''){
-  // ✅ الإصلاح الحرج: لا نغيّر MY_ROLE إطلاقاً هنا.
-  // الدور يُحدَّد مرة واحدة فقط من boot(). إذا كان الإشعار موجهاً لدور مختلف، نرفض فتحه.
   if(targetRole && (targetRole === 'me' || targetRole === 'her') && targetRole !== MY_ROLE){
     console.warn('🚫 محاولة فتح إشعار موجه لدور آخر:', targetRole, '| دورك الحالي:', MY_ROLE);
     try { toast('⚠️ هذا الإشعار موجه للطرف الآخر ولا يمكن فتحه من حسابك'); } catch(e){}
     return;
   }
   
-  // تحديث اسم الشريك المعروض حسب دورك الحالي (دون تغيير الدور)
   try {
     if(typeof window.currentMailRole !== 'undefined') window.currentMailRole = MY_ROLE;
     const p = document.getElementById('chatPartnerName');
     if(p && state?.settings) p.textContent = MY_ROLE === 'me' ? state.settings.wifeName : state.settings.myName;
   } catch(e){}
 
-  // إذا كانت الوجهة مشروع البطاقات المحمي برمز
   if(type === 'cardsProject' || type === 'cards_app' || id === 'cardsProject'){
     switchView('mood');
     window.promptCardsPasscode();
     return;
   }
 
-  // 2. الكشف الذكي الشامل عن اللعبة المحددة
   const allKnownGames = ['balderdash', 'fibbage', 'codenames', 'werewolf', 'resistance', 'xo', 'story', 'trivia', 'puzzle', 'telepathy', 'spin', 'cards', 'draw', 'guessNum', 'doors', 'dailyShared'];
 
   let targetGame = null;
@@ -1032,7 +1020,6 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
     else if(type === 'game') targetGame = (id && id !== 'new-games') ? id : 'balderdash';
   }
 
-  // 3. إذا كانت الوجهة لعبة: الدخول المباشر فوراً داخل اللعبة المحددة تماماً مثل لعبة الرسم
   if(targetGame){
     switchView('games');
     const openGameDirectly = () => {
@@ -1045,22 +1032,14 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
       }
     };
 
-    // فتح فوري مباشر في 0ms دون أي تأخير
     openGameDirectly();
-    // تأكيد إضافي بعد وقت قصير
     setTimeout(openGameDirectly, 60);
 
-    // التركيز التلقائي على منطقة لعب الدور بحسب اللعبة
     setTimeout(() => {
       const cgInput = document.getElementById('cgTextInput');
-      if(cgInput) {
-        cgInput.focus();
-        cgInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      if(cgInput) { cgInput.focus(); cgInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
       const voteBtns = document.querySelectorAll('[data-cg-vote]:not([disabled])');
-      if(voteBtns.length) {
-        voteBtns[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      if(voteBtns.length) voteBtns[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
       const clueInput = document.getElementById('cgClueInput');
       if(clueInput) clueInput.focus();
       const wordsGrid = document.querySelector('[data-cg-word]:not([disabled])');
@@ -1072,10 +1051,7 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
       const missionBtn = document.querySelector('[data-cg-mission]:not([disabled])');
       if(missionBtn) missionBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
       const storyInput = document.getElementById('storyNewSentence');
-      if(storyInput && !storyInput.disabled) {
-        storyInput.focus();
-        storyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      if(storyInput && !storyInput.disabled) { storyInput.focus(); storyInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
       const puzzleInput = document.getElementById('puzzleUserAns');
       if(puzzleInput) puzzleInput.focus();
       const trivInput = document.getElementById('fakeAnsInput');
@@ -1090,22 +1066,16 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
     return;
   }
 
-  // 4. البريد والرسائل: الانتقال إلى المحادثة وتركيز مؤشر الكتابة للرد الفوري
   if(type === 'mail'){ 
     switchView('mail'); 
     setTimeout(() => {
       if(id) focusRequestedMail(id);
       const textInput = document.getElementById('instantMailText');
-      if(textInput) {
-        textInput.focus();
-        textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      if(textInput) { textInput.focus(); textInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     }, 300);
     return; 
   }
 
-  // 5. المفاجآت: فتح قسم المفاجآت وفتح المفاجأة المحددة مباشرة إذا وُجد معرّفها
-  // 4.5 الهدية التفاعلية: تفتح مباشرة في نفس أيقونة الهدية التفاعلية دون فتح بريد الرسائل نهائياً
   if(type === 'interactiveGift' || type === 'gift' || id === 'interactiveGift'){
     if(typeof window.openInteractiveGiftSystem === 'function'){
       window.openInteractiveGiftSystem(id !== 'interactiveGift' ? id : null);
@@ -1123,7 +1093,6 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
     return;
   }
 
-  // 6. الذكريات: الانتقال للذكريات والتركيز على الذكرى المحددة
   if(type === 'memory'){
     switchView('memories');
     if(id){
@@ -1139,7 +1108,6 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
     return;
   }
 
-  // 7. نبضة الحب (Ping): مؤثرات القلوب الفورية وتوجيه للرئيسية مع زر الرد
   if(type === 'ping'){
     switchView('home');
     burstHearts();
@@ -1156,7 +1124,6 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
     return;
   }
 
-  // 8. إجابة سؤال اليوم الرئيسي
   if(type === 'answer'){
     switchView('home');
     setTimeout(() => {
@@ -1168,7 +1135,6 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
     return;
   }
 
-  // 9. المزاج
   if(type === 'mood'){
     switchView('mood');
     setTimeout(() => {
@@ -1178,7 +1144,6 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
     return;
   }
 
-  // 10. أنشطة عشوائية أو اختبار
   if(type === 'quiz' || type === 'random'){
     if(typeof window.v10ActivityModal === 'function') window.v10ActivityModal(type);
     return;
@@ -1194,7 +1159,7 @@ function handleDeepLink(attempts = 0){
   const forRole = p.get('for');
   if(!type && !forRole) return;
 
-  // ✅ الإصلاح: إذا كان الرابط موجهاً لدور مختلف عن دورك، تجاهله وامسح البارامترات
+  // ✅ تجاهل الروابط الموجهة لدور مختلف
   if(forRole && forRole !== MY_ROLE){
     console.warn('🚫 رابط فتح عميق لدور آخر ('+forRole+') — سيتم تجاهله (دورك الحالي: '+MY_ROLE+')');
     p.delete('open'); p.delete('item'); p.delete('for');
@@ -1203,7 +1168,6 @@ function handleDeepLink(attempts = 0){
     return;
   }
 
-  // إذا كانت الوجهة لعبة، نتأكد من تحميل المحرك
   if((type === 'game' || ['balderdash','fibbage','codenames','werewolf','resistance'].includes(type)) && typeof window.launchGameModal !== 'function' && attempts < 15){
     setTimeout(() => handleDeepLink(attempts + 1), 100);
     return;
@@ -1215,7 +1179,7 @@ function handleDeepLink(attempts = 0){
   history.replaceState({}, '', location.pathname + newSearch + location.hash);
 }
 
-// الاستماع لرسائل Service Worker عند نقر المستخدم على الإشعار من شاشة القفل في الهاتف
+// ✅ رسائل SW
 if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('message', event => {
     const data = event.data;
@@ -1231,7 +1195,6 @@ if('serviceWorker' in navigator){
           if(!targetRole) targetRole = parsed.searchParams.get('for');
         } catch(e){}
       }
-      // ✅ الإصلاح: تجاهل إشعارات الأدوار الأخرى
       if(targetRole && targetRole !== MY_ROLE){
         console.warn('🚫 SW: إشعار لدور آخر — تجاهل');
         return;
@@ -1243,14 +1206,12 @@ if('serviceWorker' in navigator){
   });
 }
 
-// فحص روابط الفتح العميق فور عودة التطبيق من وضع الخلفية بالهاتف
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     handleDeepLink();
   }
 });
 
-// نظام الحفاظ التلقائي على نصوص الإدخال لمنع اختفاء ما يكتبه المستخدم عند وصول إجابة الشريك
 window.preserveModalInputs = function() {
   const content = document.getElementById('modalContent');
   if(!content) return {};
@@ -1307,7 +1268,7 @@ window.switchView = function(name){
 };
 
 /* =========================================================
-   In-Game Floating Chat (نفس الكود الأول)
+   In-Game Floating Chat
    ========================================================= */
 let gameChatTimer = null;
 window.renderGameChatUI = function(gamePath){
@@ -1693,7 +1654,7 @@ window.resetXOGame = async function(){
   toast('🔄 جولة جديدة!');
 };
 
-/* ================= 4. Draw: one guess, then swap ================= */
+/* ================= 4. Draw ================= */
 const DRAW_WORDS = ["شمس ☀️","قلب 💖","قطة 🐱","سيارة 🚗","وردة 🌹","قمر 🌙","بيت 🏡"].concat(window.GAME_EXTRAS?.draw||[]);
 const nextDrawWord=()=>DRAW_WORDS[Math.floor(Math.random()*DRAW_WORDS.length)];
 let drawCtx=null,isDrawing=false,drawColor='#d81b60',drawRoundId=null;
@@ -2425,7 +2386,7 @@ window.deleteSurprise=async function(id){
 };
 
 /* ============================================================
-   نظام الهدية التفاعلية المتطور (تظهر الرسالة في الأيقونة دون الانتقال للبريد)
+   نظام الهدية التفاعلية
    ============================================================ */
 window.allInteractiveGifts = [];
 try {
@@ -2472,7 +2433,6 @@ window.openInteractiveGiftSystem = function(specificGiftId = null){
   const role = typeof MY_ROLE !== 'undefined' ? MY_ROLE : 'me';
   const gifts = window.allInteractiveGifts || [];
   
-  // إذا تم تمرير معرف محدد
   if(specificGiftId && specificGiftId !== 'interactiveGift'){
     const target = gifts.find(g => g.id === specificGiftId);
     if(target){
@@ -2481,7 +2441,6 @@ window.openInteractiveGiftSystem = function(specificGiftId = null){
     }
   }
   
-  // البحث عن أي هدية غير مفتوحة موجهة للمستخدم
   const unopened = gifts.find(g => 
     (g.recipient === role || g.to === role || (!g.recipient && g.sender !== role && g.from !== role)) && !g.opened
   );
@@ -2490,7 +2449,6 @@ window.openInteractiveGiftSystem = function(specificGiftId = null){
     return;
   }
   
-  // إذا لم توجد هدايا معلقة، فتح شاشة إرسال أو استعراض الهدايا السابقة
   window.openSendInteractiveGiftModal();
 };
 
@@ -2850,7 +2808,7 @@ window.v9MoodSound=function(){
 };
 
 /* ============================================================
-   Daily & Dashboard & Archives
+   Daily & Dashboard
    ============================================================ */
 const DEFAULT_QUESTIONS = [
   "لو عندك يوم كامل نقضيه سوا، شو أول شيء تحبين نعمله؟",
@@ -3008,7 +2966,6 @@ window.v9QuestionHistory=function(){
 window.openNotifItem = function(id){
   const n = allNotifs.find(x => x.id === id);
   if(!n) return;
-  // ✅ الإصلاح: لا يفتح إلا الإشعارات الموجهة لك فعلاً
   if(n.to !== MY_ROLE){
     toast('⚠️ هذا الإشعار موجه للطرف الآخر');
     return;
@@ -3143,10 +3100,29 @@ async function initFCM(){
     if(Notification.permission!=='granted')return;
     const registration=await navigator.serviceWorker.ready;
     const token=await getToken(messaging,{vapidKey:DEFAULT_VAPID_KEY,serviceWorkerRegistration:registration});
-    if(token){await set(ref(db,`config/${MY_ROLE}/fcmToken`),token);}
+    if(token){
+      // ✅ تنظيف التوكن القديم من الدور الآخر (في حال تغيّر الدور سابقاً)
+      const otherRoleName = MY_ROLE === 'me' ? 'her' : 'me';
+      try {
+        const otherSnap = await get(ref(db, `config/${otherRoleName}/fcmToken`));
+        if (otherSnap.val() === token) {
+          await remove(ref(db, `config/${otherRoleName}/fcmToken`));
+          console.log('[FCM] حذف التوكن القديم من config/' + otherRoleName);
+        }
+      } catch(e){}
+      
+      // ✅ حفظ التوكن في دورنا الصحيح
+      await set(ref(db, `config/${MY_ROLE}/fcmToken`), token);
+      
+      // ✅ إعادة إبلاغ SW بالدور
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        if (reg.active) reg.active.postMessage({ type: 'SET_ROLE', role: MY_ROLE });
+      } catch(e){}
+    }
     onMessage(messaging,payload=>{
       const d=payload.data||{};
-      // ✅ الإصلاح: لا تعرض إشعاراً موجهاً لدور آخر (حماية من مشاركة الـ Token)
+      // ✅ الإصلاح: لا تعرض إشعاراً موجهاً لدور آخر
       if(d.role && d.role !== MY_ROLE){
         console.warn('🚫 FCM: إشعار لدور آخر — تجاهل', d.role, '| دورك:', MY_ROLE);
         return;
@@ -3165,8 +3141,7 @@ async function boot(){
   const r=urlParams.get('for');
   const storedRole = localStorage.getItem('ayousha_role');
   if(r==='her'||r==='me'){
-    // ✅ الإصلاح: لا تُغيّر الدور المحفوظ إذا كان الرابط موجهاً لدور آخر
-    // (يمنع تحويل جهاز المرسل إلى جهاز المستقبل عند فتح رابط إشعار لها)
+    // ✅ لا تُغيّر الدور المحفوظ إذا كان الرابط موجهاً لدور آخر
     if(!storedRole || storedRole === r){
       MY_ROLE=r;
       localStorage.setItem('ayousha_role',r);
@@ -3179,6 +3154,9 @@ async function boot(){
     localStorage.setItem('ayousha_role',MY_ROLE);
   }
   window.currentMailRole=MY_ROLE;
+
+  // ✅ مزامنة الدور مع Service Worker
+  syncRoleToSW();
 
   try{
     firebaseApp=initializeApp(firebaseConfig);
@@ -3210,6 +3188,8 @@ async function boot(){
 
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
+    // مزامنة إضافية بعد تسجيل SW
+    navigator.serviceWorker.ready.then(syncRoleToSW).catch(()=>{});
   }
 
   updateGreet();updateCountdown();renderDaily();renderPings();renderSurprises();if(typeof updateInteractiveGiftBadge==='function')updateInteractiveGiftBadge();renderMails();renderMemories();renderMood();
@@ -3282,7 +3262,7 @@ async function boot(){
   setInterval(()=>{updateChatPresence();},3000);
 }
 /* ============================================================
-   مشروع البطاقات المضمّن والحماية برمز مرور (الافتراضي: 36)
+   مشروع البطاقات المضمّن
    ============================================================ */
 const CARDS_DEFAULT_PIN = '36';
 function getCardsPin() {
