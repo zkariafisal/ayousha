@@ -13,83 +13,36 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-/* ================================================================
-   ✅ الإصلاح الجوهري: تخزين دور الجهاز في Cache API (دائم)
-   يُكتب من صفحة index.html، ويُقرأ هنا في SW
-   ================================================================ */
-const ROLE_CACHE = 'ayousha-role-v1';
-
-async function getMyRole() {
-  try {
-    const cache = await caches.open(ROLE_CACHE);
-    const resp = await cache.match('/__my_role__');
-    if (!resp) return null;
-    const text = (await resp.text()).trim();
-    return (text === 'me' || text === 'her') ? text : null;
-  } catch (e) { return null; }
-}
-
-async function setMyRole(role) {
-  try {
-    const cache = await caches.open(ROLE_CACHE);
-    await cache.put('/__my_role__', new Response(role, {
-      headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' }
-    }));
-    console.log('[SW] 🎯 تم تعيين دور الجهاز:', role);
-  } catch (e) { console.warn('[SW] فشل حفظ الدور:', e); }
-}
-
-/* استقبال الدور من الصفحة عبر postMessage */
-self.addEventListener('message', event => {
-  const data = event.data || {};
-  if (data.type === 'SET_ROLE' && (data.role === 'me' || data.role === 'her')) {
-    event.waitUntil(setMyRole(data.role));
-  }
-});
-
-/* رموز الإشعارات */
 const symbols = {
-  mail: '💌', game: '🎮', surprise: '🎁', memory: '📸',
-  ping: '💗', mood: '🌙', answer: '📝', quiz: '🧠',
-  dailyShared: '🌟', random: '🎲', interactiveGift: '🎁', gift: '🎁',
-  balderdash: '🌀', fibbage: '🤥', codenames: '🕵️', werewolf: '🐺',
-  resistance: '🎭', xo: '❌⭕', story: '📖', trivia: '🧠',
-  puzzle: '🧩', telepathy: '💞', spin: '🎡', draw: '🎨',
-  guessNum: '🔢', cards: '💌', doors: '🚪'
+  mail: '💌',
+  game: '🎮',
+  surprise: '🎁',
+  memory: '📸',
+  ping: '💗',
+  mood: '🌙',
+  answer: '📝',
+  quiz: '🧠',
+  dailyShared: '🌟',
+  random: '🎲'
 };
 
-/* ================================================================
-   ✅ الإصلاح الحرج: التحقق من الدور قبل عرض الإشعار
-   ================================================================ */
-messaging.onBackgroundMessage(async payload => {
+// استقبال الإشعارات في الخلفية وتوجيه الرابط بدقة
+messaging.onBackgroundMessage(payload => {
   const d = payload.data || {};
   const type = d.type || 'game';
   const itemId = d.itemId || '';
-  const notifRole = d.role === 'her' ? 'her' : (d.role === 'me' ? 'me' : null);
+  const role = d.role === 'her' ? 'her' : 'me';
 
-  // ✅ الخطوة 1: جلب دور هذا الجهاز من الكاش
-  const myRole = await getMyRole();
-
-  // ✅ الخطوة 2: إذا عرفنا دورنا وكان الإشعار لغيرنا ← تجاهل تماماً
-  if (myRole && notifRole && notifRole !== myRole) {
-    console.log(`[SW] 🚫 إشعار مُوجّه لـ "${notifRole}" — جهازي هو "${myRole}" — تجاهل`);
-    return; // لا نعرض الإشعار إطلاقاً
-  }
-
-  // إذا لم نعرف دورنا أو لم نعرف المرسل إليه ← نعرض (fallback آمن)
-  if (!myRole) {
-    console.warn('[SW] ⚠️ دور الجهاز غير محفوظ بعد — قد يظهر إشعار خاطئ. سيُصلح بعد فتح التطبيق.');
-  }
-
-  const role = notifRole || 'me';
-  const base = self.registration.scope || (self.location.origin + '/');
+  const base = self.registration.scope || self.location.origin + '/';
   const url = new URL(base);
-  if (url.pathname.endsWith('/')) url.pathname += 'index.html';
+  if (url.pathname.endsWith('/')) {
+    url.pathname += 'index.html';
+  }
   url.searchParams.set('for', role);
   url.searchParams.set('open', type);
   if (itemId) url.searchParams.set('item', itemId);
 
-  const icon = symbols[type] || symbols[itemId] || '🔔';
+  const icon = symbols[type] || '🔔';
   const title = (d.title || 'عيون عيوشة 🌸').startsWith(icon) ? d.title : `${icon} ${d.title || 'رسالة جديدة'}`;
 
   return self.registration.showNotification(title, {
@@ -102,13 +55,16 @@ messaging.onBackgroundMessage(async payload => {
     requireInteraction: true,
     renotify: true,
     timestamp: Date.now(),
-    data: { url: url.href, type, itemId, role }
+    data: {
+      url: url.href,
+      type,
+      itemId,
+      role
+    }
   });
 });
 
-/* ================================================================
-   ✅ عند النقر: فتح التطبيق والانتقال للشيء المطلوب
-   ================================================================ */
+// عند نقر المستخدم على الإشعار من شاشة القفل أو مركز إشعارات الهاتف
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const details = event.notification.data || {};
@@ -116,16 +72,19 @@ self.addEventListener('notificationclick', event => {
   const itemId = details.itemId || '';
   const role = details.role || 'me';
 
+  // بناء الرابط المقصود بدقة
   let targetUrl;
   try {
-    const base = self.registration.scope || (self.location.origin + '/');
+    const base = self.registration.scope || self.location.origin + '/';
     const u = new URL(base);
-    if (u.pathname.endsWith('/')) u.pathname += 'index.html';
+    if (u.pathname.endsWith('/')) {
+      u.pathname += 'index.html';
+    }
     if (details.url) {
       try {
         const parsed = new URL(details.url, self.location.origin);
         u.pathname = parsed.pathname;
-        parsed.searchParams.forEach((v, k) => u.searchParams.set(k, v));
+        parsed.searchParams.forEach((val, key) => u.searchParams.set(key, val));
       } catch (_) {}
     }
     u.searchParams.set('for', role);
@@ -139,10 +98,13 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil((async () => {
     const windowClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
 
+    // إذا كان التطبيق مفتوحاً في الخلفية
     for (const client of windowClients) {
       try {
         if ('focus' in client) await client.focus();
-        if ('navigate' in client && client.url !== targetUrl) await client.navigate(targetUrl);
+        if ('navigate' in client && client.url !== targetUrl) {
+          await client.navigate(targetUrl);
+        }
         client.postMessage({
           type: 'OPEN_AYOUSHA_DESTINATION',
           open: openType,
@@ -152,10 +114,13 @@ self.addEventListener('notificationclick', event => {
         });
         return;
       } catch (err) {
-        console.warn('[SW] خطأ في التركيز على النافذة:', err);
+        console.warn('Focus existing client error:', err);
       }
     }
 
-    if (clients.openWindow) await clients.openWindow(targetUrl);
+    // إذا كان التطبيق مقفلاً تماماً، افتح نافذة جديدة مباشرة بالرابط والوجهة المحددة
+    if (clients.openWindow) {
+      await clients.openWindow(targetUrl);
+    }
   })());
 });
