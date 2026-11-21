@@ -659,6 +659,53 @@ let modalLocked = false;
 let allNotifs = [];
 let currentNotifTab = 'inbox';
 let _lastSyncedMeetupIso = '';
+let _dbPermissionDenied = false;
+const APP_CACHE_KEY = 'ayousha_app_cache_v1';
+function saveLocalAppCache(){
+  try{
+    localStorage.setItem(APP_CACHE_KEY, JSON.stringify({
+      meetupDate: state.meetupDate,
+      settings: state.settings,
+      mails: state.mails.slice(-200),
+      surprises: state.surprises,
+      memories: state.memories.slice(0, 60),
+      pings: state.pings.slice(-100),
+      v9Daily,
+      v9Moods,
+      v9Occasions
+    }));
+  }catch(e){}
+}
+function loadLocalAppCache(){
+  try{
+    const raw = localStorage.getItem(APP_CACHE_KEY);
+    if(!raw) return;
+    const c = JSON.parse(raw);
+    if(c.meetupDate && !state.meetupDate){ state.meetupDate = c.meetupDate; _lastSyncedMeetupIso = c.meetupDate; }
+    if(c.settings) state.settings = { ...state.settings, ...c.settings };
+    if(Array.isArray(c.mails) && !state.mails.length) state.mails = c.mails;
+    if(Array.isArray(c.surprises) && !state.surprises.length) state.surprises = c.surprises;
+    if(Array.isArray(c.memories) && !state.memories.length) state.memories = c.memories;
+    if(Array.isArray(c.pings) && !state.pings.length) state.pings = c.pings;
+    if(c.v9Daily) v9Daily = c.v9Daily;
+    if(c.v9Moods) v9Moods = c.v9Moods;
+    if(c.v9Occasions) v9Occasions = c.v9Occasions;
+  }catch(e){}
+}
+function handleFirebaseReadError(scope, err){
+  console.warn(scope, err);
+  const msg = String(err?.code || err?.message || err || '');
+  if(msg.toLowerCase().includes('permission')){
+    if(!_dbPermissionDenied){
+      _dbPermissionDenied = true;
+      const dot = document.getElementById('syncDot');
+      const txt = document.getElementById('syncText');
+      if(dot) dot.className = 'sync-dot offline';
+      if(txt) txt.textContent = '⚠️ انتهت صلاحية قواعد Firebase (Permission Denied) — حدّث Rules لاسترجاع البيانات';
+      toast('⚠️ قاعدة البيانات مرفوضة: حدّث Rules في Firebase Console لاسترجاع رسائلك القديمة');
+    }
+  }
+}
 let v9Daily={}, v9Prompts={}, v9Moods={}, v9Occasions={};
 
 let state = {
@@ -1952,7 +1999,8 @@ window.openResistanceGame = function(){ window.launchGameModal('resistance'); };
 window.resizeChatInput=function(el){ if(!el) return; el.style.height='43px'; el.style.height=Math.min(el.scrollHeight,115)+'px'; };
 
 function chatMessageHtml(m){
-  const mine=m.by===MY_ROLE;
+  const msgSender=m.by||m.from||'me';
+  const mine=msgSender===MY_ROLE;
   const status=m.readAt?'◉':m.deliveredAt?'✓✓':'✓';
   const label=m.readAt?'قُرئت '+chatTime(m.readAt):m.deliveredAt?'استُلمت '+chatTime(m.deliveredAt):'أُرسلت';
   const quoted=m.replyTo&&state.mails.find(x=>x.id===m.replyTo);
@@ -1987,7 +2035,7 @@ window.openMedia = function(url){
 
 function renderMails(){
   const el=document.getElementById('mailList');if(!el)return;
-  const items=[...state.mails].filter(m=>m.by===MY_ROLE||m.to===MY_ROLE||!m.to).sort((a,b)=>new Date(a.createdAt||a.at||0)-new Date(b.createdAt||b.at||0));
+  const items=[...state.mails].filter(m=>{const s=m.by||m.from;return !s||!m.to||s===MY_ROLE||m.to===MY_ROLE||s===otherRole();}).sort((a,b)=>new Date(a.createdAt||a.at||0)-new Date(b.createdAt||b.at||0));
   const nearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<160;
   const previousCount=el.querySelectorAll('[data-mail-id]').length;
   el.innerHTML=items.length?items.map(chatMessageHtml).join(''):'<div style="text-align:center;color:#887581;padding:30px;">💌 ابدآ المحادثة برسالة جميلة</div>';
@@ -2012,7 +2060,7 @@ window.sendInstantMail=async function(event){
     field.value='';window.resizeChatInput(field);status.textContent='';window.cancelChatReply();clearTyping();playEventSound('mail',true);
     requestAnimationFrame(()=>{const list=document.getElementById('mailList');if(list)list.scrollTop=list.scrollHeight;});
     Promise.resolve().then(()=>addNotification('💌 رسالة من '+senderName(MY_ROLE),message,'mail',record.key)).catch(console.warn);
-  }catch(error){console.error(error);status.textContent='تعذر الإرسال: '+(error?.message||'');}
+  }catch(error){console.error(error);const msg=String(error?.message||'');if(msg.toLowerCase().includes('permission')){status.textContent='❌ تم رفض الإرسال من Firebase (انتهت صلاحية Rules في Firebase Console — حدّث Rules إلى true لاستعادة الإرسال والرسائل القديمة)';}else{status.textContent='تعذر الإرسال: '+msg;}}
   finally{button.disabled=false;}
 };
 
@@ -3064,12 +3112,18 @@ async function boot(){
     navigator.serviceWorker.ready.then(syncRoleToSW).catch(()=>{});
   }
 
+  loadLocalAppCache();
   try{const cachedMeet=localStorage.getItem('ayousha_meetupDate');if(cachedMeet){state.meetupDate=cachedMeet;_lastSyncedMeetupIso=cachedMeet;}}catch(e){}
   updateGreet();updateCountdown();renderDaily();renderPings();renderSurprises();if(typeof updateInteractiveGiftBadge==='function')updateInteractiveGiftBadge();renderMails();renderMemories();renderMood();
 
   onValue(ref(db,'.info/connected'),s=>{
     const ok=s.val()===true;
     const dot=document.getElementById('syncDot'),txt=document.getElementById('syncText');
+    if(_dbPermissionDenied){
+      if(dot)dot.className='sync-dot offline';
+      if(txt)txt.textContent='⚠️ قاعدة البيانات مرفوضة (Permission Denied) — حدّث Rules في Firebase Console';
+      return;
+    }
     if(dot)dot.className='sync-dot '+(ok?'':'offline');
     if(txt)txt.textContent=ok?'متصل بالحب وقاعدة البيانات':'غير متصل — تحقق من الإنترنت';
   });
@@ -3077,10 +3131,12 @@ async function boot(){
   onValue(ref(db,'games/stats/hearts'),s=>{const c=s.val()||0;const el=document.getElementById('sharedHeartsCount');if(el)el.textContent=c;});
 
   onValue(ref(db,'app/mails'),s=>{
+    _dbPermissionDenied=false;
     const v=s.val();
     state.mails=v?Object.entries(v).map(([id,item])=>({id,...item})):[];
+    saveLocalAppCache();
     renderMails();markDelivered().then(markChatMessages);
-  },e=>console.warn('mail sync',e));
+  },e=>handleFirebaseReadError('mail sync',e));
 
   onValue(ref(db,'app/notifications'),s=>{
     const v=s.val();
@@ -3088,40 +3144,43 @@ async function boot(){
     updateNotifBell();
     processIncomingNotifications(allNotifs);
     if(document.getElementById('view-notifications')?.classList.contains('active'))renderNotifs(currentNotifTab);
-  });
+  },e=>handleFirebaseReadError('notif sync',e));
 
   onValue(ref(db,'app/pings'),s=>{
     const v=s.val();
     state.pings=v?Object.entries(v).map(([id,item])=>({id,...item})):[];
+    saveLocalAppCache();
     renderPings();
-  });
+  },e=>handleFirebaseReadError('ping sync',e));
 
-  onValue(ref(db,'app/dailyResponses'),s=>{v9Daily=s.val()||{};renderDaily();});
-  onValue(ref(db,'app/dailyPrompts'),s=>{v9Prompts=s.val()||{};renderDaily();});
-  onValue(ref(db,'app/v9Moods'),s=>{v9Moods=s.val()||{};renderMood();});
-  onValue(ref(db,'app/v9Occasions'),s=>{v9Occasions=s.val()||{};});
+  onValue(ref(db,'app/dailyResponses'),s=>{v9Daily=s.val()||{};saveLocalAppCache();renderDaily();},e=>handleFirebaseReadError('daily sync',e));
+  onValue(ref(db,'app/dailyPrompts'),s=>{v9Prompts=s.val()||{};renderDaily();},e=>handleFirebaseReadError('prompts sync',e));
+  onValue(ref(db,'app/v9Moods'),s=>{v9Moods=s.val()||{};saveLocalAppCache();renderMood();},e=>handleFirebaseReadError('moods sync',e));
+  onValue(ref(db,'app/v9Occasions'),s=>{v9Occasions=s.val()||{};saveLocalAppCache();},e=>handleFirebaseReadError('occasions sync',e));
 
   onValue(ref(db,'app/interactiveGifts'),s=>{
     const v=s.val();
     window.allInteractiveGifts = v ? Object.entries(v).map(([id,item])=>({id,...item})).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)) : [];
     try { localStorage.setItem('ayousha_interactive_gifts', JSON.stringify(window.allInteractiveGifts)); } catch(e){}
     if(typeof window.updateInteractiveGiftBadge === 'function') window.updateInteractiveGiftBadge();
-  }, e=>console.warn('interactiveGifts sync', e));
+  }, e=>handleFirebaseReadError('interactiveGifts sync', e));
 
   onValue(ref(db,'app/surprises'),s=>{
     const v=s.val();
     state.surprises=v?Object.entries(v).map(([id,item])=>({id,...item})):[];
+    saveLocalAppCache();
     renderSurprises();
-  });
+  },e=>handleFirebaseReadError('surprises sync',e));
 
   onValue(ref(db,'app/memories'),s=>{
     const v=s.val();
     state.memories=v?Object.entries(v).map(([id,item])=>({id,...item})):[];
+    saveLocalAppCache();
     renderMemories();
-  });
+  },e=>handleFirebaseReadError('memories sync',e));
 
-  onValue(ref(db,'app/moods'),s=>{state.moods=s.val()||{};renderMood();});
-  onValue(ref(db,'app/settings'),s=>{if(s.val())state.settings=s.val();updateGreet();});
+  onValue(ref(db,'app/moods'),s=>{state.moods=s.val()||{};renderMood();},e=>handleFirebaseReadError('legacy moods sync',e));
+  onValue(ref(db,'app/settings'),s=>{if(s.val())state.settings=s.val();saveLocalAppCache();updateGreet();},e=>handleFirebaseReadError('settings sync',e));
   let _initialMeetupMetaLoaded=false;
   onValue(ref(db,'app/meetupDate'),s=>{
     const val=s.val()||'';
