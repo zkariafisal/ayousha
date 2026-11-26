@@ -823,6 +823,9 @@ const SOUND_PATTERNS = {
   mood: [{ freq: 523.25, dur: 0.10, gap: 0.03, vol: 0.32 }, { freq: 783.99, dur: 0.16, gap: 0.02, vol: 0.36 }],
   reconnect: [{ freq: 659.25, dur: 0.085, gap: 0.025, vol: 0.34 }, { freq: 880, dur: 0.095, gap: 0.025, vol: 0.36 }, { freq: 1174.66, dur: 0.18, gap: 0.02, vol: 0.40 }],
   call: [{ freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.45 }, { freq: 880.00, dur: 0.14, gap: 0.03, vol: 0.48 }, { freq: 1046.50, dur: 0.16, gap: 0.05, vol: 0.50 }, { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.45 }, { freq: 880.00, dur: 0.14, gap: 0.03, vol: 0.48 }, { freq: 1046.50, dur: 0.22, gap: 0.10, vol: 0.52 }],
+  notif_romantic: [{ freq: 523.25, dur: 0.11, gap: 0.03, vol: 0.34 }, { freq: 659.25, dur: 0.11, gap: 0.03, vol: 0.38 }, { freq: 783.99, dur: 0.12, gap: 0.03, vol: 0.40 }, { freq: 1046.50, dur: 0.22, gap: 0.02, vol: 0.42 }],
+  notif_crystal: [{ freq: 1046.50, dur: 0.075, gap: 0.025, vol: 0.36 }, { freq: 1318.51, dur: 0.085, gap: 0.025, vol: 0.40 }, { freq: 1567.98, dur: 0.16, gap: 0.02, vol: 0.38 }],
+  notif_dew: [{ freq: 740.00, dur: 0.08, gap: 0.03, vol: 0.36 }, { freq: 987.77, dur: 0.10, gap: 0.03, vol: 0.40 }, { freq: 1479.98, dur: 0.18, gap: 0.02, vol: 0.38 }],
   send: [{ freq: 580, dur: 0.055, gap: 0.015, vol: 0.18 }, { freq: 780, dur: 0.07, gap: 0.01, vol: 0.20 }]
 };
 
@@ -982,13 +985,46 @@ function playViaWebAudio(key){
 
 function playEventSound(type='mail', outgoing=false, force=false){
   if(!soundsEnabled) return;
-  const key = outgoing ? 'send' : (SOUND_PATTERNS[type] ? type : 'notification');
+  const isCustomNotifTarget = !outgoing && type !== 'call';
+  const presetKey = (isCustomNotifTarget && customNotifPreset && SOUND_PATTERNS['notif_' + customNotifPreset])
+    ? ('notif_' + customNotifPreset)
+    : '';
+  const key = outgoing ? 'send' : (presetKey || (SOUND_PATTERNS[type] ? type : 'notification'));
   const now = Date.now();
   if(!outgoing && !force){
     if(now - _lastIncomingSoundAt < 240) return;
     _lastIncomingSoundAt = now;
   }
   initAudio();
+  if(isCustomNotifTarget && customNotifSoundUrl){
+    try {
+      stopActiveCustomNotifPlayer();
+      const customPlayer = new Audio(customNotifSoundUrl);
+      customPlayer.volume = 0.95;
+      activeCustomNotifPlayer = customPlayer;
+      customPlayer.onended = () => {
+        if(activeCustomNotifPlayer === customPlayer) activeCustomNotifPlayer = null;
+      };
+      clearTimeout(activeCustomNotifTimer);
+      activeCustomNotifTimer = setTimeout(() => {
+        if(activeCustomNotifPlayer === customPlayer) stopActiveCustomNotifPlayer();
+      }, 9500);
+      const cp = customPlayer.play();
+      if(cp && typeof cp.catch === 'function'){
+        cp.catch(() => {
+          if(activeCustomNotifPlayer === customPlayer) activeCustomNotifPlayer = null;
+          const ok = playViaWebAudio(key);
+          if(!ok || (audioCtx && audioCtx.state === 'suspended')){
+            _pendingSoundType = type;
+            if(document.visibilityState === 'visible'){
+              toast('🔊 اضغط في أي مكان لتشغيل صوت الإشعار الوارد');
+            }
+          }
+        });
+      }
+      return;
+    } catch(e){}
+  }
   try {
     const base = getPreloadedAudio(key);
     if(base){
@@ -1850,9 +1886,9 @@ window.openModal = function(html){
   window.restoreModalInputs(drafts);
   document.getElementById('modalBg').classList.add('show');
 };
-function closeModal(){ if(modalLocked) return; if(typeof window.stopCustomRingtonePreview === 'function') window.stopCustomRingtonePreview(); if(typeof v10ActivityListeners!=="undefined"){Object.values(v10ActivityListeners).forEach(fn=>fn());v10ActivityListeners={};} document.getElementById('modalBg').classList.remove('show'); if(window._activeGameUnsub){window._activeGameUnsub();window._activeGameUnsub=null;} if(window._activeChatUnsub){window._activeChatUnsub();window._activeChatUnsub=null;} }
+function closeModal(){ if(modalLocked) return; if(typeof window.stopCustomRingtonePreview === 'function') window.stopCustomRingtonePreview(); if(typeof window.stopCustomNotifPreview === 'function') window.stopCustomNotifPreview(); if(typeof v10ActivityListeners!=="undefined"){Object.values(v10ActivityListeners).forEach(fn=>fn());v10ActivityListeners={};} document.getElementById('modalBg').classList.remove('show'); if(window._activeGameUnsub){window._activeGameUnsub();window._activeGameUnsub=null;} if(window._activeChatUnsub){window._activeChatUnsub();window._activeChatUnsub=null;} }
 window.closeModal = closeModal;
-window.forceCloseModal = () => { modalLocked=false; if(typeof window.stopCustomRingtonePreview === 'function') window.stopCustomRingtonePreview(); document.getElementById('modalBg').classList.remove('show'); };
+window.forceCloseModal = () => { modalLocked=false; if(typeof window.stopCustomRingtonePreview === 'function') window.stopCustomRingtonePreview(); if(typeof window.stopCustomNotifPreview === 'function') window.stopCustomNotifPreview(); document.getElementById('modalBg').classList.remove('show'); };
 
 window.switchView = function(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
@@ -2892,11 +2928,43 @@ let customRingtoneUrl = null;
 let customRingtoneName = '';
 let customRingtonePreviewEl = null;
 
+let customNotifSoundUrl = null;
+let customNotifSoundName = '';
+let customNotifPreset = '';
+let customNotifPreviewEl = null;
+let activeCustomNotifPlayer = null;
+let activeCustomNotifTimer = null;
+
+function stopActiveCustomNotifPlayer(){
+  clearTimeout(activeCustomNotifTimer);
+  activeCustomNotifTimer = null;
+  if(activeCustomNotifPlayer){
+    try { activeCustomNotifPlayer.pause(); activeCustomNotifPlayer.currentTime = 0; } catch(e){}
+    activeCustomNotifPlayer = null;
+  }
+}
+
 function getRingtoneStorageKey(){
   return 'ringtone_' + (MY_ROLE || 'me');
 }
 function getRingtoneMetaKey(){
   return roleStorageKey('ayousha_custom_ringtone_meta');
+}
+function getNotifStorageKey(){
+  return 'notif_' + (MY_ROLE || 'me');
+}
+function getNotifMetaKey(){
+  return roleStorageKey('ayousha_custom_notif_meta');
+}
+function getNotifPresetKey(){
+  return roleStorageKey('ayousha_custom_notif_preset');
+}
+function getNotifDisplayLabel(){
+  if(customNotifSoundName) return `🎵 من الهاتف: ${customNotifSoundName}`;
+  if(customNotifPreset === 'romantic') return '💖 نغمة رومانسية ناعمة';
+  if(customNotifPreset === 'crystal') return '✨ نغمة كريستال سريعة';
+  if(customNotifPreset === 'dew') return '💧 نغمة قطرة ندى';
+  return '🔔 نغمة الإشعارات الافتراضية';
 }
 function openRingtoneDB(){
   return new Promise((resolve, reject) => {
@@ -2921,6 +2989,21 @@ function updateCustomRingtoneSettingsUI(){
   if(previewBtn){
     previewBtn.textContent = (customRingtonePreviewEl && !customRingtonePreviewEl.paused) ? '⏹️ إيقاف المعاينة' : '▶️ تجربة الرنين';
   }
+  const notifLabel = document.getElementById('customNotifNameLabel');
+  if(notifLabel){
+    notifLabel.textContent = getNotifDisplayLabel();
+  }
+  const notifPreviewBtn = document.getElementById('previewCustomNotifBtn');
+  if(notifPreviewBtn){
+    notifPreviewBtn.textContent = (customNotifPreviewEl && !customNotifPreviewEl.paused) ? '⏹️ إيقاف المعاينة' : '▶️ تجربة الإشعار';
+  }
+  ['default', 'romantic', 'crystal', 'dew'].forEach(p => {
+    const pb = document.getElementById('notifPresetBtn_' + p);
+    if(pb){
+      const isSelected = !customNotifSoundName && ((p === 'default' && !customNotifPreset) || customNotifPreset === p);
+      pb.className = 'btn ' + (isSelected ? 'btn-primary' : 'btn-soft');
+    }
+  });
   const standbyBtn = document.getElementById('settingsStandbyToggleBtn');
   if(standbyBtn){
     standbyBtn.textContent = bgCallStandbyEnabled
@@ -2955,6 +3038,34 @@ async function loadCustomRingtone(){
   } catch(e){}
   return null;
 }
+async function loadCustomNotifSound(){
+  try {
+    customNotifPreset = localStorage.getItem(getNotifPresetKey()) || '';
+    const metaRaw = localStorage.getItem(getNotifMetaKey());
+    if(metaRaw){
+      try { customNotifSoundName = JSON.parse(metaRaw)?.name || ''; } catch(e){}
+    }
+    const idb = await openRingtoneDB();
+    const record = await new Promise((resolve) => {
+      const tx = idb.transaction(RINGTONE_STORE_NAME, 'readonly');
+      const req = tx.objectStore(RINGTONE_STORE_NAME).get(getNotifStorageKey());
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+    if(record && record.blob){
+      if(customNotifSoundUrl && customNotifSoundUrl.startsWith('blob:')){
+        try { URL.revokeObjectURL(customNotifSoundUrl); } catch(e){}
+      }
+      customNotifSoundUrl = URL.createObjectURL(record.blob);
+      customNotifSoundName = record.name || customNotifSoundName || 'نغمة الإشعارات المخصصة';
+      localStorage.setItem(getNotifMetaKey(), JSON.stringify({ name: customNotifSoundName, type: record.type || record.blob.type || 'audio/mpeg', updatedAt: record.updatedAt || Date.now() }));
+      updateCustomRingtoneSettingsUI();
+      return customNotifSoundUrl;
+    }
+  } catch(e){}
+  updateCustomRingtoneSettingsUI();
+  return null;
+}
 window.stopCustomRingtonePreview = function(){
   if(customRingtonePreviewEl){
     try {
@@ -2962,6 +3073,16 @@ window.stopCustomRingtonePreview = function(){
       customRingtonePreviewEl.currentTime = 0;
     } catch(e){}
     customRingtonePreviewEl = null;
+  }
+  updateCustomRingtoneSettingsUI();
+};
+window.stopCustomNotifPreview = function(){
+  if(customNotifPreviewEl){
+    try {
+      customNotifPreviewEl.pause();
+      customNotifPreviewEl.currentTime = 0;
+    } catch(e){}
+    customNotifPreviewEl = null;
   }
   updateCustomRingtoneSettingsUI();
 };
@@ -2973,6 +3094,7 @@ window.handleCustomRingtoneSelect = async function(input){
     return;
   }
   window.stopCustomRingtonePreview();
+  window.stopCustomNotifPreview();
   try {
     const idb = await openRingtoneDB();
     const payload = { blob: file, name: file.name, type: file.type || 'audio/mpeg', updatedAt: Date.now() };
@@ -3001,8 +3123,73 @@ window.handleCustomRingtoneSelect = async function(input){
     if(input) input.value = '';
   }
 };
+window.handleCustomNotifSoundSelect = async function(input){
+  const file = input?.files?.[0];
+  if(!file) return;
+  if(!file.type.startsWith('audio/') && !/\.(mp3|m4a|wav|ogg|aac|flac|opus|3gp)$/i.test(file.name)){
+    toast('⚠️ يرجى اختيار ملف صوتي صالح من الهاتف');
+    return;
+  }
+  window.stopCustomRingtonePreview();
+  window.stopCustomNotifPreview();
+  stopActiveCustomNotifPlayer();
+  try {
+    const idb = await openRingtoneDB();
+    const payload = { blob: file, name: file.name, type: file.type || 'audio/mpeg', updatedAt: Date.now() };
+    await new Promise((resolve, reject) => {
+      const tx = idb.transaction(RINGTONE_STORE_NAME, 'readwrite');
+      const req = tx.objectStore(RINGTONE_STORE_NAME).put(payload, getNotifStorageKey());
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+    if(customNotifSoundUrl && customNotifSoundUrl.startsWith('blob:')){
+      try { URL.revokeObjectURL(customNotifSoundUrl); } catch(e){}
+    }
+    customNotifSoundUrl = URL.createObjectURL(file);
+    customNotifSoundName = file.name;
+    customNotifPreset = '';
+    try { localStorage.removeItem(getNotifPresetKey()); } catch(e){}
+    localStorage.setItem(getNotifMetaKey(), JSON.stringify({ name: file.name, type: file.type || 'audio/mpeg', updatedAt: Date.now() }));
+    updateCustomRingtoneSettingsUI();
+    toast(`✅ تم تخصيص نغمة الإشعارات: ${file.name}`);
+    window.previewCustomNotifSound();
+  } catch(e){
+    toast('⚠️ تعذر حفظ نغمة الإشعارات — حاول بملف أصغر');
+  } finally {
+    if(input) input.value = '';
+  }
+};
+window.selectCustomNotifPreset = async function(preset){
+  initAudio();
+  window.stopCustomNotifPreview();
+  stopActiveCustomNotifPlayer();
+  try {
+    const idb = await openRingtoneDB();
+    await new Promise((resolve) => {
+      const tx = idb.transaction(RINGTONE_STORE_NAME, 'readwrite');
+      const req = tx.objectStore(RINGTONE_STORE_NAME).delete(getNotifStorageKey());
+      req.onsuccess = () => resolve();
+      req.onerror = () => resolve();
+    });
+  } catch(e){}
+  if(customNotifSoundUrl && customNotifSoundUrl.startsWith('blob:')){
+    try { URL.revokeObjectURL(customNotifSoundUrl); } catch(e){}
+  }
+  customNotifSoundUrl = null;
+  customNotifSoundName = '';
+  customNotifPreset = preset === 'default' ? '' : preset;
+  try { localStorage.removeItem(getNotifMetaKey()); } catch(e){}
+  try {
+    if(customNotifPreset) localStorage.setItem(getNotifPresetKey(), customNotifPreset);
+    else localStorage.removeItem(getNotifPresetKey());
+  } catch(e){}
+  updateCustomRingtoneSettingsUI();
+  playEventSound('mail', false, true);
+  toast(`✅ تم تفعيل: ${getNotifDisplayLabel()}`);
+};
 window.previewCustomRingtone = async function(){
   initAudio();
+  window.stopCustomNotifPreview();
   if(customRingtonePreviewEl && !customRingtonePreviewEl.paused){
     window.stopCustomRingtonePreview();
     return;
@@ -3029,6 +3216,36 @@ window.previewCustomRingtone = async function(){
     toast('⚠️ تعذر تشغيل معاينة النغمة');
   }
 };
+window.previewCustomNotifSound = async function(){
+  initAudio();
+  window.stopCustomRingtonePreview();
+  if(customNotifPreviewEl && !customNotifPreviewEl.paused){
+    window.stopCustomNotifPreview();
+    return;
+  }
+  window.stopCustomNotifPreview();
+  if(!customNotifSoundUrl) await loadCustomNotifSound();
+  const presetKey = (customNotifPreset && SOUND_PATTERNS['notif_' + customNotifPreset]) ? ('notif_' + customNotifPreset) : 'mail';
+  const srcUrl = customNotifSoundUrl || getToneAudioUrl(presetKey);
+  try {
+    const a = new Audio(srcUrl);
+    a.loop = false;
+    a.volume = 0.95;
+    a.onended = () => {
+      if(customNotifPreviewEl === a){
+        customNotifPreviewEl = null;
+        updateCustomRingtoneSettingsUI();
+      }
+    };
+    customNotifPreviewEl = a;
+    updateCustomRingtoneSettingsUI();
+    await a.play();
+  } catch(e){
+    customNotifPreviewEl = null;
+    updateCustomRingtoneSettingsUI();
+    playEventSound('mail', false, true);
+  }
+};
 window.resetCustomRingtone = async function(){
   window.stopCustomRingtonePreview();
   try {
@@ -3052,6 +3269,9 @@ window.resetCustomRingtone = async function(){
   } catch(e){}
   updateCustomRingtoneSettingsUI();
   toast('🔔 تم استعادة نغمة الرنين الافتراضية');
+};
+window.resetCustomNotifSound = async function(){
+  await window.selectCustomNotifPreset('default');
 };
 window.toggleBgStandbyFromSettings = function(){
   window.toggleBgCallStandby();
@@ -3251,6 +3471,8 @@ async function startCallTone(mode){
     _ringOscillators = [];
   }
   window.stopCustomRingtonePreview();
+  window.stopCustomNotifPreview();
+  stopActiveCustomNotifPlayer();
 
   if(!activeCallState || activeCallState.status !== 'ringing') return;
   const myEpoch = callToneEpoch;
@@ -4809,6 +5031,23 @@ window.openSettings=function(){
       <div style="font-size:.74rem;color:#887581;line-height:1.55;">💡 لتعمل نغمتك المخصصة من الهاتف تلقائياً أثناء المكالمة حتى والشاشة مقفلة، فعّل وضع 📡 بالخلفية. إذا كان المتصفح مغلقاً نهائياً فسيعمل صوت إشعارات Chrome في النظام مع الاهتزاز وزر الرد.</div>
     </div>
     <div style="margin-top:16px;padding-top:12px;border-top:1px dashed #f2d9e4;">
+      <div style="font-weight:800;color:#ad1457;font-size:.92rem;margin-bottom:6px;">🔔 تخصيص نغمة إشعارات ورسائل التطبيق</div>
+      <div id="customNotifNameLabel" class="v9-panel" style="margin:6px 0 8px;font-size:.8rem;color:#6f4b5b;background:#fff8fb;">${escapeHtml(getNotifDisplayLabel())}</div>
+      <input type="file" id="customNotifSoundInput" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac" style="display:none" onchange="window.handleCustomNotifSoundSelect(this)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+        <button type="button" id="notifPresetBtn_default" class="btn ${!customNotifSoundName && !customNotifPreset ? 'btn-primary' : 'btn-soft'}" style="font-size:.78rem;padding:8px 6px;" onclick="window.selectCustomNotifPreset('default')">🔔 افتراضية</button>
+        <button type="button" id="notifPresetBtn_romantic" class="btn ${!customNotifSoundName && customNotifPreset === 'romantic' ? 'btn-primary' : 'btn-soft'}" style="font-size:.78rem;padding:8px 6px;" onclick="window.selectCustomNotifPreset('romantic')">💖 رومانسي ناعم</button>
+        <button type="button" id="notifPresetBtn_crystal" class="btn ${!customNotifSoundName && customNotifPreset === 'crystal' ? 'btn-primary' : 'btn-soft'}" style="font-size:.78rem;padding:8px 6px;" onclick="window.selectCustomNotifPreset('crystal')">✨ كريستال</button>
+        <button type="button" id="notifPresetBtn_dew" class="btn ${!customNotifSoundName && customNotifPreset === 'dew' ? 'btn-primary' : 'btn-soft'}" style="font-size:.78rem;padding:8px 6px;" onclick="window.selectCustomNotifPreset('dew')">💧 قطرة ندى</button>
+      </div>
+      <button type="button" class="btn btn-primary btn-full" style="margin-bottom:8px;" onclick="document.getElementById('customNotifSoundInput')?.click()">📁 اختيار نغمة إشعارات من الهاتف</button>
+      <div style="display:flex;gap:8px;margin-bottom:6px;">
+        <button type="button" id="previewCustomNotifBtn" class="btn btn-soft" style="flex:1;" onclick="window.previewCustomNotifSound()">▶️ تجربة الإشعار</button>
+        <button type="button" class="btn btn-soft" style="flex:1;" onclick="window.resetCustomNotifSound()">↺ استعادة الافتراضية</button>
+      </div>
+      <div style="font-size:.74rem;color:#887581;line-height:1.5;">✨ تعمل هذه النغمة للرسائل والإشعارات والتنبيهات داخل التطبيق وفي الخلفية.</div>
+    </div>
+    <div style="margin-top:16px;padding-top:12px;border-top:1px dashed #f2d9e4;">
       <div style="font-weight:800;color:#ad1457;font-size:.92rem;margin-bottom:8px;">🔄 تغيير هوية هذا الجهاز</div>
       <div style="font-size:.78rem;color:#887581;margin-bottom:10px;line-height:1.5;">إذا كانت الرسائل تظهر وكأنك ترسل لنفسك، اضغط على الزر الصحيح لهويتك:</div>
       <div style="display:flex;gap:8px;margin-bottom:8px;">
@@ -5007,6 +5246,7 @@ async function boot(){
     updateBgStandbyBtn();
   } catch(e){}
   loadCustomRingtone();
+  loadCustomNotifSound();
 
   // ✅ مزامنة الدور مع Service Worker
   syncRoleToSW();
