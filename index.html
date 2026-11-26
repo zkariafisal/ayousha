@@ -733,7 +733,7 @@ body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e)
       <h3 class="call-name" id="callPartnerTitle">عيوشة</h3>
       <div class="call-subline" id="callSubline">
         <span class="call-hd-badge">HD</span>
-        <span>اتصال صوتي خاص</span>
+        <span id="callRouteLabel">🎧 سماعة الأذن</span>
       </div>
       <p class="call-state" id="callStatusText">جاري الاتصال...</p>
       <button type="button" id="callUnmuteHint" class="call-unmute-hint" hidden onclick="event.stopPropagation();window.unlockCallAudioOnTap(true, event)">🔊 اضغطي هنا لسماع الرنة بوضوح</button>
@@ -3685,6 +3685,8 @@ function renderCallOverlay(mode, partnerName, statusText){
   if(title) title.textContent = partnerName || senderName(otherRole());
   if(floatTitle) floatTitle.textContent = `📞 ${partnerName || senderName(otherRole())}`;
   if(status) status.textContent = statusText || '';
+  const routeEl = document.getElementById('callRouteLabel');
+  if(routeEl) routeEl.textContent = callSpeakerOn ? '🔊 مكبر الصوت' : '🎧 سماعة الأذن';
 
   if(mode === 'incoming'){
     lastRenderedCallMode = 'incoming';
@@ -3844,7 +3846,8 @@ function createCallPeerConnection(callId){
       callRemoteStreamRef = ev.streams[0];
       if(audioEl.srcObject !== ev.streams[0]) audioEl.srcObject = ev.streams[0];
       audioEl.muted = !!(callOnHold || remoteOnHold);
-      audioEl.volume = callSpeakerOn ? 1.0 : 0.85;
+      audioEl.volume = callSpeakerOn ? 1.0 : 0.62;
+      applyCallAudioRoute(callSpeakerOn);
       audioEl.play().catch(()=>{});
     }
   };
@@ -3913,8 +3916,21 @@ function cleanupCallSession(msg = ''){
   callRemoteStreamRef = null;
   const audioEl = document.getElementById('remoteCallAudio');
   if(audioEl){
-    try { audioEl.pause(); audioEl.muted = false; audioEl.srcObject = null; } catch(e){}
+    try {
+      audioEl.pause();
+      audioEl.muted = false;
+      audioEl.volume = 1.0;
+      audioEl.srcObject = null;
+      if(typeof audioEl.setSinkId === 'function') audioEl.setSinkId('').catch(()=>{});
+    } catch(e){}
   }
+  try {
+    if(navigator.audioSession) navigator.audioSession.type = 'auto';
+  } catch(e){}
+  try {
+    if(window.Android && typeof window.Android.setSpeakerphoneOn === 'function') window.Android.setSpeakerphoneOn(false);
+    if(window.ayoushaNativeSpeaker && typeof window.ayoushaNativeSpeaker === 'function') window.ayoushaNativeSpeaker(false);
+  } catch(e){}
   activeCallState = null;
   callMuted = false;
   callOnHold = false;
@@ -4005,6 +4021,8 @@ window.startVoiceCall = async function(){
 
   callLocalStream = stream;
   callMuted = false;
+  callSpeakerOn = false;
+  applyCallAudioRoute(false);
   const partnerName = senderName(otherRole());
   const callId = 'call_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
   activeCallState = { callId, role: 'caller', status: 'ringing', from: MY_ROLE, to: otherRole() };
@@ -4146,7 +4164,9 @@ window.answerIncomingCall = async function(ev = null){
 
   callLocalStream = stream;
   callMuted = false;
+  callSpeakerOn = false;
   activeCallState = { callId, role: 'callee', status: 'connected', from: callData.from, to: MY_ROLE };
+  applyCallAudioRoute(false);
 
   const handled = getHandledMissedCallSet();
   handled.add(callId);
@@ -4357,26 +4377,80 @@ window.toggleCallRecording = function(ev = null){
   }
 };
 
-window.toggleCallSpeaker = async function(ev = null){
-  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
-  callSpeakerOn = !callSpeakerOn;
+async function applyCallAudioRoute(useSpeaker = false){
+  callSpeakerOn = !!useSpeaker;
+  const routeEl = document.getElementById('callRouteLabel');
+  if(routeEl) routeEl.textContent = callSpeakerOn ? '🔊 مكبر الصوت' : '🎧 سماعة الأذن';
+  const btn = document.getElementById('callSpeakerBtn');
+  if(btn) btn.classList.toggle('active', callSpeakerOn);
+
+  // 1) Native Android / WebView bridge if hosted inside an Android wrapper
+  let routedNative = false;
+  try {
+    if(window.Android && typeof window.Android.setSpeakerphoneOn === 'function'){
+      window.Android.setSpeakerphoneOn(callSpeakerOn);
+      routedNative = true;
+    }
+    if(window.Android && typeof window.Android.setAudioRoute === 'function'){
+      window.Android.setAudioRoute(callSpeakerOn ? 'speaker' : 'earpiece');
+      routedNative = true;
+    }
+    if(window.ayoushaNativeSpeaker && typeof window.ayoushaNativeSpeaker === 'function'){
+      window.ayoushaNativeSpeaker(callSpeakerOn);
+      routedNative = true;
+    }
+  } catch(e){}
+
+  // 2) iOS Safari AudioSession API (play-and-record routes WebRTC audio to earpiece by default)
+  try {
+    if(navigator.audioSession){
+      navigator.audioSession.type = 'play-and-record';
+    }
+  } catch(e){}
+
+  // 3) Standard Web Audio Output Routing via setSinkId
+  let routedHardware = routedNative;
   const audioEl = document.getElementById('remoteCallAudio');
   if(audioEl){
-    audioEl.volume = callSpeakerOn ? 1.0 : 0.85;
+    audioEl.volume = callSpeakerOn ? 1.0 : 0.62;
     if(typeof audioEl.setSinkId === 'function' && navigator.mediaDevices?.enumerateDevices){
       try {
         const devs = await navigator.mediaDevices.enumerateDevices();
         const outputs = devs.filter(d => d.kind === 'audiooutput');
-        const speakerDev = outputs.find(d => /speaker|مكبر|loud/i.test(d.label));
-        const earDev = outputs.find(d => /ear|receiver|default/i.test(d.label));
-        if(callSpeakerOn && speakerDev) await audioEl.setSinkId(speakerDev.deviceId);
-        else if(!callSpeakerOn && earDev) await audioEl.setSinkId(earDev.deviceId);
+        if(callSpeakerOn){
+          const speakerDev = outputs.find(d => /speaker|loud|external|مكبر/i.test(d.label || ''))
+            || outputs.find(d => d.deviceId === 'default')
+            || outputs[0];
+          if(speakerDev){
+            await audioEl.setSinkId(speakerDev.deviceId);
+            routedHardware = true;
+          }
+        } else {
+          const earDev = outputs.find(d => /earpiece|handset|receiver|أذن/i.test(d.label || ''))
+            || outputs.find(d => /headset|wired|headphones|bluetooth/i.test(d.label || ''))
+            || outputs.find(d => d.deviceId === 'communications' || /communications/i.test(d.label || ''))
+            || outputs.find(d => d.deviceId && d.deviceId !== 'default' && !/speaker|loud|مكبر/i.test(d.label || ''));
+          if(earDev){
+            await audioEl.setSinkId(earDev.deviceId);
+            routedHardware = true;
+          } else {
+            try {
+              await audioEl.setSinkId('communications');
+              routedHardware = true;
+            } catch(err){}
+          }
+        }
       } catch(e){}
     }
   }
-  const btn = document.getElementById('callSpeakerBtn');
-  if(btn) btn.classList.toggle('active', callSpeakerOn);
-  toast(callSpeakerOn ? '🔊 تم تفعيل مكبر الصوت' : '🔈 الوضع العادي للصوت');
+  return { routedHardware };
+}
+
+window.toggleCallSpeaker = async function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  const nextSpeaker = !callSpeakerOn;
+  await applyCallAudioRoute(nextSpeaker);
+  toast(nextSpeaker ? '🔊 تم تفعيل مكبر الصوت' : '🎧 تم التحويل إلى سماعة الأذن');
 };
 
 window.toggleCallKeypad = function(ev = null){
