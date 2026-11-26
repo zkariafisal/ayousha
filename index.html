@@ -1617,21 +1617,24 @@ window.openEventDestination = async function(type, id, targetRole, notifTitle=''
 
   if(type === 'call' || type === 'call_missed'){
     const pendingAct = window._pendingCallAction || new URLSearchParams(location.search).get('action') || '';
-    window._pendingCallAction = '';
+    if(pendingAct){
+      window._pendingCallAction = pendingAct;
+      window._pendingCallId = id || '';
+      window._pendingCallActionAt = Date.now();
+    }
     if(db){
       try {
         const snap = await get(ref(db, 'app/calls/active'));
         const active = snap.val() || window._latestActiveCall;
         if(active && active.to === MY_ROLE && active.status === 'ringing' && (Date.now() - (active.createdAt || 0) < 65000)){
           await handleActiveCallSnapshot(active);
-          if(pendingAct === 'answer'){
-            setTimeout(() => { window.answerIncomingCall(); }, 120);
-          } else if(pendingAct === 'decline'){
-            setTimeout(() => { window.declineIncomingCall(); }, 120);
-          }
           return;
         }
       } catch(e){}
+    }
+    if(pendingAct === 'decline'){
+      window._pendingCallAction = '';
+      return;
     }
     switchView('mail');
     toast('📞 اضغط على أيقونة 📞 بالأسفل لمعاودة الاتصال');
@@ -2867,6 +2870,7 @@ let callToneEpoch = 0;
 let _ringOscillators = [];
 let callTimeoutTimer = null;
 let callFcmFallbackTimer = null;
+let callFcmRepeatInterval = null;
 let callIceUnsub = null;
 let processedIceKeys = new Set();
 let pendingRemoteIce = [];
@@ -3298,6 +3302,7 @@ function cleanupCallSession(msg = ''){
   clearInterval(callTimerInterval); callTimerInterval = null;
   clearTimeout(callTimeoutTimer); callTimeoutTimer = null;
   clearTimeout(callFcmFallbackTimer); callFcmFallbackTimer = null;
+  clearInterval(callFcmRepeatInterval); callFcmRepeatInterval = null;
   if(callIceUnsub){ callIceUnsub(); callIceUnsub = null; }
   if(activeCallDisconnectRef){
     try { activeCallDisconnectRef.cancel(); } catch(e){}
@@ -3452,22 +3457,36 @@ window.startVoiceCall = async function(){
     acquireCallWakeLock();
     document.body.style.overflow = 'hidden';
 
-    // Wait briefly for instant in-app ringingAck before sending push notification;
-    // if recipient's app is already running/online, it rings directly above everything with zero notification!
+    // Wait briefly (700ms) for instant in-app ringingAck before sending push notification;
+    // if recipient's app is closed, send high-priority re-ringing notification with Answer/Decline buttons!
     clearTimeout(callFcmFallbackTimer);
+    clearInterval(callFcmRepeatInterval);
+    const sendDirectRingPush = () => {
+      if(!activeCallState || activeCallState.callId !== callId || activeCallState.status !== 'ringing' || activeCallState.ringingAcked) return false;
+      sendFCM(otherRole(), `📞 مكالمة واردة من ${senderName(MY_ROLE)}`, 'يرن الآن — اضغط للرد أو الرفض', 'call', callId, false, {
+        priority: 'high',
+        callMode: 'direct_ring',
+        requireInteraction: true,
+        renotify: true,
+        tag: 'ayousha-call-' + callId,
+        actions: [
+          { action: 'answer', title: '📞 رد الآن' },
+          { action: 'decline', title: '📵 رفض' }
+        ]
+      });
+      return true;
+    };
     callFcmFallbackTimer = setTimeout(() => {
-      if(activeCallState && activeCallState.callId === callId && activeCallState.status === 'ringing' && !activeCallState.ringingAcked){
-        sendFCM(otherRole(), `📞 مكالمة واردة من ${senderName(MY_ROLE)}`, 'يرن الآن — اضغط للرد فوراً', 'call', callId, false, {
-          priority: 'high',
-          callMode: 'direct_ring',
-          requireInteraction: true,
-          actions: [
-            { action: 'answer', title: '📞 رد الآن' },
-            { action: 'decline', title: '📵 رفض' }
-          ]
-        });
+      if(sendDirectRingPush()){
+        let repeats = 0;
+        callFcmRepeatInterval = setInterval(() => {
+          repeats++;
+          if(repeats >= 6 || !sendDirectRingPush()){
+            clearInterval(callFcmRepeatInterval); callFcmRepeatInterval = null;
+          }
+        }, 5500);
       }
-    }, 1500);
+    }, 700);
 
     clearTimeout(callTimeoutTimer);
     callTimeoutTimer = setTimeout(async () => {
@@ -3661,6 +3680,13 @@ async function handleActiveCallSnapshot(call){
           renderCallOverlay('incoming', callerTitle, `مكالمة صوتية واردة من ${callerTitle} 📞`);
         }
       }
+      if(window._pendingCallAction && (Date.now() - (window._pendingCallActionAt || 0) < 65000) && (!window._pendingCallId || window._pendingCallId === call.callId)){
+        const act = window._pendingCallAction;
+        window._pendingCallAction = '';
+        window._pendingCallId = '';
+        if(act === 'answer') setTimeout(() => window.answerIncomingCall(), 100);
+        else if(act === 'decline') setTimeout(() => window.declineIncomingCall(), 100);
+      }
       return;
     }
 
@@ -3671,7 +3697,7 @@ async function handleActiveCallSnapshot(call){
         if(!handled.has(call.callId)){
           handled.add(call.callId);
           saveIdSet(roleStorageKey('ayousha_handled_calls'), handled);
-          showAppNotification(`📞 مكالمة فائتة من ${callerTitle}`, `حاول الاتصال بكِ الساعة ${chatTime(call.createdAt || Date.now())}`, 'call', call.callId, MY_ROLE, { forceSound: true, tag: 'ayousha-missed-' + call.callId });
+          showAppNotification(`📞 مكالمة فائتة من ${callerTitle}`, `حاول الاتصال بك الساعة ${chatTime(call.createdAt || Date.now())}`, 'call_missed', call.callId, MY_ROLE, { forceSound: true, tag: 'ayousha-call-' + call.callId });
         }
         remove(ref(db, `app/calls/pendingMissed/${MY_ROLE}/${call.callId}`)).catch(()=>{});
         cleanupCallSession(`📞 مكالمة فائتة من ${callerTitle}`);
@@ -3687,6 +3713,7 @@ async function handleActiveCallSnapshot(call){
     if(call.ringingAck && !activeCallState.ringingAcked){
       activeCallState.ringingAcked = true;
       clearTimeout(callFcmFallbackTimer); callFcmFallbackTimer = null;
+      clearInterval(callFcmRepeatInterval); callFcmRepeatInterval = null;
       const stEl = document.getElementById('callStatusText');
       if(stEl && activeCallState.status === 'ringing'){
         stEl.textContent = `يرن الآن على جوال ${call.toName || senderName(otherRole())} 📞`;
@@ -3697,6 +3724,7 @@ async function handleActiveCallSnapshot(call){
       stopCallTones();
       clearTimeout(callTimeoutTimer); callTimeoutTimer = null;
       clearTimeout(callFcmFallbackTimer); callFcmFallbackTimer = null;
+      clearInterval(callFcmRepeatInterval); callFcmRepeatInterval = null;
       if(activeCallDisconnectRef){
         try { activeCallDisconnectRef.cancel(); } catch(e){}
       }
