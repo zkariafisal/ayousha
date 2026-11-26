@@ -822,7 +822,7 @@ const SOUND_PATTERNS = {
   memory: [{ freq: 587.33, dur: 0.10, gap: 0.03, vol: 0.33 }, { freq: 880, dur: 0.16, gap: 0.02, vol: 0.36 }],
   mood: [{ freq: 523.25, dur: 0.10, gap: 0.03, vol: 0.32 }, { freq: 783.99, dur: 0.16, gap: 0.02, vol: 0.36 }],
   reconnect: [{ freq: 659.25, dur: 0.085, gap: 0.025, vol: 0.34 }, { freq: 880, dur: 0.095, gap: 0.025, vol: 0.36 }, { freq: 1174.66, dur: 0.18, gap: 0.02, vol: 0.40 }],
-  call: [{ freq: 783.99, dur: 0.12, gap: 0.04, vol: 0.38 }, { freq: 1046.50, dur: 0.18, gap: 0.04, vol: 0.40 }],
+  call: [{ freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.45 }, { freq: 880.00, dur: 0.14, gap: 0.03, vol: 0.48 }, { freq: 1046.50, dur: 0.16, gap: 0.05, vol: 0.50 }, { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.45 }, { freq: 880.00, dur: 0.14, gap: 0.03, vol: 0.48 }, { freq: 1046.50, dur: 0.22, gap: 0.10, vol: 0.52 }],
   send: [{ freq: 580, dur: 0.055, gap: 0.015, vol: 0.18 }, { freq: 780, dur: 0.07, gap: 0.01, vol: 0.20 }]
 };
 
@@ -1850,9 +1850,9 @@ window.openModal = function(html){
   window.restoreModalInputs(drafts);
   document.getElementById('modalBg').classList.add('show');
 };
-function closeModal(){ if(modalLocked) return; if(typeof v10ActivityListeners!=="undefined"){Object.values(v10ActivityListeners).forEach(fn=>fn());v10ActivityListeners={};} document.getElementById('modalBg').classList.remove('show'); if(window._activeGameUnsub){window._activeGameUnsub();window._activeGameUnsub=null;} if(window._activeChatUnsub){window._activeChatUnsub();window._activeChatUnsub=null;} }
+function closeModal(){ if(modalLocked) return; if(typeof window.stopCustomRingtonePreview === 'function') window.stopCustomRingtonePreview(); if(typeof v10ActivityListeners!=="undefined"){Object.values(v10ActivityListeners).forEach(fn=>fn());v10ActivityListeners={};} document.getElementById('modalBg').classList.remove('show'); if(window._activeGameUnsub){window._activeGameUnsub();window._activeGameUnsub=null;} if(window._activeChatUnsub){window._activeChatUnsub();window._activeChatUnsub=null;} }
 window.closeModal = closeModal;
-window.forceCloseModal = () => { modalLocked=false; document.getElementById('modalBg').classList.remove('show'); };
+window.forceCloseModal = () => { modalLocked=false; if(typeof window.stopCustomRingtonePreview === 'function') window.stopCustomRingtonePreview(); document.getElementById('modalBg').classList.remove('show'); };
 
 window.switchView = function(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
@@ -2885,6 +2885,179 @@ let handledMissedCallIds = null;
 let dismissedCallIds = new Set();
 let activeCallDisconnectRef = null;
 
+// ====== Custom Phone Ringtone Storage (IndexedDB + ObjectURL) ======
+const RINGTONE_DB_NAME = 'ayousha_ringtone_db';
+const RINGTONE_STORE_NAME = 'ringtones';
+let customRingtoneUrl = null;
+let customRingtoneName = '';
+let customRingtonePreviewEl = null;
+
+function getRingtoneStorageKey(){
+  return 'ringtone_' + (MY_ROLE || 'me');
+}
+function getRingtoneMetaKey(){
+  return roleStorageKey('ayousha_custom_ringtone_meta');
+}
+function openRingtoneDB(){
+  return new Promise((resolve, reject) => {
+    if(!('indexedDB' in window)) return reject(new Error('No IndexedDB'));
+    const req = indexedDB.open(RINGTONE_DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const dbInst = req.result;
+      if(!dbInst.objectStoreNames.contains(RINGTONE_STORE_NAME)){
+        dbInst.createObjectStore(RINGTONE_STORE_NAME);
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error || new Error('IDB error'));
+  });
+}
+function updateCustomRingtoneSettingsUI(){
+  const label = document.getElementById('customRingtoneNameLabel');
+  if(label){
+    label.textContent = customRingtoneName ? `🎵 النغمة المختارة: ${customRingtoneName}` : '🔔 النغمة الهاتفية الافتراضية';
+  }
+  const previewBtn = document.getElementById('previewCustomRingBtn');
+  if(previewBtn){
+    previewBtn.textContent = (customRingtonePreviewEl && !customRingtonePreviewEl.paused) ? '⏹️ إيقاف المعاينة' : '▶️ تجربة الرنين';
+  }
+  const standbyBtn = document.getElementById('settingsStandbyToggleBtn');
+  if(standbyBtn){
+    standbyBtn.textContent = bgCallStandbyEnabled
+      ? '📡 وضع الرنين المباشر بالخلفية: مفعّل ✅'
+      : '📡 تفعيل الرنين المباشر بالخلفية (للرن بنغمتك حتى عند تصغير التطبيق)';
+    standbyBtn.className = 'btn btn-full ' + (bgCallStandbyEnabled ? 'btn-primary' : 'btn-soft');
+  }
+}
+async function loadCustomRingtone(){
+  try {
+    const metaRaw = localStorage.getItem(getRingtoneMetaKey());
+    if(metaRaw){
+      try { customRingtoneName = JSON.parse(metaRaw)?.name || ''; } catch(e){}
+    }
+    const idb = await openRingtoneDB();
+    const record = await new Promise((resolve) => {
+      const tx = idb.transaction(RINGTONE_STORE_NAME, 'readonly');
+      const req = tx.objectStore(RINGTONE_STORE_NAME).get(getRingtoneStorageKey());
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+    if(record && record.blob){
+      if(customRingtoneUrl && customRingtoneUrl.startsWith('blob:')){
+        try { URL.revokeObjectURL(customRingtoneUrl); } catch(e){}
+      }
+      customRingtoneUrl = URL.createObjectURL(record.blob);
+      customRingtoneName = record.name || customRingtoneName || 'نغمة الهاتف المخصصة';
+      localStorage.setItem(getRingtoneMetaKey(), JSON.stringify({ name: customRingtoneName, type: record.type || record.blob.type || 'audio/mpeg', updatedAt: record.updatedAt || Date.now() }));
+      updateCustomRingtoneSettingsUI();
+      return customRingtoneUrl;
+    }
+  } catch(e){}
+  return null;
+}
+window.stopCustomRingtonePreview = function(){
+  if(customRingtonePreviewEl){
+    try {
+      customRingtonePreviewEl.pause();
+      customRingtonePreviewEl.currentTime = 0;
+    } catch(e){}
+    customRingtonePreviewEl = null;
+  }
+  updateCustomRingtoneSettingsUI();
+};
+window.handleCustomRingtoneSelect = async function(input){
+  const file = input?.files?.[0];
+  if(!file) return;
+  if(!file.type.startsWith('audio/') && !/\.(mp3|m4a|wav|ogg|aac|flac|opus|3gp)$/i.test(file.name)){
+    toast('⚠️ يرجى اختيار ملف صوتي صالح من الهاتف');
+    return;
+  }
+  window.stopCustomRingtonePreview();
+  try {
+    const idb = await openRingtoneDB();
+    const payload = { blob: file, name: file.name, type: file.type || 'audio/mpeg', updatedAt: Date.now() };
+    await new Promise((resolve, reject) => {
+      const tx = idb.transaction(RINGTONE_STORE_NAME, 'readwrite');
+      const req = tx.objectStore(RINGTONE_STORE_NAME).put(payload, getRingtoneStorageKey());
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+    if(customRingtoneUrl && customRingtoneUrl.startsWith('blob:')){
+      try { URL.revokeObjectURL(customRingtoneUrl); } catch(e){}
+    }
+    customRingtoneUrl = URL.createObjectURL(file);
+    customRingtoneName = file.name;
+    localStorage.setItem(getRingtoneMetaKey(), JSON.stringify({ name: file.name, type: file.type || 'audio/mpeg', updatedAt: Date.now() }));
+    try {
+      const cache = await caches.open('ayousha-ringtone-v1');
+      await cache.put('/__custom_ringtone__', new Response(file, { headers: { 'Content-Type': file.type || 'audio/mpeg' } }));
+    } catch(e){}
+    updateCustomRingtoneSettingsUI();
+    toast(`✅ تم حفظ نغمة الرنين: ${file.name}`);
+    window.previewCustomRingtone();
+  } catch(e){
+    toast('⚠️ تعذر حفظ النغمة من الهاتف — حاول بملف أصغر');
+  } finally {
+    if(input) input.value = '';
+  }
+};
+window.previewCustomRingtone = async function(){
+  initAudio();
+  if(customRingtonePreviewEl && !customRingtonePreviewEl.paused){
+    window.stopCustomRingtonePreview();
+    return;
+  }
+  window.stopCustomRingtonePreview();
+  if(!customRingtoneUrl) await loadCustomRingtone();
+  const srcUrl = customRingtoneUrl || getRingtoneWavUrl('incoming');
+  try {
+    const a = new Audio(srcUrl);
+    a.loop = false;
+    a.volume = 1.0;
+    a.onended = () => {
+      if(customRingtonePreviewEl === a){
+        customRingtonePreviewEl = null;
+        updateCustomRingtoneSettingsUI();
+      }
+    };
+    customRingtonePreviewEl = a;
+    updateCustomRingtoneSettingsUI();
+    await a.play();
+  } catch(e){
+    customRingtonePreviewEl = null;
+    updateCustomRingtoneSettingsUI();
+    toast('⚠️ تعذر تشغيل معاينة النغمة');
+  }
+};
+window.resetCustomRingtone = async function(){
+  window.stopCustomRingtonePreview();
+  try {
+    const idb = await openRingtoneDB();
+    await new Promise((resolve) => {
+      const tx = idb.transaction(RINGTONE_STORE_NAME, 'readwrite');
+      const req = tx.objectStore(RINGTONE_STORE_NAME).delete(getRingtoneStorageKey());
+      req.onsuccess = () => resolve();
+      req.onerror = () => resolve();
+    });
+  } catch(e){}
+  if(customRingtoneUrl && customRingtoneUrl.startsWith('blob:')){
+    try { URL.revokeObjectURL(customRingtoneUrl); } catch(e){}
+  }
+  customRingtoneUrl = null;
+  customRingtoneName = '';
+  try { localStorage.removeItem(getRingtoneMetaKey()); } catch(e){}
+  try {
+    const cache = await caches.open('ayousha-ringtone-v1');
+    await cache.delete('/__custom_ringtone__');
+  } catch(e){}
+  updateCustomRingtoneSettingsUI();
+  toast('🔔 تم استعادة نغمة الرنين الافتراضية');
+};
+window.toggleBgStandbyFromSettings = function(){
+  window.toggleBgCallStandby();
+  updateCustomRingtoneSettingsUI();
+};
+
 function getBgStandbyKey(){
   return roleStorageKey('ayousha_bg_standby');
 }
@@ -2892,6 +3065,7 @@ function getBgStandbyKey(){
 function updateBgStandbyBtn(){
   const btn = document.getElementById('bgRingStandbyBtn');
   if(btn) btn.classList.toggle('active', !!bgCallStandbyEnabled);
+  updateCustomRingtoneSettingsUI();
 }
 
 function startBgKeepAliveAudio(){
@@ -2936,7 +3110,7 @@ window.toggleBgCallStandby = function(){
   if(bgCallStandbyEnabled){
     startBgKeepAliveAudio();
     acquireCallWakeLock();
-    toast('📡 تم تفعيل وضع الرنين المباشر بالخلفية — سيرن الجوال فوراً حتى عند تصغير التطبيق');
+    toast('📡 تم تفعيل وضع الرنين المباشر بالخلفية — ستعمل نغمتك المخصصة حتى عند تصغير التطبيق');
   } else {
     stopBgKeepAliveAudio();
     if(!activeCallState) releaseCallWakeLock();
@@ -3009,15 +3183,16 @@ function clearCallMediaSession(){
 
 function getRingtoneWavUrl(mode){
   if(mode === 'incoming'){
+    if(customRingtoneUrl) return customRingtoneUrl;
     return createToneWavBlobUrl([
-      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.52 },
-      { freq: 880.00, dur: 0.14, gap: 0.03, vol: 0.52 },
-      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.52 },
-      { freq: 880.00, dur: 0.20, gap: 0.22, vol: 0.54 },
-      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.52 },
-      { freq: 880.00, dur: 0.14, gap: 0.03, vol: 0.52 },
-      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.52 },
-      { freq: 880.00, dur: 0.20, gap: 1.05, vol: 0.54 }
+      { freq: 587.33, dur: 0.13, gap: 0.025, vol: 0.50 },
+      { freq: 783.99, dur: 0.13, gap: 0.025, vol: 0.52 },
+      { freq: 987.77, dur: 0.15, gap: 0.04, vol: 0.54 },
+      { freq: 1174.66, dur: 0.20, gap: 0.18, vol: 0.56 },
+      { freq: 587.33, dur: 0.13, gap: 0.025, vol: 0.50 },
+      { freq: 783.99, dur: 0.13, gap: 0.025, vol: 0.52 },
+      { freq: 987.77, dur: 0.15, gap: 0.04, vol: 0.54 },
+      { freq: 1174.66, dur: 0.22, gap: 1.05, vol: 0.56 }
     ]);
   }
   return createToneWavBlobUrl([
@@ -3067,19 +3242,38 @@ function playRingBurstWebAudio(key, epoch){
   } catch(e){ return false; }
 }
 
-function startCallTone(mode){
-  stopCallTones();
+async function startCallTone(mode){
+  // Clear prior intervals/oscillators without killing an active background keep-alive audio session
+  callToneEpoch++;
+  if(callRingInterval){ clearInterval(callRingInterval); callRingInterval = null; }
+  if(_ringOscillators.length){
+    _ringOscillators.forEach(o => { try { o.stop(); o.disconnect(); } catch(e){} });
+    _ringOscillators = [];
+  }
+  window.stopCustomRingtonePreview();
+
   if(!activeCallState || activeCallState.status !== 'ringing') return;
-  const myEpoch = ++callToneEpoch;
+  const myEpoch = callToneEpoch;
   const hint = document.getElementById('callUnmuteHint');
   if(hint) hint.hidden = true;
+
+  if(mode === 'incoming' && !customRingtoneUrl){
+    await loadCustomRingtone();
+    if(myEpoch !== callToneEpoch || !activeCallState || activeCallState.status !== 'ringing') return;
+  }
+
   try {
     const url = getRingtoneWavUrl(mode);
     const domPlayer = document.getElementById('ringTonePlayer');
     ringAudioEl = domPlayer || new Audio();
+    const keepFocus = domPlayer && !domPlayer.paused;
+    if(!keepFocus){
+      try { domPlayer && domPlayer.pause(); } catch(e){}
+    }
     ringAudioEl.src = url;
     ringAudioEl.loop = true;
     ringAudioEl.volume = mode === 'incoming' ? 1.0 : 0.65;
+    ringAudioEl.currentTime = 0;
     const p = ringAudioEl.play();
     if(p && typeof p.then === 'function'){
       p.then(() => {
@@ -4603,6 +4797,18 @@ window.openSettings=function(){
     <div id="meetupSyncHint" style="font-size:.76rem;color:#ad1457;margin-top:6px;">${state.meetupDate ? '📅 الموعد المتزامن حالياً: ' + escapeHtml(fmtDateTime(state.meetupDate)) : '⏰ اختر أي تاريخ ووقت مستقبلي وسيتحدث عند الطرفين تلقائياً'}</div>
     <button type="button" class="btn btn-soft btn-full" style="margin-top:6px;font-size:.82rem;" onclick="window.syncMeetupDateImmediate(document.getElementById('setMeetup')?.value||'')">⏰ مزامنة الموعد الآن للطرفين</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px dashed #f2d9e4;">
+      <div style="font-weight:800;color:#ad1457;font-size:.92rem;margin-bottom:6px;">📞 نغمة رنين المكالمات (من الهاتف)</div>
+      <div id="customRingtoneNameLabel" class="v9-panel" style="margin:6px 0 8px;font-size:.8rem;color:#6f4b5b;background:#fff8fb;">${customRingtoneName ? '🎵 النغمة المختارة: ' + escapeHtml(customRingtoneName) : '🔔 النغمة الهاتفية الافتراضية'}</div>
+      <input type="file" id="customRingtoneInput" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac" style="display:none" onchange="window.handleCustomRingtoneSelect(this)">
+      <button type="button" class="btn btn-primary btn-full" style="margin-bottom:8px;" onclick="document.getElementById('customRingtoneInput')?.click()">📁 اختيار نغمة رنين من الهاتف</button>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button type="button" id="previewCustomRingBtn" class="btn btn-soft" style="flex:1;" onclick="window.previewCustomRingtone()">▶️ تجربة الرنين</button>
+        <button type="button" class="btn btn-soft" style="flex:1;" onclick="window.resetCustomRingtone()">↺ استعادة الافتراضية</button>
+      </div>
+      <button type="button" id="settingsStandbyToggleBtn" class="btn btn-full ${bgCallStandbyEnabled ? 'btn-primary' : 'btn-soft'}" style="margin-bottom:8px;font-size:.82rem;" onclick="window.toggleBgStandbyFromSettings()">${bgCallStandbyEnabled ? '📡 وضع الرنين المباشر بالخلفية: مفعّل ✅' : '📡 تفعيل الرنين المباشر بالخلفية (للرن بنغمتك حتى عند تصغير التطبيق)'}</button>
+      <div style="font-size:.74rem;color:#887581;line-height:1.55;">💡 لتعمل نغمتك المخصصة من الهاتف تلقائياً أثناء المكالمة حتى والشاشة مقفلة، فعّل وضع 📡 بالخلفية. إذا كان المتصفح مغلقاً نهائياً فسيعمل صوت إشعارات Chrome في النظام مع الاهتزاز وزر الرد.</div>
+    </div>
+    <div style="margin-top:16px;padding-top:12px;border-top:1px dashed #f2d9e4;">
       <div style="font-weight:800;color:#ad1457;font-size:.92rem;margin-bottom:8px;">🔄 تغيير هوية هذا الجهاز</div>
       <div style="font-size:.78rem;color:#887581;margin-bottom:10px;line-height:1.5;">إذا كانت الرسائل تظهر وكأنك ترسل لنفسك، اضغط على الزر الصحيح لهويتك:</div>
       <div style="display:flex;gap:8px;margin-bottom:8px;">
@@ -4800,6 +5006,7 @@ async function boot(){
     bgCallStandbyEnabled = localStorage.getItem(getBgStandbyKey()) === '1';
     updateBgStandbyBtn();
   } catch(e){}
+  loadCustomRingtone();
 
   // ✅ مزامنة الدور مع Service Worker
   syncRoleToSW();
