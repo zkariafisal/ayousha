@@ -212,8 +212,9 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
 .bg-ring-btn{width:38px;height:38px;border-radius:50%;background:#fff5f9;border:1px solid #f2c9da;color:#8e5a72;font-size:1.05rem;display:grid;place-items:center;transition:all .18s}
 .bg-ring-btn.active{background:linear-gradient(135deg,#2e7d32,#43a047);color:#fff;border-color:#81c784;box-shadow:0 0 0 4px rgba(76,175,80,.2)}
 body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e);color:#ffd6e7;border-color:#9e477c}
-.call-overlay{position:fixed;inset:0;z-index:2147483647;background:radial-gradient(circle at 50% 25%,#5d1035 0%,#2b081b 60%,#16040f 100%);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(12px);animation:fadeIn .22s ease;touch-action:manipulation}
-.call-overlay[hidden]{display:none !important}
+.call-overlay{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100dvh;z-index:2147483647;background:linear-gradient(160deg,#520e30 0%,#260717 55%,#12030b 100%);color:#fff;display:none;align-items:center;justify-content:center;padding:24px;touch-action:manipulation}
+.call-overlay.is-open{display:flex !important;opacity:1 !important;visibility:visible !important}
+.call-overlay[hidden]:not(.is-open){display:none !important}
 .call-unmute-hint{margin-top:6px;padding:7px 14px;border-radius:18px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;animation:pulse 1.2s infinite}
 .call-card{width:100%;max-width:380px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
 .call-rings{position:relative;width:140px;height:140px;display:grid;place-items:center;margin-bottom:8px}
@@ -676,8 +677,8 @@ body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e)
 </nav>
 
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this && !modalLocked) closeModal()"><div class="modal" id="modalContent"></div></div>
-<div id="voiceCallOverlay" class="call-overlay" hidden onclick="window.unlockCallAudioOnTap()">
-  <div class="call-card">
+<div id="voiceCallOverlay" class="call-overlay" hidden onclick="window.unlockCallAudioOnTap(false, event)">
+  <div class="call-card" onclick="event.stopPropagation()">
     <div class="call-rings">
       <div class="call-ring r1"></div>
       <div class="call-ring r2"></div>
@@ -685,16 +686,16 @@ body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e)
     </div>
     <h3 class="call-name" id="callPartnerTitle">عيوشة</h3>
     <p class="call-state" id="callStatusText">جاري الاتصال...</p>
-    <button type="button" id="callUnmuteHint" class="call-unmute-hint" hidden onclick="event.stopPropagation();window.unlockCallAudioOnTap(true)">🔊 اضغطي هنا لسماع الرنة بوضوح</button>
+    <button type="button" id="callUnmuteHint" class="call-unmute-hint" hidden onclick="event.stopPropagation();window.unlockCallAudioOnTap(true, event)">🔊 اضغطي هنا لسماع الرنة بوضوح</button>
     <div class="call-timer" id="callTimer" hidden>00:00</div>
     <div class="call-wave" id="callWave" hidden>
       <span></span><span></span><span></span><span></span><span></span>
     </div>
     <div class="call-actions" id="callActions"></div>
   </div>
-  <audio id="remoteCallAudio" autoplay playsinline style="display:none"></audio>
-  <audio id="ringTonePlayer" loop playsinline preload="auto" style="display:none"></audio>
 </div>
+<audio id="remoteCallAudio" autoplay playsinline style="display:none"></audio>
+<audio id="ringTonePlayer" loop playsinline preload="auto" style="display:none"></audio>
 <div class="toast" id="toast"></div>
 <div id="fullScreen"></div>
 
@@ -2856,6 +2857,8 @@ let callPC = null;
 let callLocalStream = null;
 let callTimerInterval = null;
 let callRingInterval = null;
+let callToneEpoch = 0;
+let _ringOscillators = [];
 let callTimeoutTimer = null;
 let callFcmFallbackTimer = null;
 let callIceUnsub = null;
@@ -3012,7 +3015,8 @@ function getRingtoneWavUrl(mode){
   ]);
 }
 
-window.unlockCallAudioOnTap = function(forceToast = false){
+window.unlockCallAudioOnTap = function(forceToast = false, ev = null){
+  if(ev && ev.target && ev.target.closest && ev.target.closest('.call-action-btn')) return;
   initAudio();
   const hint = document.getElementById('callUnmuteHint');
   if(hint) hint.hidden = true;
@@ -3022,8 +3026,41 @@ window.unlockCallAudioOnTap = function(forceToast = false){
   }
 };
 
+function playRingBurstWebAudio(key, epoch){
+  try {
+    if(epoch !== callToneEpoch || !activeCallState || activeCallState.status !== 'ringing') return false;
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(!audioCtx || audioCtx.state !== 'running') return false;
+    const pat = SOUND_PATTERNS[key] || SOUND_PATTERNS.call;
+    let offset = 0;
+    const t = audioCtx.currentTime;
+    pat.forEach(seg => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(seg.freq, t + offset);
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      g.gain.setValueAtTime(0.0001, t + offset);
+      g.gain.exponentialRampToValueAtTime(Math.min(0.42, seg.vol || 0.35), t + offset + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + offset + seg.dur);
+      o.start(t + offset);
+      o.stop(t + offset + seg.dur + 0.02);
+      _ringOscillators.push(o);
+      o.onended = () => {
+        const idx = _ringOscillators.indexOf(o);
+        if(idx !== -1) _ringOscillators.splice(idx, 1);
+      };
+      offset += seg.dur + (seg.gap || 0.02);
+    });
+    return true;
+  } catch(e){ return false; }
+}
+
 function startCallTone(mode){
   stopCallTones();
+  if(!activeCallState || activeCallState.status !== 'ringing') return;
+  const myEpoch = ++callToneEpoch;
   const hint = document.getElementById('callUnmuteHint');
   if(hint) hint.hidden = true;
   try {
@@ -3034,18 +3071,22 @@ function startCallTone(mode){
     ringAudioEl.loop = true;
     ringAudioEl.volume = mode === 'incoming' ? 1.0 : 0.65;
     const p = ringAudioEl.play();
-    if(p && typeof p.catch === 'function'){
-      p.catch(() => {
-        if(hint && mode === 'incoming') hint.hidden = false;
-        // Fallback WebAudio interval if browser blocked autoplay before gesture
-        if(audioCtx && audioCtx.state === 'running'){
-          playViaWebAudio(mode === 'incoming' ? 'call' : 'ping');
+    if(p && typeof p.then === 'function'){
+      p.then(() => {
+        if(myEpoch !== callToneEpoch || !activeCallState || activeCallState.status !== 'ringing'){
+          stopCallTones();
         }
+      }).catch(() => {
+        if(myEpoch !== callToneEpoch || !activeCallState || activeCallState.status !== 'ringing') return;
+        if(hint && mode === 'incoming') hint.hidden = false;
+        playRingBurstWebAudio(mode === 'incoming' ? 'call' : 'ping', myEpoch);
+        clearInterval(callRingInterval);
         callRingInterval = setInterval(() => {
-          if(!activeCallState) return;
-          if(audioCtx && audioCtx.state === 'running'){
-            playViaWebAudio(mode === 'incoming' ? 'call' : 'ping');
+          if(myEpoch !== callToneEpoch || !activeCallState || activeCallState.status !== 'ringing'){
+            clearInterval(callRingInterval); callRingInterval = null;
+            return;
           }
+          playRingBurstWebAudio(mode === 'incoming' ? 'call' : 'ping', myEpoch);
           if(mode === 'incoming' && navigator.vibrate) navigator.vibrate([550, 200, 550]);
         }, mode === 'incoming' ? 1900 : 2800);
       });
@@ -3055,6 +3096,10 @@ function startCallTone(mode){
     if(navigator.vibrate) navigator.vibrate([600, 200, 600]);
     if(!callRingInterval){
       callRingInterval = setInterval(() => {
+        if(myEpoch !== callToneEpoch || !activeCallState || activeCallState.status !== 'ringing'){
+          clearInterval(callRingInterval); callRingInterval = null;
+          return;
+        }
         if(navigator.vibrate) navigator.vibrate([600, 200, 600]);
       }, 2100);
     }
@@ -3062,13 +3107,25 @@ function startCallTone(mode){
 }
 
 function stopCallTones(){
+  callToneEpoch++;
   if(callRingInterval){ clearInterval(callRingInterval); callRingInterval = null; }
   const hint = document.getElementById('callUnmuteHint');
   if(hint) hint.hidden = true;
-  if(ringAudioEl){
-    try { ringAudioEl.pause(); ringAudioEl.currentTime = 0; } catch(e){}
-    ringAudioEl = null;
+  if(_ringOscillators.length){
+    _ringOscillators.forEach(o => { try { o.stop(); o.disconnect(); } catch(e){} });
+    _ringOscillators = [];
   }
+  const players = [ringAudioEl, document.getElementById('ringTonePlayer')].filter(Boolean);
+  players.forEach(el => {
+    try {
+      el.loop = false;
+      el.pause();
+      el.currentTime = 0;
+      el.removeAttribute('src');
+      el.load();
+    } catch(e){}
+  });
+  ringAudioEl = null;
   try { if(navigator.vibrate) navigator.vibrate(0); } catch(e){}
 }
 
@@ -3082,7 +3139,13 @@ function renderCallOverlay(mode, partnerName, statusText){
   const actions = document.getElementById('callActions');
   if(!overlay) return;
 
+  if(overlay.parentNode !== document.body){
+    document.body.appendChild(overlay);
+  }
   overlay.hidden = false;
+  overlay.removeAttribute('hidden');
+  overlay.classList.add('is-open');
+  overlay.style.display = 'flex';
   if(avatar) avatar.textContent = MY_ROLE === 'me' ? '🌸' : '💙';
   if(title) title.textContent = partnerName || senderName(otherRole());
   if(status) status.textContent = statusText || '';
@@ -3092,11 +3155,11 @@ function renderCallOverlay(mode, partnerName, statusText){
     if(wave) wave.hidden = true;
     if(actions) actions.innerHTML = `
       <div class="call-action-wrap">
-        <button type="button" class="call-action-btn decline" onclick="window.declineIncomingCall()" aria-label="رفض">📵</button>
+        <button type="button" class="call-action-btn decline" onclick="event.stopPropagation();window.declineIncomingCall(event)" aria-label="رفض">📵</button>
         <span>رفض</span>
       </div>
       <div class="call-action-wrap">
-        <button type="button" class="call-action-btn answer" onclick="window.answerIncomingCall()" aria-label="رد">📞</button>
+        <button type="button" class="call-action-btn answer" onclick="event.stopPropagation();window.answerIncomingCall(event)" aria-label="رد">📞</button>
         <span>رد</span>
       </div>
     `;
@@ -3105,11 +3168,11 @@ function renderCallOverlay(mode, partnerName, statusText){
     if(wave) wave.hidden = true;
     if(actions) actions.innerHTML = `
       <div class="call-action-wrap">
-        <button type="button" class="call-action-btn mute ${callMuted?'active':''}" id="callMuteBtn" onclick="window.toggleCallMute()" aria-label="كتم">${callMuted?'🔇':'🎙️'}</button>
+        <button type="button" class="call-action-btn mute ${callMuted?'active':''}" id="callMuteBtn" onclick="event.stopPropagation();window.toggleCallMute(event)" aria-label="كتم">${callMuted?'🔇':'🎙️'}</button>
         <span>${callMuted?'إلغاء الكتم':'كتم'}</span>
       </div>
       <div class="call-action-wrap">
-        <button type="button" class="call-action-btn end" onclick="window.endVoiceCall()" aria-label="إنهاء">📵</button>
+        <button type="button" class="call-action-btn end" onclick="event.stopPropagation();window.endVoiceCall(event)" aria-label="إنهاء">📵</button>
         <span>إنهاء</span>
       </div>
     `;
@@ -3118,11 +3181,11 @@ function renderCallOverlay(mode, partnerName, statusText){
     if(wave) wave.hidden = false;
     if(actions) actions.innerHTML = `
       <div class="call-action-wrap">
-        <button type="button" class="call-action-btn mute ${callMuted?'active':''}" id="callMuteBtn" onclick="window.toggleCallMute()" aria-label="كتم">${callMuted?'🔇':'🎙️'}</button>
+        <button type="button" class="call-action-btn mute ${callMuted?'active':''}" id="callMuteBtn" onclick="event.stopPropagation();window.toggleCallMute(event)" aria-label="كتم">${callMuted?'🔇':'🎙️'}</button>
         <span>${callMuted?'إلغاء الكتم':'كتم'}</span>
       </div>
       <div class="call-action-wrap">
-        <button type="button" class="call-action-btn end" onclick="window.endVoiceCall()" aria-label="إنهاء">📵</button>
+        <button type="button" class="call-action-btn end" onclick="event.stopPropagation();window.endVoiceCall(event)" aria-label="إنهاء">📵</button>
         <span>إنهاء المكالمة</span>
       </div>
     `;
@@ -3253,7 +3316,11 @@ function cleanupCallSession(msg = ''){
   localIceQueue = [];
   signalingDocReady = false;
   const overlay = document.getElementById('voiceCallOverlay');
-  if(overlay) overlay.hidden = true;
+  if(overlay){
+    overlay.classList.remove('is-open');
+    overlay.hidden = true;
+    overlay.style.display = 'none';
+  }
   const btn = document.getElementById('chatCallBtn');
   if(btn) btn.classList.remove('calling');
   if(msg) toast(msg);
@@ -3408,16 +3475,23 @@ window.startVoiceCall = async function(){
   }
 };
 
-window.answerIncomingCall = async function(){
-  initAudio();
-  stopCallTones();
+window.answerIncomingCall = async function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
   const callData = window._latestActiveCall || activeCallState;
   if(!callData || !callData.callId || !callData.offer){
+    stopCallTones();
     cleanupCallSession('انتهى الرنين');
     return;
   }
   const callId = callData.callId;
   const partnerName = callData.fromName || senderName(callData.from || otherRole());
+
+  // Stop ringtone IMMEDIATELY and lock state before awaiting mic so nothing can re-trigger ringing
+  activeCallState = { callId, role: 'callee', status: 'connecting', from: callData.from, to: MY_ROLE };
+  stopCallTones();
+  initAudio();
+  stopCallTones();
+  renderCallOverlay('connected', partnerName, 'جاري فتح الميكروفون وربط الصوت...');
 
   let stream;
   try {
@@ -3427,9 +3501,11 @@ window.answerIncomingCall = async function(){
     });
   } catch(err){
     toast('⚠️ يرجى السماح بصلاحية الميكروفون للرد على المكالمة');
+    cleanupCallSession();
     return;
   }
 
+  stopCallTones();
   const audioEl = document.getElementById('remoteCallAudio');
   if(audioEl){
     try { audioEl.play().catch(()=>{}); } catch(e){}
@@ -3470,7 +3546,9 @@ window.answerIncomingCall = async function(){
   }
 };
 
-window.declineIncomingCall = async function(){
+window.declineIncomingCall = async function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  if(activeCallState) activeCallState.status = 'declined';
   stopCallTones();
   const callId = activeCallState?.callId || window._latestActiveCall?.callId;
   if(callId){
@@ -3486,9 +3564,11 @@ window.declineIncomingCall = async function(){
   cleanupCallSession('تم رفض المكالمة');
 };
 
-window.endVoiceCall = async function(){
-  stopCallTones();
+window.endVoiceCall = async function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
   const stateCopy = activeCallState ? { ...activeCallState } : null;
+  if(activeCallState) activeCallState.status = 'ended';
+  stopCallTones();
   if(stateCopy && stateCopy.callId){
     const wasRingingOutgoing = (stateCopy.role === 'caller' && stateCopy.status === 'ringing');
     try {
@@ -3505,7 +3585,8 @@ window.endVoiceCall = async function(){
   cleanupCallSession('تم إنهاء المكالمة');
 };
 
-window.toggleCallMute = function(){
+window.toggleCallMute = function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
   callMuted = !callMuted;
   if(callLocalStream){
     callLocalStream.getAudioTracks().forEach(t => { t.enabled = !callMuted; });
@@ -3532,6 +3613,10 @@ async function handleActiveCallSnapshot(call){
       const isFresh = (Date.now() - (call.createdAt || 0)) < 65000;
       if(!isFresh) return;
       if(dismissedCallIds.has(call.callId)) return;
+      if(activeCallState && activeCallState.callId === call.callId && (activeCallState.status === 'connecting' || activeCallState.status === 'connected')){
+        return;
+      }
+      const callerTitle = call.fromName || senderName(call.from);
       if(!activeCallState || activeCallState.callId !== call.callId){
         activeCallState = {
           callId: call.callId,
@@ -3542,7 +3627,6 @@ async function handleActiveCallSnapshot(call){
           offer: call.offer,
           fromName: call.fromName
         };
-        const callerTitle = call.fromName || senderName(call.from);
         const banner = document.getElementById('interactiveNotifBanner');
         if(banner) banner.classList.remove('show');
         clearRingNotifications();
@@ -3561,6 +3645,12 @@ async function handleActiveCallSnapshot(call){
         startCallTone('incoming');
         if(db){
           update(ref(db, 'app/calls/active'), { ringingAck: Date.now() }).catch(()=>{});
+        }
+      } else {
+        // Ensure UI is ALWAYS fused/visible if ringing is already active
+        const overlay = document.getElementById('voiceCallOverlay');
+        if(overlay && !overlay.classList.contains('is-open')){
+          renderCallOverlay('incoming', callerTitle, `مكالمة صوتية واردة من ${callerTitle} 📞`);
         }
       }
       return;
@@ -3595,6 +3685,7 @@ async function handleActiveCallSnapshot(call){
       }
     }
     if(call.status === 'connected' && call.answer && callPC && !callPC.currentRemoteDescription){
+      activeCallState.status = 'connected';
       stopCallTones();
       clearTimeout(callTimeoutTimer); callTimeoutTimer = null;
       clearTimeout(callFcmFallbackTimer); callFcmFallbackTimer = null;
@@ -3603,15 +3694,14 @@ async function handleActiveCallSnapshot(call){
       }
       activeCallDisconnectRef = onDisconnect(ref(db, 'app/calls/active/status'));
       activeCallDisconnectRef.set('ended').catch(()=>{});
-      activeCallState.status = 'connected';
       try {
         await callPC.setRemoteDescription(new RTCSessionDescription(call.answer));
         await flushPendingIce();
       } catch(e){ console.warn('setRemoteDescription error', e); }
+      stopCallTones();
       const partnerName = call.toName || senderName(otherRole());
       renderCallOverlay('connected', partnerName, 'متصل صوتياً الآن 🎙️');
       startCallTimer();
-      playEventSound('ping', false, true);
     } else if(call.status === 'declined'){
       cleanupCallSession('تم رفض المكالمة 📵');
     } else if(call.status === 'ended'){
