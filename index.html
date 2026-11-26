@@ -1022,19 +1022,7 @@ function initAudio(){
           }
         }
       }
-      const rem = document.getElementById('remoteCallAudio');
-      if(rem && !activeCallState && !rem.srcObject){
-        rem.src = _silentWavUrl;
-        rem.volume = 0.01;
-        const rp2 = rem.play();
-        if(rp2 && typeof rp2.then === 'function'){
-          rp2.then(() => {
-            if(!activeCallState && !rem.srcObject){
-              try { rem.pause(); rem.removeAttribute('src'); rem.load(); rem.volume = 1; } catch(e){}
-            }
-          }).catch(()=>{});
-        }
-      }
+      // Leave #remoteCallAudio clean for WebRTC MODE_IN_COMMUNICATION (do not pre-play media WAV on it)
     } catch(e){}
   }
   if(_pendingSoundType && soundsEnabled){
@@ -3844,9 +3832,15 @@ function createCallPeerConnection(callId){
     const audioEl = document.getElementById('remoteCallAudio');
     if(audioEl && ev.streams && ev.streams[0]){
       callRemoteStreamRef = ev.streams[0];
-      if(audioEl.srcObject !== ev.streams[0]) audioEl.srcObject = ev.streams[0];
+      if(!callRecording && audioCtx && audioCtx.state === 'running'){
+        try { audioCtx.suspend().catch(()=>{}); } catch(e){}
+      }
+      if(audioEl.srcObject !== ev.streams[0]){
+        try { audioEl.pause(); audioEl.removeAttribute('src'); } catch(e){}
+        audioEl.srcObject = ev.streams[0];
+      }
       audioEl.muted = !!(callOnHold || remoteOnHold);
-      audioEl.volume = callSpeakerOn ? 1.0 : 0.62;
+      audioEl.volume = callSpeakerOn ? 1.0 : 0.42;
       applyCallAudioRoute(callSpeakerOn);
       audioEl.play().catch(()=>{});
     }
@@ -4005,18 +3999,14 @@ window.startVoiceCall = async function(){
 
   let stream;
   try {
+    clearCallMediaSession();
     stream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
       video: false
     });
   } catch(err){
     toast('⚠️ يرجى السماح بصلاحية الميكروفون لإجراء المكالمة');
     return;
-  }
-
-  const audioEl = document.getElementById('remoteCallAudio');
-  if(audioEl){
-    try { audioEl.play().catch(()=>{}); } catch(e){}
   }
 
   callLocalStream = stream;
@@ -4146,8 +4136,9 @@ window.answerIncomingCall = async function(ev = null){
 
   let stream;
   try {
+    clearCallMediaSession();
     stream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
       video: false
     });
   } catch(err){
@@ -4157,10 +4148,6 @@ window.answerIncomingCall = async function(ev = null){
   }
 
   stopCallTones();
-  const audioEl = document.getElementById('remoteCallAudio');
-  if(audioEl){
-    try { audioEl.play().catch(()=>{}); } catch(e){}
-  }
 
   callLocalStream = stream;
   callMuted = false;
@@ -4412,7 +4399,7 @@ async function applyCallAudioRoute(useSpeaker = false){
   let routedHardware = routedNative;
   const audioEl = document.getElementById('remoteCallAudio');
   if(audioEl){
-    audioEl.volume = callSpeakerOn ? 1.0 : 0.62;
+    audioEl.volume = callSpeakerOn ? 1.0 : 0.42;
     if(typeof audioEl.setSinkId === 'function' && navigator.mediaDevices?.enumerateDevices){
       try {
         const devs = await navigator.mediaDevices.enumerateDevices();
