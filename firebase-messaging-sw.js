@@ -1,126 +1,159 @@
+/* firebase-messaging-sw.js — ضعه في المجلد الرئيسي للموقع */
+const ICON_URL = 'https://raw.githubusercontent.com/zkariafisal/Oreo-quiz-images/refs/heads/main/Aa.png';
+const ROLE_CACHE_NAME = 'ayousha-role-v1';
+let cachedRole = '';
+
+async function getMyRole() {
+  if (cachedRole) return cachedRole;
+  try {
+    const cache = await caches.open(ROLE_CACHE_NAME);
+    const res = await cache.match('/__my_role__');
+    if (res) {
+      cachedRole = (await res.text()).trim();
+      return cachedRole;
+    }
+  } catch (e) {}
+  return '';
+}
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SET_ROLE' && event.data.role) {
+    cachedRole = event.data.role;
+  }
+});
+
+// Intercept push BEFORE Firebase SW SDK so call notifications ALWAYS include Answer/Decline buttons + ringing sound/vibration
+self.addEventListener('push', (event) => {
+  try {
+    const raw = event.data ? event.data.json() : null;
+    const d = (raw && raw.data) ? raw.data : (raw || {});
+    if (!d || (d.type !== 'call' && d.type !== 'call_missed')) return;
+
+    event.stopImmediatePropagation();
+    event.waitUntil((async () => {
+      const myRole = await getMyRole();
+      if (myRole && d.role && d.role !== myRole) return;
+
+      const isIncomingCall = d.type === 'call';
+      const callId = d.itemId || '';
+      const title = d.title || raw?.notification?.title || (isIncomingCall ? '📞 مكالمة واردة' : '📞 مكالمة فائتة');
+      const body = d.body || raw?.notification?.body || (isIncomingCall ? 'يرن الآن — اضغط للرد أو الرفض' : 'لم يتم الرد على المكالمة');
+
+      const clientsList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      if (isIncomingCall && clientsList.length > 0) {
+        for (const client of clientsList) {
+          client.postMessage({ type: 'INCOMING_CALL_RING', open: 'call', item: callId, role: d.role || myRole });
+        }
+      }
+
+      const options = {
+        body,
+        icon: d.icon || ICON_URL,
+        badge: ICON_URL,
+        tag: 'ayousha-call-' + callId,
+        renotify: true,
+        silent: false,
+        requireInteraction: isIncomingCall,
+        vibrate: isIncomingCall ? [900, 300, 900, 300, 900, 300, 900] : [250, 100, 250],
+        data: {
+          url: d.url || ('/index.html?for=' + (d.role || myRole || 'her') + '&open=' + d.type + '&item=' + encodeURIComponent(callId)),
+          type: d.type,
+          itemId: callId,
+          role: d.role || myRole
+        }
+      };
+
+      if (isIncomingCall) {
+        options.actions = [
+          { action: 'answer', title: '📞 رد الآن' },
+          { action: 'decline', title: '📵 رفض' }
+        ];
+      }
+
+      await self.registration.showNotification(title, options);
+    })());
+  } catch (e) {}
+});
+
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey: 'AIzaSyA5srAIJRXItE5uT9OKpRq0gHeEUeatDp0',
-  authDomain: 'ayousha.firebaseapp.com',
-  databaseURL: 'https://ayousha-default-rtdb.firebaseio.com',
-  projectId: 'ayousha',
-  storageBucket: 'ayousha.firebasestorage.app',
-  messagingSenderId: '68680035248',
-  appId: '1:68680035248:web:212c41987a40628969c475'
+  apiKey: "AIzaSyA5srAIJRXItE5uT9OKpRq0gHeEUeatDp0",
+  authDomain: "ayousha.firebaseapp.com",
+  databaseURL: "https://ayousha-default-rtdb.firebaseio.com",
+  projectId: "ayousha",
+  storageBucket: "ayousha.firebasestorage.app",
+  messagingSenderId: "68680035248",
+  appId: "1:68680035248:web:212c41987a40628969c475"
 });
 
 const messaging = firebase.messaging();
 
-const symbols = {
-  mail: '💌',
-  game: '🎮',
-  surprise: '🎁',
-  memory: '📸',
-  ping: '💗',
-  mood: '🌙',
-  answer: '📝',
-  quiz: '🧠',
-  dailyShared: '🌟',
-  random: '🎲'
-};
-
-// استقبال الإشعارات في الخلفية وتوجيه الرابط بدقة
-messaging.onBackgroundMessage(payload => {
+messaging.onBackgroundMessage(async (payload) => {
   const d = payload.data || {};
-  const type = d.type || 'game';
+  const myRole = await getMyRole();
+  if (myRole && d.role && d.role !== myRole) return;
+
+  const title = d.title || payload.notification?.title || 'عيون عيوشة 🌸';
+  const body = d.body || payload.notification?.body || 'لديك إشعار جديد';
   const itemId = d.itemId || '';
-  const role = d.role === 'her' ? 'her' : 'me';
-
-  const base = self.registration.scope || self.location.origin + '/';
-  const url = new URL(base);
-  if (url.pathname.endsWith('/')) {
-    url.pathname += 'index.html';
-  }
-  url.searchParams.set('for', role);
-  url.searchParams.set('open', type);
-  if (itemId) url.searchParams.set('item', itemId);
-
-  const icon = symbols[type] || '🔔';
-  const title = (d.title || 'عيون عيوشة 🌸').startsWith(icon) ? d.title : `${icon} ${d.title || 'رسالة جديدة'}`;
 
   return self.registration.showNotification(title, {
-    body: d.body || 'اضغط هنا للفتح والدخول المباشر',
-    icon: '/icon.png',
-    badge: '/icon.png',
-    tag: `ayousha-${type}-${itemId || Date.now()}`,
-    vibrate: [200, 100, 200, 100, 200],
-    silent: false,
-    requireInteraction: true,
+    body,
+    icon: d.icon || ICON_URL,
+    badge: ICON_URL,
+    tag: 'ayousha-' + (d.type || 'msg') + '-' + (itemId || Date.now()),
     renotify: true,
-    timestamp: Date.now(),
+    silent: false,
+    vibrate: [220, 100, 220],
     data: {
-      url: url.href,
-      type,
+      url: d.url || ('/index.html?for=' + (d.role || myRole || 'her') + '&open=' + (d.type || 'notification') + '&item=' + encodeURIComponent(itemId)),
+      type: d.type || 'notification',
       itemId,
-      role
+      role: d.role || myRole
     }
   });
 });
 
-// عند نقر المستخدم على الإشعار من شاشة القفل أو مركز إشعارات الهاتف
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  const details = event.notification.data || {};
-  const openType = details.type || 'game';
-  const itemId = details.itemId || '';
-  const role = details.role || 'me';
+self.addEventListener('notificationclick', (event) => {
+  const notif = event.notification;
+  const data = notif.data || {};
+  const action = event.action || '';
+  notif.close();
 
-  // بناء الرابط المقصود بدقة
-  let targetUrl;
-  try {
-    const base = self.registration.scope || self.location.origin + '/';
-    const u = new URL(base);
-    if (u.pathname.endsWith('/')) {
-      u.pathname += 'index.html';
-    }
-    if (details.url) {
-      try {
-        const parsed = new URL(details.url, self.location.origin);
-        u.pathname = parsed.pathname;
-        parsed.searchParams.forEach((val, key) => u.searchParams.set(key, val));
-      } catch (_) {}
-    }
-    u.searchParams.set('for', role);
-    u.searchParams.set('open', openType);
-    if (itemId) u.searchParams.set('item', itemId);
-    targetUrl = u.href;
-  } catch (_) {
-    targetUrl = details.url || self.registration.scope || '/index.html';
+  if (action === 'decline' && data.type === 'call') {
+    event.waitUntil(
+      fetch('https://ayousha-default-rtdb.firebaseio.com/app/calls/active.json', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'declined', endedAt: Date.now() })
+      }).catch(() => {})
+    );
+    return;
   }
 
   event.waitUntil((async () => {
-    const windowClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const baseUrl = new URL(data.url || '/index.html', self.location.origin);
+    if (action === 'answer') baseUrl.searchParams.set('action', 'answer');
 
-    // إذا كان التطبيق مفتوحاً في الخلفية
-    for (const client of windowClients) {
-      try {
-        if ('focus' in client) await client.focus();
-        if ('navigate' in client && client.url !== targetUrl) {
-          await client.navigate(targetUrl);
-        }
+    const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of allClients) {
+      if ('focus' in client) {
+        await client.focus();
         client.postMessage({
-          type: 'OPEN_AYOUSHA_DESTINATION',
-          open: openType,
-          item: itemId,
-          role,
-          url: targetUrl
+          type: data.type === 'call' ? 'INCOMING_CALL_RING' : 'OPEN_AYOUSHA_DESTINATION',
+          open: data.type,
+          item: data.itemId,
+          role: data.role,
+          action,
+          url: baseUrl.href
         });
         return;
-      } catch (err) {
-        console.warn('Focus existing client error:', err);
       }
     }
-
-    // إذا كان التطبيق مقفلاً تماماً، افتح نافذة جديدة مباشرة بالرابط والوجهة المحددة
-    if (clients.openWindow) {
-      await clients.openWindow(targetUrl);
+    if (self.clients.openWindow) {
+      await self.clients.openWindow(baseUrl.href);
     }
   })());
 });
