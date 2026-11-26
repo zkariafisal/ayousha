@@ -1615,15 +1615,19 @@ window.openEventDestination = async function(type, id, targetRole, notifTitle=''
     return;
   }
 
-  if(type === 'call'){
+  if(type === 'call' || type === 'call_missed'){
+    const pendingAct = window._pendingCallAction || new URLSearchParams(location.search).get('action') || '';
+    window._pendingCallAction = '';
     if(db){
       try {
         const snap = await get(ref(db, 'app/calls/active'));
         const active = snap.val() || window._latestActiveCall;
         if(active && active.to === MY_ROLE && active.status === 'ringing' && (Date.now() - (active.createdAt || 0) < 65000)){
           await handleActiveCallSnapshot(active);
-          if(new URLSearchParams(location.search).get('action') === 'answer'){
+          if(pendingAct === 'answer'){
             setTimeout(() => { window.answerIncomingCall(); }, 120);
+          } else if(pendingAct === 'decline'){
+            setTimeout(() => { window.declineIncomingCall(); }, 120);
           }
           return;
         }
@@ -1733,11 +1737,12 @@ function handleDeepLink(attempts = 0){
   const type = p.get('open');
   const id = p.get('item');
   const forRole = p.get('for');
+  const action = p.get('action');
   if(!type && !forRole) return;
 
   if(forRole && forRole !== MY_ROLE){
     console.warn('🚫 رابط فتح عميق لدور آخر ('+forRole+') — سيتم تجاهله (دورك الحالي: '+MY_ROLE+')');
-    p.delete('open'); p.delete('item'); p.delete('for');
+    p.delete('open'); p.delete('item'); p.delete('for'); p.delete('action');
     const cleanSearch = p.toString() ? '?' + p.toString() : '';
     history.replaceState({}, '', location.pathname + cleanSearch + location.hash);
     return;
@@ -1748,8 +1753,9 @@ function handleDeepLink(attempts = 0){
     return;
   }
 
+  if(action) window._pendingCallAction = action;
   window.openEventDestination(type, id, forRole);
-  p.delete('open'); p.delete('item'); p.delete('for');
+  p.delete('open'); p.delete('item'); p.delete('for'); p.delete('action');
   const newSearch = p.toString() ? '?' + p.toString() : '';
   history.replaceState({}, '', location.pathname + newSearch + location.hash);
 }
@@ -3336,14 +3342,16 @@ async function writeMissedCallNotification(callId, fromRole, fromName, atIso){
       from: fromRole,
       fromName: fromName || senderName(fromRole),
       to: toRole,
-      title: `📞 تم الاتصال بكِ من ${fromName || senderName(fromRole)}`,
-      body: `مكالمة صوتية فائتة الساعة ${chatTime(atIso || Date.now())} — اضغطي لمعاودة الاتصال`,
+      title: `📞 مكالمة فائتة من ${fromName || senderName(fromRole)}`,
+      body: `اتصل بك الساعة ${chatTime(atIso || Date.now())} — اضغط لمعاودة الاتصال`,
       type: 'call',
       itemId: callId,
       at: atIso || new Date().toISOString(),
       read: false
     });
-    await sendFCM(toRole, `📞 مكالمة فائتة من ${fromName || senderName(fromRole)}`, 'حاول الاتصال بكِ عندما كان الإنترنت مقفلاً', 'call', callId);
+    await sendFCM(toRole, `📞 مكالمة فائتة من ${fromName || senderName(fromRole)}`, 'لم يتم الرد على المكالمة — اضغط لمعاودة الاتصال', 'call_missed', callId, false, {
+      tag: 'ayousha-call-' + callId
+    });
   } catch(e){}
 }
 
