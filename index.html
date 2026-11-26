@@ -212,35 +212,66 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
 .bg-ring-btn{width:38px;height:38px;border-radius:50%;background:#fff5f9;border:1px solid #f2c9da;color:#8e5a72;font-size:1.05rem;display:grid;place-items:center;transition:all .18s}
 .bg-ring-btn.active{background:linear-gradient(135deg,#2e7d32,#43a047);color:#fff;border-color:#81c784;box-shadow:0 0 0 4px rgba(76,175,80,.2)}
 body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e);color:#ffd6e7;border-color:#9e477c}
-.call-overlay{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100dvh;z-index:2147483647;background:linear-gradient(160deg,#520e30 0%,#260717 55%,#12030b 100%);color:#fff;display:none;align-items:center;justify-content:center;padding:24px;touch-action:manipulation}
+.call-overlay{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100dvh;z-index:2147483647;background:radial-gradient(circle at 50% 18%,rgba(128,112,102,.32) 0%,transparent 52%),linear-gradient(180deg,#59534d 0%,#3e3834 38%,#211c19 72%,#0f0b0a 100%);color:#fff;display:none;flex-direction:column;align-items:center;justify-content:space-between;padding:28px 20px 26px;touch-action:manipulation;overflow-y:auto}
 .call-overlay.is-open{display:flex !important;opacity:1 !important;visibility:visible !important}
 .call-overlay[hidden]:not(.is-open){display:none !important}
-.call-unmute-hint{margin-top:6px;padding:7px 14px;border-radius:18px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;animation:pulse 1.2s infinite}
-.call-card{width:100%;max-width:380px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
-.call-rings{position:relative;width:140px;height:140px;display:grid;place-items:center;margin-bottom:8px}
-.call-ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,148,194,.45);animation:callPulse 2.1s infinite ease-out}
-.call-ring.r2{animation-delay:1.05s}
-@keyframes callPulse{0%{transform:scale(.75);opacity:.9}100%{transform:scale(1.45);opacity:0}}
-.call-avatar{width:96px;height:96px;border-radius:50%;background:linear-gradient(145deg,#ff6090,#ad1457);display:grid;place-items:center;font-size:2.8rem;box-shadow:0 12px 32px rgba(216,27,96,.45);border:3px solid rgba(255,255,255,.45);position:relative;z-index:2}
-.call-name{font-size:1.55rem;font-weight:800;margin:0;color:#fff}
-.call-state{font-size:.96rem;color:#ffd6e7;margin:0;min-height:26px}
-.call-timer{font-size:1.25rem;font-weight:800;letter-spacing:2px;color:#fff;background:rgba(255,255,255,.14);padding:5px 16px;border-radius:20px}
-.call-wave{display:flex;align-items:center;justify-content:center;gap:5px;height:28px;margin-top:2px}
-.call-wave span{width:4px;height:10px;border-radius:4px;background:#ff80ab;animation:callWave 1s infinite ease-in-out}
+.call-overlay.minimized{display:none !important}
+.floating-call-bar{position:fixed;top:10px;left:12px;right:12px;z-index:2147483646;background:linear-gradient(135deg,#2e7d32,#1b5e20);color:#fff;border-radius:16px;padding:10px 14px;display:none;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 12px 30px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.22)}
+.floating-call-bar.show{display:flex !important}
+.floating-call-info{display:flex;align-items:center;gap:10px;min-width:0;flex:1;cursor:pointer}
+.floating-call-dot{width:10px;height:10px;border-radius:50%;background:#a5f3fc;box-shadow:0 0 0 4px rgba(165,243,252,.25);animation:pulse 1.2s infinite;flex-shrink:0}
+.floating-call-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.floating-call-btn{border-radius:10px;padding:6px 10px;font-size:.76rem;font-weight:800;color:#fff;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25)}
+.floating-call-btn.end{background:#d32f2f;border-color:#ef9a9a}
+.call-unmute-hint{margin-top:4px;padding:7px 14px;border-radius:18px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;animation:pulse 1.2s infinite}
+.call-card{width:100%;max-width:400px;height:100%;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:10px}
+.call-top-block{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;padding-top:12px}
+.call-rings{position:relative;width:108px;height:108px;display:grid;place-items:center;margin-bottom:4px}
+.call-ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(255,255,255,.22);animation:callPulse 2.3s infinite ease-out}
+.call-ring.r2{animation-delay:1.15s}
+@keyframes callPulse{0%{transform:scale(.82);opacity:.75}100%{transform:scale(1.38);opacity:0}}
+.call-avatar{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:2.4rem;box-shadow:0 10px 28px rgba(0,0,0,.28);border:2px solid rgba(255,255,255,.28);position:relative;z-index:2}
+.call-name{font-size:1.55rem;font-weight:800;margin:2px 0 0;color:#fff}
+.call-subline{font-size:.82rem;color:rgba(255,255,255,.72);display:flex;align-items:center;gap:6px;justify-content:center}
+.call-hd-badge{font-size:.66rem;font-weight:800;padding:1px 5px;border-radius:4px;border:1px solid rgba(255,255,255,.45);color:rgba(255,255,255,.9)}
+.call-state{font-size:.94rem;color:rgba(255,255,255,.88);margin:2px 0 0;min-height:22px}
+.call-timer-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:2px}
+.call-timer{font-size:1.05rem;font-weight:700;letter-spacing:1.5px;color:#fff;background:rgba(255,255,255,.12);padding:4px 14px;border-radius:16px}
+.call-rec-badge{display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:800;color:#ffcdd2;background:rgba(211,47,47,.42);border:1px solid rgba(239,154,154,.55);padding:4px 10px;border-radius:16px}
+.call-rec-dot{width:8px;height:8px;border-radius:50%;background:#ff5252;animation:pulse 1s infinite}
+.call-wave{display:flex;align-items:center;justify-content:center;gap:4px;height:20px;margin-top:2px}
+.call-wave span{width:3.5px;height:8px;border-radius:4px;background:rgba(255,255,255,.72);animation:callWave 1s infinite ease-in-out}
 .call-wave span:nth-child(2){animation-delay:.15s}
 .call-wave span:nth-child(3){animation-delay:.3s}
 .call-wave span:nth-child(4){animation-delay:.45s}
 .call-wave span:nth-child(5){animation-delay:.6s}
-@keyframes callWave{0%,100%{height:8px;opacity:.55}50%{height:26px;opacity:1}}
-.call-actions{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:24px;width:100%}
-.call-action-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
-.call-action-wrap span{font-size:.82rem;color:#ffd6e7;font-weight:700}
-.call-action-btn{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;font-size:1.8rem;color:#fff;box-shadow:0 10px 26px rgba(0,0,0,.32);transition:transform .16s}
+@keyframes callWave{0%,100%{height:6px;opacity:.45}50%{height:20px;opacity:1}}
+.call-mid-drawer{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:12px;text-align:right;backdrop-filter:blur(8px)}
+.call-mid-drawer textarea,.call-mid-drawer input{width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.32);color:#fff;padding:9px 11px;font-size:.86rem;outline:none}
+.call-mid-drawer textarea::placeholder{color:rgba(255,255,255,.55)}
+.call-keypad-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;direction:ltr}
+.call-key-btn{height:48px;border-radius:14px;background:rgba(255,255,255,.14);color:#fff;font-size:1.18rem;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;border:1px solid rgba(255,255,255,.14);transition:background .12s,transform .1s}
+.call-key-btn small{font-size:.55rem;opacity:.65;letter-spacing:1px}
+.call-key-btn:active{background:rgba(255,255,255,.32);transform:scale(.95)}
+.call-bottom-block{width:100%;display:flex;flex-direction:column;gap:20px;padding-bottom:8px}
+.call-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;width:100%}
+.call-grid-item{display:flex;flex-direction:column;align-items:center;gap:6px;background:transparent;color:rgba(255,255,255,.92);padding:4px 2px;transition:transform .14s,opacity .14s}
+.call-grid-item:active{transform:scale(.92)}
+.call-grid-icon{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);transition:all .18s}
+.call-grid-icon svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.call-grid-item.is-active .call-grid-icon{background:#fff;color:#1e1a18;border-color:#fff;box-shadow:0 6px 18px rgba(255,255,255,.25)}
+.call-grid-item.is-rec .call-grid-icon{background:#e53935;color:#fff;border-color:#ff8a80;box-shadow:0 0 0 5px rgba(229,57,53,.28);animation:pulse 1.1s infinite}
+.call-grid-label{font-size:.78rem;color:rgba(255,255,255,.82);font-weight:600}
+.call-actions{display:flex;align-items:center;justify-content:space-around;gap:18px;width:100%;padding:4px 8px}
+.call-action-wrap{display:flex;flex-direction:column;align-items:center;gap:7px}
+.call-action-wrap span{font-size:.78rem;color:rgba(255,255,255,.85);font-weight:700}
+.call-action-btn{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:1.6rem;color:#fff;box-shadow:0 10px 26px rgba(0,0,0,.32);transition:transform .16s,background .16s}
+.call-action-btn svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .call-action-btn:active{transform:scale(.92)}
-.call-action-btn.answer{background:linear-gradient(135deg,#43a047,#2e7d32);animation:pulse 1.3s infinite}
-.call-action-btn.decline,.call-action-btn.end{background:linear-gradient(135deg,#e53935,#b71c1c)}
-.call-action-btn.mute{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35)}
-.call-action-btn.mute.active{background:#fff;color:#ad1457}
+.call-action-btn.answer{width:70px;height:70px;background:linear-gradient(135deg,#43a047,#2e7d32);animation:pulse 1.3s infinite}
+.call-action-btn.decline,.call-action-btn.end{width:70px;height:70px;background:linear-gradient(135deg,#d32f2f,#9a1b1b)}
+.call-action-btn.ghost{width:54px;height:54px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);box-shadow:none}
+.call-action-btn.ghost.active{background:#fff;color:#1e1a18;border-color:#fff}
 
 </style>
 <script src="/_aistudio-iframe.js?v=29045eb3"></script></head>
@@ -677,21 +708,81 @@ body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e)
 </nav>
 
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this && !modalLocked) closeModal()"><div class="modal" id="modalContent"></div></div>
+<div id="floatingCallBar" class="floating-call-bar" hidden>
+  <div class="floating-call-info" onclick="window.restoreCallOverlay()">
+    <span class="floating-call-dot"></span>
+    <div style="min-width:0;">
+      <div id="floatingCallTitle" style="font-weight:800;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">مكالمة جارية</div>
+      <div id="floatingCallTimer" style="font-size:.74rem;opacity:.88;">00:00 — اضغط للعودة لشاشة الاتصال</div>
+    </div>
+  </div>
+  <div class="floating-call-actions">
+    <button type="button" class="floating-call-btn" onclick="window.toggleCallMute(event)" id="floatingMuteBtn">🎙️</button>
+    <button type="button" class="floating-call-btn" onclick="window.restoreCallOverlay()">تكبير</button>
+    <button type="button" class="floating-call-btn end" onclick="window.endVoiceCall(event)">إنهاء</button>
+  </div>
+</div>
 <div id="voiceCallOverlay" class="call-overlay" hidden onclick="window.unlockCallAudioOnTap(false, event)">
   <div class="call-card" onclick="event.stopPropagation()">
-    <div class="call-rings">
-      <div class="call-ring r1"></div>
-      <div class="call-ring r2"></div>
-      <div class="call-avatar" id="callAvatar">💗</div>
+    <div class="call-top-block">
+      <div class="call-rings">
+        <div class="call-ring r1"></div>
+        <div class="call-ring r2"></div>
+        <div class="call-avatar" id="callAvatar">💗</div>
+      </div>
+      <h3 class="call-name" id="callPartnerTitle">عيوشة</h3>
+      <div class="call-subline" id="callSubline">
+        <span class="call-hd-badge">HD</span>
+        <span>اتصال صوتي خاص</span>
+      </div>
+      <p class="call-state" id="callStatusText">جاري الاتصال...</p>
+      <button type="button" id="callUnmuteHint" class="call-unmute-hint" hidden onclick="event.stopPropagation();window.unlockCallAudioOnTap(true, event)">🔊 اضغطي هنا لسماع الرنة بوضوح</button>
+      <div class="call-timer-row">
+        <div class="call-timer" id="callTimer" hidden>00:00</div>
+        <div class="call-rec-badge" id="callRecBadge" hidden><span class="call-rec-dot"></span><span id="callRecTime">00:00</span></div>
+      </div>
+      <div class="call-wave" id="callWave" hidden>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
     </div>
-    <h3 class="call-name" id="callPartnerTitle">عيوشة</h3>
-    <p class="call-state" id="callStatusText">جاري الاتصال...</p>
-    <button type="button" id="callUnmuteHint" class="call-unmute-hint" hidden onclick="event.stopPropagation();window.unlockCallAudioOnTap(true, event)">🔊 اضغطي هنا لسماع الرنة بوضوح</button>
-    <div class="call-timer" id="callTimer" hidden>00:00</div>
-    <div class="call-wave" id="callWave" hidden>
-      <span></span><span></span><span></span><span></span><span></span>
+
+    <div id="callNoteDrawer" class="call-mid-drawer" hidden onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <strong style="font-size:.86rem;">📝 ملاحظة سريعة أثناء المكالمة</strong>
+        <button type="button" onclick="window.toggleCallNoteDrawer(event)" style="color:#fff;font-size:1rem;padding:2px 6px;">✕</button>
+      </div>
+      <textarea id="callQuickNoteInput" rows="2" maxlength="800" placeholder="اكتب ملاحظة أو رسالة تذكارية أثناء المكالمة..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button type="button" onclick="window.saveCallQuickNote('memory', event)" style="flex:1;padding:8px;border-radius:10px;background:#d81b60;color:#fff;font-size:.78rem;font-weight:700;">📸 حفظ في الذكريات</button>
+        <button type="button" onclick="window.saveCallQuickNote('mail', event)" style="flex:1;padding:8px;border-radius:10px;background:rgba(255,255,255,.2);color:#fff;font-size:.78rem;font-weight:700;">💌 إرسال للمحادثة</button>
+      </div>
     </div>
-    <div class="call-actions" id="callActions"></div>
+
+    <div id="callKeypadDrawer" class="call-mid-drawer" hidden onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <strong id="callKeypadDisplay" style="font-size:.95rem;letter-spacing:2px;direction:ltr;"># لوحة الأرقام</strong>
+        <button type="button" onclick="window.toggleCallKeypad(event)" style="color:#fff;font-size:1rem;padding:2px 6px;">✕</button>
+      </div>
+      <div class="call-keypad-grid">
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('1',event)">1<small>&nbsp;</small></button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('2',event)">2<small>ABC</small></button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('3',event)">3<small>DEF</small></button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('4',event)">4<small>GHI</small></button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('5',event)">5<small>JKL</small></button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('6',event)">6<small>MNO</small></button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('7',event)">7<small>PQRS</small></button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('8',event)">8<small>TUV</small></button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('9',event)">9<small>WXYZ</small></button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('*',event)">*</button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('0',event)">0<small>+</small></button>
+        <button type="button" class="call-key-btn" onclick="window.pressCallDtmf('#',event)">#</button>
+      </div>
+    </div>
+
+    <div class="call-bottom-block">
+      <div class="call-feature-grid" id="callFeatureGrid" hidden></div>
+      <div class="call-actions" id="callActions"></div>
+    </div>
   </div>
 </div>
 <audio id="remoteCallAudio" autoplay playsinline style="display:none"></audio>
@@ -2913,6 +3004,19 @@ let pendingRemoteIce = [];
 let localIceQueue = [];
 let signalingDocReady = false;
 let callMuted = false;
+let callOnHold = false;
+let remoteOnHold = false;
+let callSpeakerOn = false;
+let callRecording = false;
+let callMediaRecorder = null;
+let callRecordedChunks = [];
+let callRecMixCtx = null;
+let callRecSeconds = 0;
+let callRecTimerInterval = null;
+let callRemoteStreamRef = null;
+let callKeypadDigits = '';
+let callMinimized = false;
+let lastRenderedCallMode = '';
 let callSeconds = 0;
 let ringAudioEl = null;
 let callWakeLock = null;
@@ -3562,7 +3666,9 @@ function renderCallOverlay(mode, partnerName, statusText){
   const status = document.getElementById('callStatusText');
   const timer = document.getElementById('callTimer');
   const wave = document.getElementById('callWave');
+  const grid = document.getElementById('callFeatureGrid');
   const actions = document.getElementById('callActions');
+  const floatTitle = document.getElementById('floatingCallTitle');
   if(!overlay) return;
 
   if(overlay.parentNode !== document.body){
@@ -3571,50 +3677,98 @@ function renderCallOverlay(mode, partnerName, statusText){
   overlay.hidden = false;
   overlay.removeAttribute('hidden');
   overlay.classList.add('is-open');
-  overlay.style.display = 'flex';
-  if(avatar) avatar.textContent = MY_ROLE === 'me' ? '🌸' : '💙';
+  overlay.classList.toggle('minimized', !!callMinimized);
+  overlay.style.display = callMinimized ? 'none' : 'flex';
+  if(avatar){
+    avatar.innerHTML = `<svg viewBox="0 0 24 24" width="44" height="44" fill="rgba(255,255,255,.78)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>`;
+  }
   if(title) title.textContent = partnerName || senderName(otherRole());
+  if(floatTitle) floatTitle.textContent = `📞 ${partnerName || senderName(otherRole())}`;
   if(status) status.textContent = statusText || '';
 
   if(mode === 'incoming'){
+    lastRenderedCallMode = 'incoming';
     if(timer) timer.hidden = true;
     if(wave) wave.hidden = true;
+    if(grid) grid.hidden = true;
+    const nd = document.getElementById('callNoteDrawer'); if(nd) nd.hidden = true;
+    const kd = document.getElementById('callKeypadDrawer'); if(kd) kd.hidden = true;
     if(actions) actions.innerHTML = `
       <div class="call-action-wrap">
-        <button type="button" class="call-action-btn decline" onclick="event.stopPropagation();window.declineIncomingCall(event)" aria-label="رفض">📵</button>
+        <button type="button" class="call-action-btn decline" onclick="event.stopPropagation();window.declineIncomingCall(event)" aria-label="رفض">
+          <svg viewBox="0 0 24 24"><path d="M4 15c4.5-3.2 11.5-3.2 16 0l2-2c.4-.4.3-1.1-.2-1.4-5.7-3.8-14.1-3.8-19.8 0-.5.3-.6 1-.2 1.4l2 2z" fill="currentColor" stroke="none"/></svg>
+        </button>
         <span>رفض</span>
       </div>
       <div class="call-action-wrap">
-        <button type="button" class="call-action-btn answer" onclick="event.stopPropagation();window.answerIncomingCall(event)" aria-label="رد">📞</button>
+        <button type="button" class="call-action-btn ghost" onclick="event.stopPropagation();window.declineWithQuickMsg(event)" aria-label="رسالة سريعة">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <span>رسالة</span>
+      </div>
+      <div class="call-action-wrap">
+        <button type="button" class="call-action-btn answer" onclick="event.stopPropagation();window.answerIncomingCall(event)" aria-label="رد">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
         <span>رد</span>
       </div>
     `;
-  } else if(mode === 'outgoing'){
-    if(timer) timer.hidden = true;
-    if(wave) wave.hidden = true;
-    if(actions) actions.innerHTML = `
-      <div class="call-action-wrap">
-        <button type="button" class="call-action-btn mute ${callMuted?'active':''}" id="callMuteBtn" onclick="event.stopPropagation();window.toggleCallMute(event)" aria-label="كتم">${callMuted?'🔇':'🎙️'}</button>
-        <span>${callMuted?'إلغاء الكتم':'كتم'}</span>
-      </div>
-      <div class="call-action-wrap">
-        <button type="button" class="call-action-btn end" onclick="event.stopPropagation();window.endVoiceCall(event)" aria-label="إنهاء">📵</button>
-        <span>إنهاء</span>
-      </div>
-    `;
-  } else if(mode === 'connected'){
-    if(timer) timer.hidden = false;
-    if(wave) wave.hidden = false;
-    if(actions) actions.innerHTML = `
-      <div class="call-action-wrap">
-        <button type="button" class="call-action-btn mute ${callMuted?'active':''}" id="callMuteBtn" onclick="event.stopPropagation();window.toggleCallMute(event)" aria-label="كتم">${callMuted?'🔇':'🎙️'}</button>
-        <span>${callMuted?'إلغاء الكتم':'كتم'}</span>
-      </div>
-      <div class="call-action-wrap">
-        <button type="button" class="call-action-btn end" onclick="event.stopPropagation();window.endVoiceCall(event)" aria-label="إنهاء">📵</button>
-        <span>إنهاء المكالمة</span>
-      </div>
-    `;
+  } else {
+    const isConnected = mode === 'connected';
+    if(timer) timer.hidden = !isConnected;
+    if(wave) wave.hidden = !isConnected || callOnHold || remoteOnHold;
+    if(grid){
+      grid.hidden = false;
+      grid.innerHTML = `
+        <button type="button" class="call-grid-item" onclick="event.stopPropagation();window.minimizeCallOverlay(event)">
+          <span class="call-grid-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <span class="call-grid-label">المحادثة</span>
+        </button>
+        <button type="button" class="call-grid-item" onclick="event.stopPropagation();window.sendInCallQuickLove(event)">
+          <span class="call-grid-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+          <span class="call-grid-label">نبضة حب</span>
+        </button>
+        <button type="button" class="call-grid-item" id="callNoteBtn" onclick="event.stopPropagation();window.toggleCallNoteDrawer(event)">
+          <span class="call-grid-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+          <span class="call-grid-label">ملاحظة</span>
+        </button>
+        <button type="button" class="call-grid-item ${callMuted ? 'is-active' : ''}" id="callMuteBtn" onclick="event.stopPropagation();window.toggleCallMute(event)">
+          <span class="call-grid-icon"><svg viewBox="0 0 24 24">${callMuted ? '<line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>' : '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>'}</svg></span>
+          <span class="call-grid-label">${callMuted ? 'إلغاء الكتم' : 'كتم'}</span>
+        </button>
+        <button type="button" class="call-grid-item ${callOnHold ? 'is-active' : ''}" id="callHoldBtn" onclick="event.stopPropagation();window.toggleCallHold(event)">
+          <span class="call-grid-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/></svg></span>
+          <span class="call-grid-label">${callOnHold ? 'استئناف' : 'تعليق'}</span>
+        </button>
+        <button type="button" class="call-grid-item ${callRecording ? 'is-rec' : ''}" id="callRecordBtn" onclick="event.stopPropagation();window.toggleCallRecording(event)">
+          <span class="call-grid-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><circle cx="8" cy="12" r="2.2"/><circle cx="16" cy="12" r="2.2"/><line x1="8" y1="14.2" x2="16" y2="14.2"/></svg></span>
+          <span class="call-grid-label">${callRecording ? 'إيقاف التسجيل' : 'تسجيل'}</span>
+        </button>
+      `;
+    }
+    if(actions){
+      actions.innerHTML = `
+        <div class="call-action-wrap">
+          <button type="button" class="call-action-btn ghost ${callSpeakerOn ? 'active' : ''}" id="callSpeakerBtn" onclick="event.stopPropagation();window.toggleCallSpeaker(event)" aria-label="مكبر الصوت">
+            <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          </button>
+          <span>مكبر</span>
+        </div>
+        <div class="call-action-wrap">
+          <button type="button" class="call-action-btn end" onclick="event.stopPropagation();window.endVoiceCall(event)" aria-label="إنهاء">
+            <svg viewBox="0 0 24 24"><path d="M4 15c4.5-3.2 11.5-3.2 16 0l2-2c.4-.4.3-1.1-.2-1.4-5.7-3.8-14.1-3.8-19.8 0-.5.3-.6 1-.2 1.4l2 2z" fill="currentColor" stroke="none"/></svg>
+          </button>
+          <span>${isConnected ? 'إنهاء المكالمة' : 'إنهاء'}</span>
+        </div>
+        <div class="call-action-wrap">
+          <button type="button" class="call-action-btn ghost" id="callKeypadBtn" onclick="event.stopPropagation();window.toggleCallKeypad(event)" aria-label="لوحة الأرقام">
+            <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="1.3" fill="currentColor"/><circle cx="12" cy="6" r="1.3" fill="currentColor"/><circle cx="18" cy="6" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="18" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="18" r="1.3" fill="currentColor"/><circle cx="12" cy="18" r="1.3" fill="currentColor"/><circle cx="18" cy="18" r="1.3" fill="currentColor"/></svg>
+          </button>
+          <span>أرقام</span>
+        </div>
+      `;
+    }
+    lastRenderedCallMode = mode;
   }
   const btn = document.getElementById('chatCallBtn');
   if(btn) btn.classList.add('calling');
@@ -3631,6 +3785,8 @@ function startCallTimer(){
     const ss = pad(callSeconds % 60);
     const tEl = document.getElementById('callTimer');
     if(tEl) tEl.textContent = `${mm}:${ss}`;
+    const ftEl = document.getElementById('floatingCallTimer');
+    if(ftEl) ftEl.textContent = `${mm}:${ss} — اضغط للعودة لشاشة الاتصال`;
   }, 1000);
 }
 
@@ -3685,7 +3841,10 @@ function createCallPeerConnection(callId){
   pc.ontrack = ev => {
     const audioEl = document.getElementById('remoteCallAudio');
     if(audioEl && ev.streams && ev.streams[0]){
+      callRemoteStreamRef = ev.streams[0];
       if(audioEl.srcObject !== ev.streams[0]) audioEl.srcObject = ev.streams[0];
+      audioEl.muted = !!(callOnHold || remoteOnHold);
+      audioEl.volume = callSpeakerOn ? 1.0 : 0.85;
       audioEl.play().catch(()=>{});
     }
   };
@@ -3695,8 +3854,8 @@ function createCallPeerConnection(callId){
     const statusEl = document.getElementById('callStatusText');
     const waveEl = document.getElementById('callWave');
     if(st === 'connected' || st === 'completed'){
-      if(statusEl) statusEl.textContent = 'متصل صوتياً الآن 🎙️';
-      if(waveEl) waveEl.hidden = false;
+      if(statusEl && !callOnHold && !remoteOnHold) statusEl.textContent = 'متصل صوتياً الآن 🎙️';
+      if(waveEl) waveEl.hidden = !!(callOnHold || remoteOnHold);
     } else if(st === 'disconnected'){
       if(statusEl) statusEl.textContent = 'جاري إعادة ربط الصوت...';
     } else if(st === 'failed'){
@@ -3706,7 +3865,26 @@ function createCallPeerConnection(callId){
   return pc;
 }
 
+function stopCallRecording(autoSave = true){
+  clearInterval(callRecTimerInterval); callRecTimerInterval = null;
+  const badge = document.getElementById('callRecBadge');
+  if(badge) badge.hidden = true;
+  if(callMediaRecorder && callMediaRecorder.state !== 'inactive'){
+    try {
+      callMediaRecorder._autoSaveOnStop = autoSave;
+      callMediaRecorder.stop();
+    } catch(e){}
+  } else {
+    callRecording = false;
+    if(callRecMixCtx){
+      try { callRecMixCtx.close(); } catch(e){}
+      callRecMixCtx = null;
+    }
+  }
+}
+
 function cleanupCallSession(msg = ''){
+  stopCallRecording(true);
   stopCallTones();
   if(!bgCallStandbyEnabled) releaseCallWakeLock();
   clearCallMediaSession();
@@ -3732,19 +3910,31 @@ function cleanupCallSession(msg = ''){
     try { callLocalStream.getTracks().forEach(t => t.stop()); } catch(e){}
     callLocalStream = null;
   }
+  callRemoteStreamRef = null;
   const audioEl = document.getElementById('remoteCallAudio');
   if(audioEl){
-    try { audioEl.pause(); audioEl.srcObject = null; } catch(e){}
+    try { audioEl.pause(); audioEl.muted = false; audioEl.srcObject = null; } catch(e){}
   }
   activeCallState = null;
   callMuted = false;
+  callOnHold = false;
+  remoteOnHold = false;
+  callSpeakerOn = false;
+  callRecording = false;
+  callKeypadDigits = '';
+  callMinimized = false;
+  lastRenderedCallMode = '';
   processedIceKeys.clear();
   pendingRemoteIce = [];
   localIceQueue = [];
   signalingDocReady = false;
+  const floatBar = document.getElementById('floatingCallBar');
+  if(floatBar){ floatBar.classList.remove('show'); floatBar.hidden = true; }
+  const nd = document.getElementById('callNoteDrawer'); if(nd) nd.hidden = true;
+  const kd = document.getElementById('callKeypadDrawer'); if(kd) kd.hidden = true;
   const overlay = document.getElementById('voiceCallOverlay');
   if(overlay){
-    overlay.classList.remove('is-open');
+    overlay.classList.remove('is-open', 'minimized');
     overlay.hidden = true;
     overlay.style.display = 'none';
   }
@@ -4032,15 +4222,280 @@ window.toggleCallMute = function(ev = null){
   if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
   callMuted = !callMuted;
   if(callLocalStream){
-    callLocalStream.getAudioTracks().forEach(t => { t.enabled = !callMuted; });
+    callLocalStream.getAudioTracks().forEach(t => { t.enabled = !callMuted && !callOnHold; });
   }
   const btn = document.getElementById('callMuteBtn');
   if(btn){
-    btn.classList.toggle('active', callMuted);
-    btn.textContent = callMuted ? '🔇' : '🎙️';
-    const label = btn.parentElement?.querySelector('span');
+    btn.classList.toggle('is-active', callMuted);
+    const label = btn.querySelector('.call-grid-label');
     if(label) label.textContent = callMuted ? 'إلغاء الكتم' : 'كتم';
   }
+  const fBtn = document.getElementById('floatingMuteBtn');
+  if(fBtn) fBtn.textContent = callMuted ? '🔇' : '🎙️';
+};
+
+window.toggleCallHold = async function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  if(!activeCallState) return;
+  callOnHold = !callOnHold;
+  if(callLocalStream){
+    callLocalStream.getAudioTracks().forEach(t => { t.enabled = !callMuted && !callOnHold; });
+  }
+  const audioEl = document.getElementById('remoteCallAudio');
+  if(audioEl) audioEl.muted = !!(callOnHold || remoteOnHold);
+  const btn = document.getElementById('callHoldBtn');
+  if(btn){
+    btn.classList.toggle('is-active', callOnHold);
+    const label = btn.querySelector('.call-grid-label');
+    if(label) label.textContent = callOnHold ? 'استئناف' : 'تعليق';
+  }
+  const statusEl = document.getElementById('callStatusText');
+  const waveEl = document.getElementById('callWave');
+  if(statusEl){
+    statusEl.textContent = callOnHold ? '⏸️ المكالمة قيد التعليق مؤقتاً' : (remoteOnHold ? `⏸️ ${senderName(otherRole())} وضع المكالمة قيد التعليق` : 'متصل صوتياً الآن 🎙️');
+  }
+  if(waveEl) waveEl.hidden = !!(callOnHold || remoteOnHold);
+  if(db && activeCallState.callId){
+    try {
+      await update(ref(db, 'app/calls/active'), { heldBy: callOnHold ? MY_ROLE : '' });
+    } catch(e){}
+  }
+  toast(callOnHold ? '⏸️ تم تعليق المكالمة مؤقتاً' : '▶️ تم استئناف المكالمة');
+};
+
+window.toggleCallRecording = function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  if(callRecording){
+    stopCallRecording(true);
+    const btn = document.getElementById('callRecordBtn');
+    if(btn){
+      btn.classList.remove('is-rec');
+      const label = btn.querySelector('.call-grid-label');
+      if(label) label.textContent = 'تسجيل';
+    }
+    return;
+  }
+  if(typeof MediaRecorder === 'undefined'){
+    toast('⚠️ المتصفح لا يدعم تسجيل الصوت مباشرة');
+    return;
+  }
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    callRecMixCtx = new AudioCtx();
+    const dest = callRecMixCtx.createMediaStreamDestination();
+    let hasTrack = false;
+    if(callLocalStream && callLocalStream.getAudioTracks().length){
+      const micSrc = callRecMixCtx.createMediaStreamSource(callLocalStream);
+      micSrc.connect(dest);
+      hasTrack = true;
+    }
+    if(callRemoteStreamRef && callRemoteStreamRef.getAudioTracks().length){
+      const remSrc = callRecMixCtx.createMediaStreamSource(callRemoteStreamRef);
+      remSrc.connect(dest);
+      hasTrack = true;
+    }
+    if(!hasTrack){
+      toast('⚠️ انتظر بدء الصوت أولاً قبل التسجيل');
+      try { callRecMixCtx.close(); } catch(e){}
+      callRecMixCtx = null;
+      return;
+    }
+    const mimeList = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'];
+    const pickedMime = mimeList.find(m => MediaRecorder.isTypeSupported(m)) || '';
+    callRecordedChunks = [];
+    callMediaRecorder = pickedMime ? new MediaRecorder(dest.stream, { mimeType: pickedMime }) : new MediaRecorder(dest.stream);
+    callMediaRecorder._autoSaveOnStop = true;
+    callMediaRecorder.ondataavailable = e => {
+      if(e.data && e.data.size > 0) callRecordedChunks.push(e.data);
+    };
+    callMediaRecorder.onstop = () => {
+      const shouldSave = callMediaRecorder?._autoSaveOnStop !== false;
+      const chunks = [...callRecordedChunks];
+      callRecordedChunks = [];
+      callRecording = false;
+      if(callRecMixCtx){
+        try { callRecMixCtx.close(); } catch(e){}
+        callRecMixCtx = null;
+      }
+      if(shouldSave && chunks.length){
+        const type = chunks[0]?.type || pickedMime || 'audio/webm';
+        const ext = type.includes('mp4') ? 'm4a' : (type.includes('ogg') ? 'ogg' : 'webm');
+        const blob = new Blob(chunks, { type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ayousha-call-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        toast('💾 تم حفظ تسجيل المكالمة على جهازك');
+      }
+    };
+    callMediaRecorder.start(400);
+    callRecording = true;
+    callRecSeconds = 0;
+    const badge = document.getElementById('callRecBadge');
+    const recTimeEl = document.getElementById('callRecTime');
+    if(badge) badge.hidden = false;
+    if(recTimeEl) recTimeEl.textContent = '00:00';
+    clearInterval(callRecTimerInterval);
+    callRecTimerInterval = setInterval(() => {
+      callRecSeconds++;
+      if(recTimeEl) recTimeEl.textContent = `${pad(Math.floor(callRecSeconds/60))}:${pad(callRecSeconds%60)}`;
+    }, 1000);
+    const btn = document.getElementById('callRecordBtn');
+    if(btn){
+      btn.classList.add('is-rec');
+      const label = btn.querySelector('.call-grid-label');
+      if(label) label.textContent = 'إيقاف التسجيل';
+    }
+    toast('⏺️ بدأ تسجيل المكالمة');
+  } catch(e){
+    callRecording = false;
+    toast('⚠️ تعذر بدء التسجيل على هذا المتصفح');
+  }
+};
+
+window.toggleCallSpeaker = async function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  callSpeakerOn = !callSpeakerOn;
+  const audioEl = document.getElementById('remoteCallAudio');
+  if(audioEl){
+    audioEl.volume = callSpeakerOn ? 1.0 : 0.85;
+    if(typeof audioEl.setSinkId === 'function' && navigator.mediaDevices?.enumerateDevices){
+      try {
+        const devs = await navigator.mediaDevices.enumerateDevices();
+        const outputs = devs.filter(d => d.kind === 'audiooutput');
+        const speakerDev = outputs.find(d => /speaker|مكبر|loud/i.test(d.label));
+        const earDev = outputs.find(d => /ear|receiver|default/i.test(d.label));
+        if(callSpeakerOn && speakerDev) await audioEl.setSinkId(speakerDev.deviceId);
+        else if(!callSpeakerOn && earDev) await audioEl.setSinkId(earDev.deviceId);
+      } catch(e){}
+    }
+  }
+  const btn = document.getElementById('callSpeakerBtn');
+  if(btn) btn.classList.toggle('active', callSpeakerOn);
+  toast(callSpeakerOn ? '🔊 تم تفعيل مكبر الصوت' : '🔈 الوضع العادي للصوت');
+};
+
+window.toggleCallKeypad = function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  const kd = document.getElementById('callKeypadDrawer');
+  const nd = document.getElementById('callNoteDrawer');
+  const btn = document.getElementById('callKeypadBtn');
+  if(nd) nd.hidden = true;
+  if(kd){
+    kd.hidden = !kd.hidden;
+    if(btn) btn.classList.toggle('active', !kd.hidden);
+  }
+};
+
+window.pressCallDtmf = function(digit, ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  callKeypadDigits = (callKeypadDigits + digit).slice(-18);
+  const disp = document.getElementById('callKeypadDisplay');
+  if(disp) disp.textContent = callKeypadDigits || '# لوحة الأرقام';
+  const dtmfMap = {
+    '1':[697,1209],'2':[697,1336],'3':[697,1477],
+    '4':[770,1209],'5':[770,1336],'6':[770,1477],
+    '7':[852,1209],'8':[852,1336],'9':[852,1477],
+    '*':[941,1209],'0':[941,1336],'#':[941,1477]
+  };
+  try {
+    initAudio();
+    if(audioCtx && dtmfMap[digit]){
+      const [f1, f2] = dtmfMap[digit];
+      const t = audioCtx.currentTime;
+      [f1, f2].forEach(freq => {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.frequency.setValueAtTime(freq, t);
+        g.gain.setValueAtTime(0.14, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t); o.stop(t + 0.15);
+      });
+    }
+  } catch(e){}
+};
+
+window.toggleCallNoteDrawer = function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  const nd = document.getElementById('callNoteDrawer');
+  const kd = document.getElementById('callKeypadDrawer');
+  if(kd) kd.hidden = true;
+  const kBtn = document.getElementById('callKeypadBtn');
+  if(kBtn) kBtn.classList.remove('active');
+  if(nd){
+    nd.hidden = !nd.hidden;
+    if(!nd.hidden) setTimeout(() => document.getElementById('callQuickNoteInput')?.focus(), 50);
+  }
+};
+
+window.saveCallQuickNote = async function(target = 'memory', ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  const inp = document.getElementById('callQuickNoteInput');
+  const txt = inp?.value.trim();
+  if(!txt) return toast('✍️ اكتب الملاحظة أولاً');
+  try {
+    if(target === 'memory'){
+      await push(ref(db, 'app/memories'), { type: 'text', title: '📞 ملاحظة أثناء مكالمة', text: txt, at: new Date().toISOString(), by: MY_ROLE });
+      toast('📸 حُفظت الملاحظة في الذكريات');
+    } else {
+      await push(ref(db, 'app/mails'), { text: txt, at: new Date().toISOString(), createdAt: new Date().toISOString(), instant: true, by: MY_ROLE, to: otherRole() });
+      addNotification(`💌 رسالة من ${senderName(MY_ROLE)}`, txt.slice(0, 80), 'mail', '');
+      toast('💌 أُرسلت للمحادثة أثناء المكالمة');
+    }
+    if(inp) inp.value = '';
+    const nd = document.getElementById('callNoteDrawer');
+    if(nd) nd.hidden = true;
+  } catch(e){
+    toast('⚠️ تعذر الحفظ الآن');
+  }
+};
+
+window.sendInCallQuickLove = async function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  burstHearts();
+  try {
+    await push(ref(db, 'app/pings'), { by: MY_ROLE, to: otherRole(), text: '💗 نبضة حب أثناء المكالمة', at: new Date().toISOString() });
+    await addNotification('💗 نبضة حب أثناء المكالمة', `${senderName(MY_ROLE)} أرسل لك نبضة حب الآن!`, 'ping', '');
+    toast('💗 تم إرسال نبضة حب لشريكك');
+  } catch(e){}
+};
+
+window.minimizeCallOverlay = function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  if(!activeCallState) return;
+  callMinimized = true;
+  const overlay = document.getElementById('voiceCallOverlay');
+  const floatBar = document.getElementById('floatingCallBar');
+  if(overlay){ overlay.classList.add('minimized'); overlay.style.display = 'none'; }
+  if(floatBar){ floatBar.hidden = false; floatBar.classList.add('show'); }
+  document.body.style.overflow = '';
+  switchView('mail');
+};
+
+window.restoreCallOverlay = function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  if(!activeCallState) return;
+  callMinimized = false;
+  const overlay = document.getElementById('voiceCallOverlay');
+  const floatBar = document.getElementById('floatingCallBar');
+  if(floatBar){ floatBar.classList.remove('show'); floatBar.hidden = true; }
+  if(overlay){ overlay.classList.remove('minimized'); overlay.style.display = 'flex'; overlay.classList.add('is-open'); }
+  document.body.style.overflow = 'hidden';
+};
+
+window.declineWithQuickMsg = async function(ev = null){
+  if(ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+  await window.declineIncomingCall(ev);
+  try {
+    const txt = '📞 مشغول حالياً — سأتصل بك بعد قليل 💗';
+    await push(ref(db, 'app/mails'), { text: txt, at: new Date().toISOString(), createdAt: new Date().toISOString(), instant: true, by: MY_ROLE, to: otherRole() });
+    addNotification(`💌 رسالة من ${senderName(MY_ROLE)}`, txt, 'mail', '');
+  } catch(e){}
 };
 
 async function handleActiveCallSnapshot(call){
@@ -4107,7 +4562,19 @@ async function handleActiveCallSnapshot(call){
     }
 
     if(activeCallState && activeCallState.callId === call.callId){
-      if(call.status === 'missed'){
+      if(call.status === 'connected'){
+        const partnerName = call.fromName || senderName(call.from);
+        const nowRemoteHold = !!(call.heldBy && call.heldBy !== MY_ROLE);
+        if(nowRemoteHold !== remoteOnHold){
+          remoteOnHold = nowRemoteHold;
+          const audioEl = document.getElementById('remoteCallAudio');
+          if(audioEl) audioEl.muted = !!(callOnHold || remoteOnHold);
+          const statusEl = document.getElementById('callStatusText');
+          const waveEl = document.getElementById('callWave');
+          if(statusEl) statusEl.textContent = remoteOnHold ? `⏸️ ${partnerName} وضع المكالمة قيد التعليق` : (callOnHold ? '⏸️ المكالمة قيد التعليق مؤقتاً' : 'متصل صوتياً الآن 🎙️');
+          if(waveEl) waveEl.hidden = !!(callOnHold || remoteOnHold);
+        }
+      } else if(call.status === 'missed'){
         const callerTitle = call.fromName || senderName(call.from);
         const handled = getHandledMissedCallSet();
         if(!handled.has(call.callId)){
@@ -4135,27 +4602,40 @@ async function handleActiveCallSnapshot(call){
         stEl.textContent = `يرن الآن على جوال ${call.toName || senderName(otherRole())} 📞`;
       }
     }
-    if(call.status === 'connected' && call.answer && callPC && !callPC.currentRemoteDescription){
-      activeCallState.status = 'connected';
-      stopCallTones();
-      clearTimeout(callTimeoutTimer); callTimeoutTimer = null;
-      clearTimeout(callFcmFallbackTimer); callFcmFallbackTimer = null;
-      clearInterval(callFcmRepeatInterval); callFcmRepeatInterval = null;
-      if(activeCallDisconnectRef){
-        try { activeCallDisconnectRef.cancel(); } catch(e){}
-      }
-      activeCallDisconnectRef = onDisconnect(ref(db, 'app/calls/active/status'));
-      activeCallDisconnectRef.set('ended').catch(()=>{});
-      try {
-        await callPC.setRemoteDescription(new RTCSessionDescription(call.answer));
-        await flushPendingIce();
-      } catch(e){ console.warn('setRemoteDescription error', e); }
-      stopCallTones();
+    if(call.status === 'connected'){
       const partnerName = call.toName || senderName(otherRole());
-      renderCallOverlay('connected', partnerName, 'متصل صوتياً الآن 🎙️');
-      startCallTimer();
+      if(call.answer && callPC && !callPC.currentRemoteDescription){
+        activeCallState.status = 'connected';
+        stopCallTones();
+        clearTimeout(callTimeoutTimer); callTimeoutTimer = null;
+        clearTimeout(callFcmFallbackTimer); callFcmFallbackTimer = null;
+        clearInterval(callFcmRepeatInterval); callFcmRepeatInterval = null;
+        if(activeCallDisconnectRef){
+          try { activeCallDisconnectRef.cancel(); } catch(e){}
+        }
+        activeCallDisconnectRef = onDisconnect(ref(db, 'app/calls/active/status'));
+        activeCallDisconnectRef.set('ended').catch(()=>{});
+        try {
+          await callPC.setRemoteDescription(new RTCSessionDescription(call.answer));
+          await flushPendingIce();
+        } catch(e){ console.warn('setRemoteDescription error', e); }
+        stopCallTones();
+        renderCallOverlay('connected', partnerName, 'متصل صوتياً الآن 🎙️');
+        startCallTimer();
+      } else {
+        const nowRemoteHold = !!(call.heldBy && call.heldBy !== MY_ROLE);
+        if(nowRemoteHold !== remoteOnHold){
+          remoteOnHold = nowRemoteHold;
+          const audioEl = document.getElementById('remoteCallAudio');
+          if(audioEl) audioEl.muted = !!(callOnHold || remoteOnHold);
+          const statusEl = document.getElementById('callStatusText');
+          const waveEl = document.getElementById('callWave');
+          if(statusEl) statusEl.textContent = remoteOnHold ? `⏸️ ${partnerName} وضع المكالمة قيد التعليق` : (callOnHold ? '⏸️ المكالمة قيد التعليق مؤقتاً' : 'متصل صوتياً الآن 🎙️');
+          if(waveEl) waveEl.hidden = !!(callOnHold || remoteOnHold);
+        }
+      }
     } else if(call.status === 'declined'){
-      cleanupCallSession('تم رفض المكالمة 📵');
+      cleanupCallSession('الخط مشغول — تم رفض المكالمة 📵');
     } else if(call.status === 'ended'){
       cleanupCallSession('انتهت المكالمة');
     }
