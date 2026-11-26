@@ -3922,6 +3922,7 @@ function cleanupCallSession(msg = ''){
     if(navigator.audioSession) navigator.audioSession.type = 'auto';
   } catch(e){}
   try {
+    if(window.Android && typeof window.Android.onCallEnded === 'function') window.Android.onCallEnded();
     if(window.Android && typeof window.Android.setSpeakerphoneOn === 'function') window.Android.setSpeakerphoneOn(false);
     if(window.ayoushaNativeSpeaker && typeof window.ayoushaNativeSpeaker === 'function') window.ayoushaNativeSpeaker(false);
   } catch(e){}
@@ -4012,6 +4013,7 @@ window.startVoiceCall = async function(){
   callLocalStream = stream;
   callMuted = false;
   callSpeakerOn = false;
+  try { if(window.Android && typeof window.Android.onCallStarted === 'function') window.Android.onCallStarted(); } catch(e){}
   applyCallAudioRoute(false);
   const partnerName = senderName(otherRole());
   const callId = 'call_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
@@ -4153,6 +4155,7 @@ window.answerIncomingCall = async function(ev = null){
   callMuted = false;
   callSpeakerOn = false;
   activeCallState = { callId, role: 'callee', status: 'connected', from: callData.from, to: MY_ROLE };
+  try { if(window.Android && typeof window.Android.onCallStarted === 'function') window.Android.onCallStarted(); } catch(e){}
   applyCallAudioRoute(false);
 
   const handled = getHandledMissedCallSet();
