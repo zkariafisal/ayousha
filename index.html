@@ -209,9 +209,12 @@ body.chat-dark .messenger-composer textarea{background:#1c1922;border-color:#433
 .chat-call-btn{flex:0 0 43px;height:43px;width:43px;border-radius:50%;background:linear-gradient(135deg,#ffe2ed,#ffd1e2);color:#c2185b;font-size:1.25rem;display:grid;place-items:center;border:1px solid #f48fb1;box-shadow:0 2px 8px rgba(216,27,96,.15);transition:transform .16s,box-shadow .16s}
 .chat-call-btn:active{transform:scale(.92)}
 .chat-call-btn.calling{background:linear-gradient(135deg,#43a047,#2e7d32);color:#fff;border-color:#81c784;animation:pulse 1.2s infinite}
+.bg-ring-btn{width:38px;height:38px;border-radius:50%;background:#fff5f9;border:1px solid #f2c9da;color:#8e5a72;font-size:1.05rem;display:grid;place-items:center;transition:all .18s}
+.bg-ring-btn.active{background:linear-gradient(135deg,#2e7d32,#43a047);color:#fff;border-color:#81c784;box-shadow:0 0 0 4px rgba(76,175,80,.2)}
 body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e);color:#ffd6e7;border-color:#9e477c}
-.call-overlay{position:fixed;inset:0;z-index:999999;background:radial-gradient(circle at 50% 25%,#5d1035 0%,#2b081b 60%,#16040f 100%);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(12px);animation:fadeIn .25s ease}
+.call-overlay{position:fixed;inset:0;z-index:2147483647;background:radial-gradient(circle at 50% 25%,#5d1035 0%,#2b081b 60%,#16040f 100%);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(12px);animation:fadeIn .22s ease;touch-action:manipulation}
 .call-overlay[hidden]{display:none !important}
+.call-unmute-hint{margin-top:6px;padding:7px 14px;border-radius:18px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;animation:pulse 1.2s infinite}
 .call-card{width:100%;max-width:380px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
 .call-rings{position:relative;width:140px;height:140px;display:grid;place-items:center;margin-bottom:8px}
 .call-ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,148,194,.45);animation:callPulse 2.1s infinite ease-out}
@@ -558,6 +561,7 @@ body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e)
       <header class="messenger-header">
         <div class="messenger-avatar">💗</div>
         <div class="messenger-title"><strong id="chatPartnerName">عيوشة</strong><small id="chatPresence">جارٍ التحقق من الاتصال...</small></div>
+        <button type="button" id="bgRingStandbyBtn" class="bg-ring-btn" onclick="window.toggleBgCallStandby()" title="تفعيل الرنين المباشر حتى عند تصغير التطبيق" aria-label="وضع الرنين بالخلفية">📡</button>
         <button class="messenger-lock" onclick="window.toggleChatDark()" title="الوضع الليلي">☾</button>
         <button class="icon-btn" onclick="sendPing()" title="أرسل نبضة حب">💗</button>
       </header>
@@ -672,7 +676,7 @@ body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e)
 </nav>
 
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this && !modalLocked) closeModal()"><div class="modal" id="modalContent"></div></div>
-<div id="voiceCallOverlay" class="call-overlay" hidden>
+<div id="voiceCallOverlay" class="call-overlay" hidden onclick="window.unlockCallAudioOnTap()">
   <div class="call-card">
     <div class="call-rings">
       <div class="call-ring r1"></div>
@@ -681,6 +685,7 @@ body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e)
     </div>
     <h3 class="call-name" id="callPartnerTitle">عيوشة</h3>
     <p class="call-state" id="callStatusText">جاري الاتصال...</p>
+    <button type="button" id="callUnmuteHint" class="call-unmute-hint" hidden onclick="event.stopPropagation();window.unlockCallAudioOnTap(true)">🔊 اضغطي هنا لسماع الرنة بوضوح</button>
     <div class="call-timer" id="callTimer" hidden>00:00</div>
     <div class="call-wave" id="callWave" hidden>
       <span></span><span></span><span></span><span></span><span></span>
@@ -688,6 +693,7 @@ body.chat-dark .chat-call-btn{background:linear-gradient(135deg,#5a2247,#7b2c5e)
     <div class="call-actions" id="callActions"></div>
   </div>
   <audio id="remoteCallAudio" autoplay playsinline style="display:none"></audio>
+  <audio id="ringTonePlayer" loop playsinline preload="auto" style="display:none"></audio>
 </div>
 <div class="toast" id="toast"></div>
 <div id="fullScreen"></div>
@@ -900,10 +906,40 @@ function initAudio(){
       if(p && typeof p.then === 'function'){
         p.then(() => { try { sil.pause(); } catch(e){} }).catch(() => { audioUnlocked = false; });
       }
-      // Pre-warm primary tones
+      // Pre-warm primary tones & persistent call ringtone element
       getPreloadedAudio('mail');
       getPreloadedAudio('notification');
       getPreloadedAudio('ping');
+      const rt = document.getElementById('ringTonePlayer');
+      if(rt && !activeCallState){
+        if(!rt.src) rt.src = _silentWavUrl;
+        if(bgCallStandbyEnabled){
+          startBgKeepAliveAudio();
+        } else {
+          rt.volume = 0.01;
+          const rp = rt.play();
+          if(rp && typeof rp.then === 'function'){
+            rp.then(() => {
+              if(!activeCallState && !bgCallStandbyEnabled){
+                try { rt.pause(); rt.currentTime = 0; } catch(e){}
+              }
+            }).catch(()=>{});
+          }
+        }
+      }
+      const rem = document.getElementById('remoteCallAudio');
+      if(rem && !activeCallState && !rem.srcObject){
+        rem.src = _silentWavUrl;
+        rem.volume = 0.01;
+        const rp2 = rem.play();
+        if(rp2 && typeof rp2.then === 'function'){
+          rp2.then(() => {
+            if(!activeCallState && !rem.srcObject){
+              try { rem.pause(); rem.removeAttribute('src'); rem.load(); rem.volume = 1; } catch(e){}
+            }
+          }).catch(()=>{});
+        }
+      }
     } catch(e){}
   }
   if(_pendingSoundType && soundsEnabled){
@@ -1129,36 +1165,38 @@ async function addNotification(title, body, type='game', itemId=''){
   }
 }
 
-async function sendFCM(toRole, title, body, type='game', itemId='', fromFlush=false){
+async function sendFCM(toRole, title, body, type='game', itemId='', fromFlush=false, extraPayload=null){
   try {
     if(!isOnlineNow()){
-      if(!fromFlush) queueOfflineAction({ kind: 'fcm', toRole, title, body, type, itemId });
+      if(!fromFlush && type !== 'call') queueOfflineAction({ kind: 'fcm', toRole, title, body, type, itemId });
       return;
     }
     const snap = await get(ref(db, `config/${toRole}/fcmToken`));
     const token = snap.val();
     if(!token) return;
     const targetUrl = `${location.origin}/index.html?for=${toRole}&open=${encodeURIComponent(type)}&item=${encodeURIComponent(itemId || '')}`;
+    const payloadBody = {
+      token,
+      title,
+      body,
+      type,
+      itemId: itemId || '',
+      role: toRole,
+      from: MY_ROLE,
+      fromName: senderName(MY_ROLE),
+      icon: ICON_URL,
+      sentAt: new Date().toISOString(),
+      url: targetUrl,
+      ...(extraPayload && typeof extraPayload === 'object' ? extraPayload : {})
+    };
     const res = await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        token,
-        title,
-        body,
-        type,
-        itemId: itemId || '',
-        role: toRole,
-        from: MY_ROLE,
-        fromName: senderName(MY_ROLE),
-        icon: ICON_URL,
-        sentAt: new Date().toISOString(),
-        url: targetUrl
-      })
+      body: JSON.stringify(payloadBody)
     });
-    if(!res.ok && !fromFlush) throw new Error('HTTP ' + res.status);
+    if(!res.ok && !fromFlush && type !== 'call') throw new Error('HTTP ' + res.status);
   } catch(e){
-    if(!fromFlush) queueOfflineAction({ kind: 'fcm', toRole, title, body, type, itemId });
+    if(!fromFlush && type !== 'call') queueOfflineAction({ kind: 'fcm', toRole, title, body, type, itemId });
   }
 }
 
@@ -1483,7 +1521,7 @@ async function syncMissedOnReconnect(){
   }
 }
 
-window.openEventDestination = function(type, id, targetRole, notifTitle='', notifBody=''){
+window.openEventDestination = async function(type, id, targetRole, notifTitle='', notifBody=''){
   if(targetRole && (targetRole === 'me' || targetRole === 'her') && targetRole !== MY_ROLE){
     console.warn('🚫 محاولة فتح إشعار موجه لدور آخر:', targetRole, '| دورك الحالي:', MY_ROLE);
     try { toast('⚠️ هذا الإشعار موجه للطرف الآخر ولا يمكن فتحه من حسابك'); } catch(e){}
@@ -1577,21 +1615,29 @@ window.openEventDestination = function(type, id, targetRole, notifTitle='', noti
   }
 
   if(type === 'call'){
-    switchView('mail');
-    const active = window._latestActiveCall;
-    if(active && active.to === MY_ROLE && active.status === 'ringing' && (Date.now() - (active.createdAt || 0) < 65000)){
-      handleActiveCallSnapshot(active);
-    } else {
-      toast('📞 اضغط على أيقونة 📞 بالأسفل لمعاودة الاتصال');
-      setTimeout(() => {
-        const callBtn = document.getElementById('chatCallBtn');
-        if(callBtn){
-          callBtn.style.transform = 'scale(1.18)';
-          callBtn.style.boxShadow = '0 0 0 6px rgba(216,27,96,.25)';
-          setTimeout(() => { callBtn.style.transform = ''; callBtn.style.boxShadow = ''; }, 1800);
+    if(db){
+      try {
+        const snap = await get(ref(db, 'app/calls/active'));
+        const active = snap.val() || window._latestActiveCall;
+        if(active && active.to === MY_ROLE && active.status === 'ringing' && (Date.now() - (active.createdAt || 0) < 65000)){
+          await handleActiveCallSnapshot(active);
+          if(new URLSearchParams(location.search).get('action') === 'answer'){
+            setTimeout(() => { window.answerIncomingCall(); }, 120);
+          }
+          return;
         }
-      }, 250);
+      } catch(e){}
     }
+    switchView('mail');
+    toast('📞 اضغط على أيقونة 📞 بالأسفل لمعاودة الاتصال');
+    setTimeout(() => {
+      const callBtn = document.getElementById('chatCallBtn');
+      if(callBtn){
+        callBtn.style.transform = 'scale(1.18)';
+        callBtn.style.boxShadow = '0 0 0 6px rgba(216,27,96,.25)';
+        setTimeout(() => { callBtn.style.transform = ''; callBtn.style.boxShadow = ''; }, 1800);
+      }
+    }, 250);
     return;
   }
 
@@ -1708,9 +1754,24 @@ function handleDeepLink(attempts = 0){
 }
 
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.addEventListener('message', event => {
+  navigator.serviceWorker.addEventListener('message', async event => {
     const data = event.data;
-    if(data && (data.type === 'OPEN_AYOUSHA_DESTINATION' || data.type === 'OPEN_AYOUSHA')){
+    if(!data) return;
+    if(data.type === 'INCOMING_CALL_RING' || (data.open === 'call' && (data.type === 'OPEN_AYOUSHA_DESTINATION' || data.type === 'OPEN_AYOUSHA'))){
+      if(data.role && data.role !== MY_ROLE) return;
+      if(db){
+        try {
+          const snap = await get(ref(db, 'app/calls/active'));
+          if(snap.exists()){
+            await handleActiveCallSnapshot(snap.val());
+            if(data.action === 'answer') setTimeout(() => window.answerIncomingCall(), 120);
+            if(data.action === 'decline') setTimeout(() => window.declineIncomingCall(), 120);
+          }
+        } catch(e){}
+      }
+      return;
+    }
+    if(data.type === 'OPEN_AYOUSHA_DESTINATION' || data.type === 'OPEN_AYOUSHA'){
       let openType = data.open;
       let itemId = data.item;
       let targetRole = data.role;
@@ -2796,6 +2857,7 @@ let callLocalStream = null;
 let callTimerInterval = null;
 let callRingInterval = null;
 let callTimeoutTimer = null;
+let callFcmFallbackTimer = null;
 let callIceUnsub = null;
 let processedIceKeys = new Set();
 let pendingRemoteIce = [];
@@ -2804,66 +2866,205 @@ let signalingDocReady = false;
 let callMuted = false;
 let callSeconds = 0;
 let ringAudioEl = null;
+let callWakeLock = null;
+let bgCallStandbyEnabled = false;
 let handledMissedCallIds = null;
 let dismissedCallIds = new Set();
 let activeCallDisconnectRef = null;
+
+function getBgStandbyKey(){
+  return roleStorageKey('ayousha_bg_standby');
+}
+
+function updateBgStandbyBtn(){
+  const btn = document.getElementById('bgRingStandbyBtn');
+  if(btn) btn.classList.toggle('active', !!bgCallStandbyEnabled);
+}
+
+function startBgKeepAliveAudio(){
+  if(!bgCallStandbyEnabled || activeCallState) return;
+  try {
+    if(!_silentWavUrl) _silentWavUrl = createToneWavBlobUrl([{ freq: 0, dur: 1.5, vol: 0 }]);
+    const rt = document.getElementById('ringTonePlayer');
+    if(rt){
+      rt.src = _silentWavUrl;
+      rt.loop = true;
+      rt.volume = 0.002;
+      rt.play().catch(()=>{});
+    }
+    if('mediaSession' in navigator){
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: '📡 متصل لاستقبال المكالمات المباشرة',
+        artist: 'عيون عيوشة 🌸',
+        artwork: [{ src: ICON_URL, sizes: '512x512', type: 'image/png' }]
+      });
+    }
+  } catch(e){}
+}
+
+function stopBgKeepAliveAudio(){
+  try {
+    const rt = document.getElementById('ringTonePlayer');
+    if(rt && !activeCallState){
+      rt.pause();
+      rt.currentTime = 0;
+    }
+    if(!activeCallState && 'mediaSession' in navigator){
+      navigator.mediaSession.metadata = null;
+    }
+  } catch(e){}
+}
+
+window.toggleBgCallStandby = function(){
+  initAudio();
+  bgCallStandbyEnabled = !bgCallStandbyEnabled;
+  try { localStorage.setItem(getBgStandbyKey(), bgCallStandbyEnabled ? '1' : '0'); } catch(e){}
+  updateBgStandbyBtn();
+  if(bgCallStandbyEnabled){
+    startBgKeepAliveAudio();
+    acquireCallWakeLock();
+    toast('📡 تم تفعيل وضع الرنين المباشر بالخلفية — سيرن الجوال فوراً حتى عند تصغير التطبيق');
+  } else {
+    stopBgKeepAliveAudio();
+    if(!activeCallState) releaseCallWakeLock();
+    toast('تم إيقاف وضع الرنين المستمر بالخلفية');
+  }
+};
 
 function getHandledMissedCallSet(){
   if(!handledMissedCallIds) handledMissedCallIds = loadIdSet(roleStorageKey('ayousha_handled_calls'));
   return handledMissedCallIds;
 }
 
+async function acquireCallWakeLock(){
+  try {
+    if('wakeLock' in navigator && !callWakeLock){
+      callWakeLock = await navigator.wakeLock.request('screen');
+      callWakeLock.addEventListener('release', () => { callWakeLock = null; });
+    }
+  } catch(e){}
+}
+
+function releaseCallWakeLock(){
+  try {
+    if(callWakeLock){ callWakeLock.release().catch(()=>{}); callWakeLock = null; }
+  } catch(e){}
+}
+
+async function clearRingNotifications(){
+  try {
+    if('serviceWorker' in navigator){
+      const reg = await navigator.serviceWorker.ready;
+      const list = await reg.getNotifications();
+      list.forEach(n => {
+        if((n.tag && n.tag.startsWith('ayousha-ring-')) || n.data?.type === 'call'){
+          n.close();
+        }
+      });
+    }
+  } catch(e){}
+}
+
+function setupCallMediaSession(callerName){
+  try {
+    if('mediaSession' in navigator){
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: `📞 مكالمة صوتية — ${callerName}`,
+        artist: 'عيون عيوشة 🌸',
+        artwork: [{ src: ICON_URL, sizes: '512x512', type: 'image/png' }]
+      });
+      navigator.mediaSession.setActionHandler('play', () => {
+        if(activeCallState?.status === 'ringing' && activeCallState?.role === 'callee') window.answerIncomingCall();
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        if(activeCallState?.status === 'ringing' && activeCallState?.role === 'callee') window.declineIncomingCall();
+        else if(activeCallState) window.endVoiceCall();
+      });
+    }
+  } catch(e){}
+}
+
+function clearCallMediaSession(){
+  try {
+    if('mediaSession' in navigator){
+      navigator.mediaSession.metadata = null;
+      navigator.mediaSession.setActionHandler('play', null);
+      navigator.mediaSession.setActionHandler('pause', null);
+    }
+  } catch(e){}
+}
+
 function getRingtoneWavUrl(mode){
   if(mode === 'incoming'){
     return createToneWavBlobUrl([
-      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.45 },
-      { freq: 880.00, dur: 0.14, gap: 0.03, vol: 0.45 },
-      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.45 },
-      { freq: 880.00, dur: 0.18, gap: 0.25, vol: 0.45 },
-      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.45 },
-      { freq: 880.00, dur: 0.14, gap: 0.03, vol: 0.45 },
-      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.45 },
-      { freq: 880.00, dur: 0.18, gap: 1.35, vol: 0.45 }
+      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.52 },
+      { freq: 880.00, dur: 0.14, gap: 0.03, vol: 0.52 },
+      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.52 },
+      { freq: 880.00, dur: 0.20, gap: 0.22, vol: 0.54 },
+      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.52 },
+      { freq: 880.00, dur: 0.14, gap: 0.03, vol: 0.52 },
+      { freq: 659.25, dur: 0.14, gap: 0.03, vol: 0.52 },
+      { freq: 880.00, dur: 0.20, gap: 1.05, vol: 0.54 }
     ]);
   }
   return createToneWavBlobUrl([
-    { freq: 440, dur: 0.85, gap: 2.2, vol: 0.26 }
+    { freq: 440, dur: 0.85, gap: 2.0, vol: 0.28 }
   ]);
 }
 
+window.unlockCallAudioOnTap = function(forceToast = false){
+  initAudio();
+  const hint = document.getElementById('callUnmuteHint');
+  if(hint) hint.hidden = true;
+  if(activeCallState && activeCallState.status === 'ringing'){
+    startCallTone(activeCallState.role === 'callee' ? 'incoming' : 'outgoing');
+    if(forceToast) toast('🔊 تم تشغيل صوت الرنين');
+  }
+};
+
 function startCallTone(mode){
   stopCallTones();
+  const hint = document.getElementById('callUnmuteHint');
+  if(hint) hint.hidden = true;
   try {
     const url = getRingtoneWavUrl(mode);
-    ringAudioEl = new Audio(url);
+    const domPlayer = document.getElementById('ringTonePlayer');
+    ringAudioEl = domPlayer || new Audio();
+    ringAudioEl.src = url;
     ringAudioEl.loop = true;
-    ringAudioEl.volume = mode === 'incoming' ? 0.95 : 0.65;
+    ringAudioEl.volume = mode === 'incoming' ? 1.0 : 0.65;
     const p = ringAudioEl.play();
     if(p && typeof p.catch === 'function'){
       p.catch(() => {
+        if(hint && mode === 'incoming') hint.hidden = false;
         // Fallback WebAudio interval if browser blocked autoplay before gesture
+        if(audioCtx && audioCtx.state === 'running'){
+          playViaWebAudio(mode === 'incoming' ? 'call' : 'ping');
+        }
         callRingInterval = setInterval(() => {
           if(!activeCallState) return;
           if(audioCtx && audioCtx.state === 'running'){
             playViaWebAudio(mode === 'incoming' ? 'call' : 'ping');
           }
-          if(mode === 'incoming' && navigator.vibrate) navigator.vibrate([400, 180, 400]);
-        }, mode === 'incoming' ? 2100 : 3000);
+          if(mode === 'incoming' && navigator.vibrate) navigator.vibrate([550, 200, 550]);
+        }, mode === 'incoming' ? 1900 : 2800);
       });
     }
   } catch(e){}
   if(mode === 'incoming'){
-    if(navigator.vibrate) navigator.vibrate([450, 180, 450]);
+    if(navigator.vibrate) navigator.vibrate([600, 200, 600]);
     if(!callRingInterval){
       callRingInterval = setInterval(() => {
-        if(navigator.vibrate) navigator.vibrate([450, 180, 450]);
-      }, 2400);
+        if(navigator.vibrate) navigator.vibrate([600, 200, 600]);
+      }, 2100);
     }
   }
 }
 
 function stopCallTones(){
   if(callRingInterval){ clearInterval(callRingInterval); callRingInterval = null; }
+  const hint = document.getElementById('callUnmuteHint');
+  if(hint) hint.hidden = true;
   if(ringAudioEl){
     try { ringAudioEl.pause(); ringAudioEl.currentTime = 0; } catch(e){}
     ringAudioEl = null;
@@ -3018,8 +3219,16 @@ function createCallPeerConnection(callId){
 
 function cleanupCallSession(msg = ''){
   stopCallTones();
+  if(!bgCallStandbyEnabled) releaseCallWakeLock();
+  clearCallMediaSession();
+  clearRingNotifications();
+  document.body.style.overflow = '';
+  if(bgCallStandbyEnabled){
+    setTimeout(() => startBgKeepAliveAudio(), 120);
+  }
   clearInterval(callTimerInterval); callTimerInterval = null;
   clearTimeout(callTimeoutTimer); callTimeoutTimer = null;
+  clearTimeout(callFcmFallbackTimer); callFcmFallbackTimer = null;
   if(callIceUnsub){ callIceUnsub(); callIceUnsub = null; }
   if(activeCallDisconnectRef){
     try { activeCallDisconnectRef.cancel(); } catch(e){}
@@ -3165,7 +3374,25 @@ window.startVoiceCall = async function(){
     activeCallDisconnectRef.set('missed').catch(()=>{});
 
     listenRemoteIce(callId);
-    sendFCM(otherRole(), `📞 مكالمة واردة من ${senderName(MY_ROLE)}`, 'يرن التطبيق الآن — اضغطي للرد صوتياً', 'call', callId);
+    acquireCallWakeLock();
+    document.body.style.overflow = 'hidden';
+
+    // Wait briefly for instant in-app ringingAck before sending push notification;
+    // if recipient's app is already running/online, it rings directly above everything with zero notification!
+    clearTimeout(callFcmFallbackTimer);
+    callFcmFallbackTimer = setTimeout(() => {
+      if(activeCallState && activeCallState.callId === callId && activeCallState.status === 'ringing' && !activeCallState.ringingAcked){
+        sendFCM(otherRole(), `📞 مكالمة واردة من ${senderName(MY_ROLE)}`, 'يرن الآن — اضغط للرد فوراً', 'call', callId, false, {
+          priority: 'high',
+          callMode: 'direct_ring',
+          requireInteraction: true,
+          actions: [
+            { action: 'answer', title: '📞 رد الآن' },
+            { action: 'decline', title: '📵 رفض' }
+          ]
+        });
+      }
+    }, 1500);
 
     clearTimeout(callTimeoutTimer);
     callTimeoutTimer = setTimeout(async () => {
@@ -3316,10 +3543,24 @@ async function handleActiveCallSnapshot(call){
           fromName: call.fromName
         };
         const callerTitle = call.fromName || senderName(call.from);
+        const banner = document.getElementById('interactiveNotifBanner');
+        if(banner) banner.classList.remove('show');
+        clearRingNotifications();
+        document.body.style.overflow = 'hidden';
+        acquireCallWakeLock();
+        setupCallMediaSession(callerTitle);
+        try { window.focus(); } catch(e){}
+        try {
+          if(window.Android && typeof window.Android.onIncomingCall === 'function'){
+            window.Android.onIncomingCall(call.callId, callerTitle);
+          } else if(window.ayoushaNativeCall && typeof window.ayoushaNativeCall === 'function'){
+            window.ayoushaNativeCall(call.callId, callerTitle);
+          }
+        } catch(e){}
         renderCallOverlay('incoming', callerTitle, `مكالمة صوتية واردة من ${callerTitle} 📞`);
         startCallTone('incoming');
-        if(document.visibilityState !== 'visible'){
-          fireOSNotification(`📞 مكالمة واردة من ${callerTitle}`, 'يرن التطبيق الآن — اضغطي للرد صوتياً', 'call', call.callId, MY_ROLE, 'ayousha-ring-' + call.callId);
+        if(db){
+          update(ref(db, 'app/calls/active'), { ringingAck: Date.now() }).catch(()=>{});
         }
       }
       return;
@@ -3345,9 +3586,18 @@ async function handleActiveCallSnapshot(call){
 
   // Outgoing call from me
   if(call.from === MY_ROLE && activeCallState && activeCallState.callId === call.callId){
+    if(call.ringingAck && !activeCallState.ringingAcked){
+      activeCallState.ringingAcked = true;
+      clearTimeout(callFcmFallbackTimer); callFcmFallbackTimer = null;
+      const stEl = document.getElementById('callStatusText');
+      if(stEl && activeCallState.status === 'ringing'){
+        stEl.textContent = `يرن الآن على جوال ${call.toName || senderName(otherRole())} 📞`;
+      }
+    }
     if(call.status === 'connected' && call.answer && callPC && !callPC.currentRemoteDescription){
       stopCallTones();
       clearTimeout(callTimeoutTimer); callTimeoutTimer = null;
+      clearTimeout(callFcmFallbackTimer); callFcmFallbackTimer = null;
       if(activeCallDisconnectRef){
         try { activeCallDisconnectRef.cancel(); } catch(e){}
       }
@@ -3378,12 +3628,13 @@ async function checkPendingMissedCalls(pendingObj = null){
       const snap = await get(ref(db, `app/calls/pendingMissed/${MY_ROLE}`));
       data = snap.val();
     }
-    if(!data) return;
+    if(!data || !Object.keys(data).length) return;
 
     let active = window._latestActiveCall;
-    if(active === undefined){
+    if(!active){
       const actSnap = await get(ref(db, 'app/calls/active'));
       active = actSnap.val();
+      if(active) window._latestActiveCall = active;
     }
 
     const handled = getHandledMissedCallSet();
@@ -3392,7 +3643,10 @@ async function checkPendingMissedCalls(pendingObj = null){
       if(!item) continue;
       const callId = item.callId || cid;
       const isCurrentlyRinging = active && active.callId === callId && active.status === 'ringing' && (Date.now() - (active.createdAt || 0) < 65000);
-      if(isCurrentlyRinging) continue;
+      if(isCurrentlyRinging){
+        handleActiveCallSnapshot(active);
+        continue;
+      }
 
       await remove(ref(db, `app/calls/pendingMissed/${MY_ROLE}/${cid}`)).catch(()=>{});
 
@@ -4345,7 +4599,7 @@ async function initFCM(){
         if (reg.active) reg.active.postMessage({ type: 'SET_ROLE', role: MY_ROLE });
       } catch(e){}
     }
-    onMessage(messaging,payload=>{
+    onMessage(messaging, async payload => {
       const d=payload.data||{};
       if(d.role && d.role !== MY_ROLE){
         console.warn('🚫 FCM: إشعار لدور آخر — تجاهل', d.role, '| دورك:', MY_ROLE);
@@ -4353,6 +4607,18 @@ async function initFCM(){
       }
       if(d.from && d.from === MY_ROLE){
         console.warn('🚫 FCM: تجاهل إشعاري المرسل');
+        return;
+      }
+      if(d.type === 'call'){
+        if(db){
+          try {
+            const snap = await get(ref(db, 'app/calls/active'));
+            const active = snap.val();
+            if(active && active.to === MY_ROLE && active.status === 'ringing' && (Date.now() - (active.createdAt || 0) < 65000)){
+              await handleActiveCallSnapshot(active);
+            }
+          } catch(e){}
+        }
         return;
       }
       if(d.type === 'mail' && d.itemId){
@@ -4404,6 +4670,10 @@ async function boot(){
   
   window.currentMailRole=MY_ROLE;
   console.log('🎯 [BOOT] الدور النهائي لهذا الجهاز:', MY_ROLE);
+  try {
+    bgCallStandbyEnabled = localStorage.getItem(getBgStandbyKey()) === '1';
+    updateBgStandbyBtn();
+  } catch(e){}
 
   // ✅ مزامنة الدور مع Service Worker
   syncRoleToSW();
